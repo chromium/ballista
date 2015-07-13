@@ -13,14 +13,33 @@ function setOpenState(isOpen) {
   status_p.innerHTML = status_line;
 }
 
+// Reads a blob as text. Returns a promise, which supplies the text.
+function readBlobAsText(blob) {
+  return new Promise(function(resolve, reject) {
+    var reader = new FileReader();
+
+    reader.addEventListener('load', function() {
+      resolve(reader.result);
+    });
+
+    reader.addEventListener('abort', function() {
+      reject(new Error("aborted"));
+    });
+
+    reader.addEventListener('error', function() {
+      reject(reader.error);
+    });
+
+    reader.readAsText(blob);
+  });
+}
+
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
   var contents_textfield = document.getElementById('contents_textfield');
-  var reader = new FileReader();
-  reader.addEventListener('load', function() {
-    contents_textfield.value = reader.result;
+  readBlobAsText(file).then(function(text) {
+    contents_textfield.value = text;
   });
-  reader.readAsText(file);
 }
 
 function editButtonClick() {
