@@ -74,6 +74,18 @@ function editButtonClick() {
   });
 }
 
+// For testing/debugging purposes: send an "update" event to an action with a
+// dummy file contents.
+function debugCloseAction(action) {
+  var evt = new Event('update');
+  evt.data = {};
+  var contents = 'Updated file contents.';
+  evt.data.file = new File([contents], '');
+  evt.isClosed = true;
+
+  action.dispatchEvent(evt);
+}
+
 function onLoad() {
   document.getElementById('edit_button')
       .addEventListener('click', editButtonClick);
