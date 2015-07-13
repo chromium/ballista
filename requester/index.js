@@ -1,7 +1,7 @@
 // Foreground page
 
-function onload() {
+function onLoad() {
 
 }
 
-window.addEventListener('load', onload, false);
+window.addEventListener('load', onLoad, false);

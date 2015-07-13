@@ -1,6 +1,6 @@
 // Foreground page
 
-function onload() {
+function onLoad() {
 
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(function(registration) {
@@ -14,4 +14,4 @@ function onload() {
   }
 }
 
-window.addEventListener('load', onload, false);
+window.addEventListener('load', onLoad, false);
