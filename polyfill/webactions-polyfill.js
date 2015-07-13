@@ -9,6 +9,7 @@
  */
 
 // Polyfill Cache.addAll.
+// Not necessary in Chrome 45 with --enable-experimental-web-platform-features.
 if (Cache.prototype.addAll === undefined) {
   Cache.prototype.addAll = function(urls) {
     return Promise.all(urls.map(function(url) {
