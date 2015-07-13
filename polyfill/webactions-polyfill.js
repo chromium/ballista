@@ -80,4 +80,32 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
   }
 };
 
+// Polyfill Navigator.webActions.
+if (Navigator.prototype.webActions === undefined) {
+  var webActions = {};
+  Navigator.prototype.webActions = webActions;
+
+  // An Action is an object representing a web action in flight.
+  // Inherit from EventTarget.
+  webActions.Action = function(verb, options) {
+    CustomEventTarget.call(this);
+    this.verb = verb;
+    this.options = options;
+  };
+  webActions.Action.prototype = Object.create(CustomEventTarget.prototype);
+
+  // Performs an action with a given |verb| and |options|.
+  webActions.performAction = function(verb, options) {
+    return new Promise(function(resolve, reject) {
+      // TODO: Implement this properly.
+      // For now, just log and resolve with an empty action object.
+      console.log("webActions.performAction:", verb, options);
+
+      var action = new webActions.Action(verb, options);
+
+      resolve(action);
+    });
+  };
+}
+
 })();
