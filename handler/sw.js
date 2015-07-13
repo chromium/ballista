@@ -9,14 +9,9 @@ var urlsToCache = [
   '/index.js'
 ];
 
-// Polyfill Cache.addAll.
-if (Cache.prototype.addAll === undefined) {
-  Cache.prototype.addAll = function(urls) {
-    return Promise.all(urls.map(function(url) {
-      return this.add(url);
-    }.bind(this)));
-  }
-}
+// Version number: 1
+// (Increment this when the script changes, to force a reload.)
+importScripts('webactions-polyfill.js');
 
 // Set the callback for the install step
 self.addEventListener('install', function(event) {
