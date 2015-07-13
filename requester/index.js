@@ -36,9 +36,14 @@ function readBlobAsText(blob) {
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
-  var contents_textfield = document.getElementById('contents_textfield');
-  readBlobAsText(file).then(function(text) {
-    contents_textfield.value = text;
+  return new Promise(function(resolve, reject) {
+    var contents_textfield = document.getElementById('contents_textfield');
+    readBlobAsText(file).then(function(text) {
+      contents_textfield.value = text;
+      resolve();
+    }, function(err) {
+      reject(err);
+    });
   });
 }
 
@@ -56,15 +61,15 @@ function editButtonClick() {
     action.addEventListener('update', function(event) {
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
-      updateTextFromFile(event.data.file);
-
-      if (event.isClosed) {
-        console.log('Action completed:', action);
-        // Update the UI.
-        setOpenState(false);
-      } else {
-        console.log('Action updated:', action);
-      }
+      updateTextFromFile(event.data.file).then(function() {
+        if (event.isClosed) {
+          console.log('Action completed:', action);
+          // Update the UI.
+          setOpenState(false);
+        } else {
+          console.log('Action updated:', action);
+        }
+      });
     });
   });
 }
