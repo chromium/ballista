@@ -2,11 +2,18 @@
 <html>
   <head>
     <title>Web Actions Requester Test</title>
+    <script type="text/javascript" src="webactions-polyfill.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <link rel="icon" sizes="32x32" href="icon/32.png">
   </head>
   <body>
     <h1>Web Actions Requester Test</h1>
-    <p>This is a Web Actions requester test site.</p>
+    <p>This text field represents the contents of a file in cloud storage:</p>
+    <div>
+      <textarea id="contents_textfield" rows="25" cols="80">The file contents.</textarea>
+    </div>
+    <p>File name: <input id="filename_textfield" value="file.txt" /></p>
+    <p>This button opens up the file in an external editor using <strong>Web
+      Actions</strong>: <input type="button" id="edit_button" value="Edit" /></p>
   </body>
 </html>
