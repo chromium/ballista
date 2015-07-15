@@ -81,9 +81,14 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
 };
 
 // Polyfill Navigator.webActions.
-if (Navigator.prototype.webActions === undefined) {
+// The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
+// Web Workers. Support either case.
+var navigator_proto =
+    (self.WorkerNavigator !== undefined ? WorkerNavigator : Navigator)
+        .prototype;
+if (navigator_proto.webActions === undefined) {
   var webActions = {};
-  Navigator.prototype.webActions = webActions;
+  navigator_proto.webActions = webActions;
 
   // An Action is an object representing a web action in flight.
   // Inherit from EventTarget.
