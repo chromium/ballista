@@ -46,7 +46,9 @@ self.addEventListener('fetch', function(event) {
   );
 });
 
-// XXX: None of these ever seem to receive any events!
+// XXX: The 'connect' and 'message' events on navigator.services are the
+// currently spec'd way to receive events, but Chrome 45 does not implement this
+// event model.
 navigator.services.addEventListener('connect', function(event) {
   console.log('navigator.services: Received connect event for ' +
               event.targetURL + ' from ' + event.origin);
@@ -56,4 +58,17 @@ navigator.services.addEventListener('connect', function(event) {
 
 navigator.services.addEventListener('message', function(event) {
   console.log('navigator.services: Received message event:', event);
+});
+
+// The older version of the standard passes 'crossoriginconnect' and
+// 'crossoriginmessage' events to the global object instead (Chrome's current
+// implementation as of 45 does this). I don't know how to send messages back to
+// the client in this model.
+self.addEventListener('crossoriginconnect', function(event) {
+  console.log('global: Received crossoriginconnection on self');
+  event.acceptConnection(true);
+});
+
+self.addEventListener('crossoriginmessage', function(event) {
+  console.log('global: Received crossoriginmessage event:', event);
 });
