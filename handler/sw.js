@@ -45,3 +45,15 @@ self.addEventListener('fetch', function(event) {
     )
   );
 });
+
+// XXX: None of these ever seem to receive any events!
+navigator.services.addEventListener('connect', function(event) {
+  console.log('navigator.services: Received connect event for ' +
+              event.targetURL + ' from ' + event.origin);
+  event.respondWith({accept: true, name: 'the_connecter'})
+      .then(port => port.postMessage('You are connected!'));
+});
+
+navigator.services.addEventListener('message', function(event) {
+  console.log('navigator.services: Received message event:', event);
+});
