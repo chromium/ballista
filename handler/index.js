@@ -12,6 +12,10 @@ function onLoad() {
       // registration failed :(
       console.log('ServiceWorker registration failed: ', err);
     });
+
+    navigator.serviceWorker.addEventListener('message', event => {
+      console.log('message:', event);
+    });
   }
 }
 

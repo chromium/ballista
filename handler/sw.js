@@ -52,9 +52,24 @@ self.addEventListener('fetch', event => {
   */
 });
 
-// Loads a file into the text field in the app's UI.
-function loadFileIntoTextField(file) {
+// Opens a new window and loads the file up. Returns the Client object
+// associated with the window, in a promise.
+function openFileInNewWindow(file) {
+  // TODO(mgiuca): Don't decode the file here; do it in the foreground.
   readBlobAsText(file).then(text => console.log('File text:', text));
+
+  return new Promise((resolve, reject) => {
+    // TODO(mgiuca): Unfortunately, this is not allowed here because it is not
+    // in direct response to a user gesture. I have temporarily hacked Chromium
+    // to allow this (an unmodified browser will fail here).
+    clients.openWindow('/').then(client => {
+      // TODO(mgiuca): I think this is flaky because it will post a message to a
+      // client as it is starting up. Need to have the client call us with a
+      // port when ready. (Groan.)
+      client.postMessage(file);
+      resolve(client);
+    }, err => reject(err));
+  });
 }
 
 self.addEventListener('action', event => {
@@ -64,7 +79,7 @@ self.addEventListener('action', event => {
       return;
     }
 
-    loadFileIntoTextField(event.data.file);
+    openFileInNewWindow(event.data.file);
 
     // Immediately send an update (temp).
     var contents = "Updated contents.";
