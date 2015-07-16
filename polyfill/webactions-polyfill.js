@@ -99,10 +99,11 @@ if (navigator_proto.webActions === undefined) {
 
   // An Action is an object representing a web action in flight.
   webActions.Action = class extends CustomEventTarget {
-    constructor(verb, options) {
+    constructor(verb, options, port) {
       super();
       this.verb = verb;
       this.options = options;
+      this.port = port;
     }
   };
 
@@ -119,13 +120,9 @@ if (navigator_proto.webActions === undefined) {
     }
 
     return new Promise((resolve, reject) => {
-      console.log("webActions.performAction:", verb, options);
-
       navigator.services.connect(handlerUrl)
           .then(port => {
-            console.log('Successful connection:', port);
-
-            var action = new webActions.Action(verb, options);
+            var action = new webActions.Action(verb, options, port);
             resolve(action);
           }, err => reject(err))
     });
