@@ -86,22 +86,9 @@ function debugCloseAction(action) {
   action.dispatchEvent(evt);
 }
 
-// For testing/debugging purposes: connect to a service worker using
-// navigator.connect.
-function debugNavigatorConnect() {
-  navigator.services.connect('http://localhost:8000/test')
-      .then(port => {
-        console.log('Successful connection:', port);
-        navigator.services.addEventListener(
-            'message', event => {console.log('Received message:', event.data)});
-      }, err => console.log('Error: ' + err.name))
-}
-
 function onLoad() {
   document.getElementById('edit_button')
       .addEventListener('click', editButtonClick);
-  document.getElementById('debug_button')
-      .addEventListener('click', debugNavigatorConnect);
 }
 
 window.addEventListener('load', onLoad, false);
