@@ -28,10 +28,23 @@ function onMessage(event) {
   var type = data.type;
   if (type == 'loadFile') {
     var file = data.file;
-    console.log('Got file:', file);
+    updateUIFromFile(file);
   } else {
     console.log('Got unknown message:', data);
   }
+}
+
+// Updates |contents_textfield| with the contents of |file|, asynchronously.
+function updateUIFromFile(file) {
+  return new Promise((resolve, reject) => {
+    var contents_textfield = document.getElementById('contents_textfield');
+    var filename_textfield = document.getElementById('filename_textfield');
+    readBlobAsText(file).then(text => {
+      contents_textfield.value = text;
+      filename_textfield.value = file.name;
+      resolve();
+    }, err => reject(err));
+  });
 }
 
 window.addEventListener('load', onLoad, false);

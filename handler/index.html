@@ -2,11 +2,19 @@
 <html>
   <head>
     <title>Web Actions Handler Test</title>
+    <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <link rel="icon" sizes="32x32" href="icon/32.png">
   </head>
   <body>
     <h1>Web Actions Handler Test</h1>
-    <p>This is a Web Actions handler test site.</p>
+    <p>This text field contains a file given to use via <strong>Web
+      Actions</strong>:</p>
+    <div>
+      <textarea id="contents_textfield" rows="25" cols="80">(nothing so far)</textarea>
+    </div>
+    <p>File name: <input id="filename_textfield" /></p>
+    <p>This button saves the file back to the requester using <strong>Web
+      Actions</strong>: <input type="button" id="save_button" value="Save" /></p>
   </body>
 </html>
