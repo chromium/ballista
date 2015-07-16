@@ -61,6 +61,13 @@ self.addEventListener('action', event => {
     }
 
     loadFileIntoTextField(event.data.file);
+
+    // Immediately send an update (temp).
+    var contents = "Updated contents.";
+    event.action.update({
+      file: new File([contents], event.data.file.name,
+                     {type: event.data.file.type})
+    });
   } else {
     console.log('Received unknown action:', event.verb);
   }
