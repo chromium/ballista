@@ -110,21 +110,6 @@ if (navigator_proto.webActions === undefined) {
   // we just let the client specify its URL by setting this variable.
   webActions.polyfillHandlerUrl = null;
 
-  webActions.RequesterAction = class extends Action {
-    constructor(verb, data, port) {
-      super(verb, data);
-      this.port = port;
-    }
-  }
-
-  webActions.HandlerAction = class extends Action {
-    // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
-    constructor(verb, data, client) {
-      super(verb, data);
-      this.client = client;
-    }
-  };
-
   // ActionEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
@@ -139,6 +124,21 @@ if (navigator_proto.webActions === undefined) {
       }
     };
   }
+
+  webActions.RequesterAction = class extends Action {
+    constructor(verb, data, port) {
+      super(verb, data);
+      this.port = port;
+    }
+  }
+
+  webActions.HandlerAction = class extends Action {
+    // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
+    constructor(verb, data, client) {
+      super(verb, data);
+      this.client = client;
+    }
+  };
 
   // Performs an action with a given |verb| and |data|. Returns a
   // Promise<Action> with an action object allowing further interaction with the
