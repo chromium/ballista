@@ -82,6 +82,15 @@ class CustomEventTarget {
   }
 }
 
+// An Action is an object representing a web action in flight.
+class Action extends CustomEventTarget {
+  constructor(verb, data) {
+    super();
+    this.verb = verb;
+    this.data = data;
+  }
+}
+
 // Polyfill Navigator.webActions.
 // The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
 // Web Workers. Support either case.
@@ -97,13 +106,16 @@ if (navigator_proto.webActions === undefined) {
   // we just let the client specify its URL by setting this variable.
   webActions.polyfillHandlerUrl = null;
 
-  // An Action is an object representing a web action in flight.
-  webActions.Action = class extends CustomEventTarget {
+  webActions.RequesterAction = class extends Action {
     constructor(verb, data, port) {
-      super();
-      this.verb = verb;
-      this.data = data;
+      super(verb, data);
       this.port = port;
+    }
+  }
+
+  webActions.HandlerAction = class extends Action {
+    constructor(verb, data) {
+      super(verb, data);
     }
   };
 
@@ -139,7 +151,7 @@ if (navigator_proto.webActions === undefined) {
       // Connect to the handler.
       navigator.services.connect(handlerUrl)
           .then(port => {
-            var action = new webActions.Action(verb, data, port);
+            var action = new webActions.RequesterAction(verb, data, port);
 
             // Send the verb and data payload to the handler.
             var message = {'type': 'request', 'verb': verb, 'data': data};
@@ -157,9 +169,7 @@ function onMessageReceived(data) {
     if (webActions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
-    // XXX: |port| is null on the handler side. This is a limitation of the
-    // current implementation of navigator.connect (you don't get a port).
-    var action = new webActions.Action(data.verb, data.data, null);
+    var action = new webActions.HandlerAction(data.verb, data.data);
 
     // Forward the event as an 'action' event to the global object.
     var actionEvent = new webActions.ActionEvent(action);
