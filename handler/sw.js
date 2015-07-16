@@ -13,7 +13,6 @@ var urlsToCache = [
 // Version number: 1
 // (Increment this when the script changes, to force a reload.)
 importScripts('webactions-polyfill.js');
-importScripts('common.js');
 
 // Set the callback for the install step
 self.addEventListener('install', event => {
@@ -58,9 +57,6 @@ var mostRecentFile = null;
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file) {
-  // TODO(mgiuca): Don't decode the file here; do it in the foreground.
-  readBlobAsText(file).then(text => console.log('File text:', text));
-
   return new Promise((resolve, reject) => {
     // TODO(mgiuca): Unfortunately, this is not allowed here because it is not
     // in direct response to a user gesture. I have temporarily hacked Chromium
