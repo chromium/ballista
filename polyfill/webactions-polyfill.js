@@ -125,6 +125,15 @@ if (navigator_proto.webActions === undefined) {
     };
   }
 
+  // TODO(mgiuca): Should this extend ExtendableEvent? (Requires that the
+  // requester is a service worker.)
+  webActions.UpdateEvent = class extends Event {
+    constructor(data) {
+      super('update');
+      this.data = data;
+    }
+  }
+
   webActions.RequesterAction = class extends Action {
     constructor(verb, data, port) {
       super(verb, data);
@@ -190,6 +199,11 @@ function onMessageReceived(data, client) {
     // Forward the event as an 'action' event to the global object.
     var actionEvent = new webActions.ActionEvent(action);
     self.dispatchEvent(actionEvent);
+  } else if (data.type == 'update') {
+    // Forward the event as an 'update' event to the action object.
+    var updateEvent = new webActions.UpdateEvent(data.data);
+    // TODO(mgiuca): Send to the action, not the global object.
+    self.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
   }
