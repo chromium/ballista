@@ -65,7 +65,7 @@ navigator.services.addEventListener('message', function(event) {
 // implementation as of 45 does this). I don't know how to send messages back to
 // the client in this model.
 self.addEventListener('crossoriginconnect', function(event) {
-  console.log('global: Received crossoriginconnection on self');
+  console.log('global: Received crossoriginconnection on self:', event);
   event.acceptConnection(true);
 });
 

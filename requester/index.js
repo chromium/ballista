@@ -90,7 +90,11 @@ function debugCloseAction(action) {
 // navigator.connect.
 function debugNavigatorConnect() {
   navigator.services.connect('http://localhost:8000/test')
-      .then(port => console.log(port), err => console.log('Error: ' + err.name))
+      .then(port => {
+        console.log('Successful connection:', port);
+        navigator.services.addEventListener(
+            'message', event => {console.log('Received message:', event.data)});
+      }, err => console.log('Error: ' + err.name))
 }
 
 function onLoad() {
