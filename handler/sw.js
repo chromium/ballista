@@ -20,10 +20,12 @@ self.addEventListener('install', event => {
   // Perform install steps
   console.log('install');
 
+  /*
   event.waitUntil(caches.open(CACHE_NAME).then(cache => {
     console.log('Opened cache');
     return cache.addAll(urlsToCache);
   }));
+  */
 });
 
 self.addEventListener('activate', event => {
@@ -32,6 +34,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
   console.log('fetch: ' + event.request.url);
+  /*
   event.respondWith(
     caches.match(event.request)
       .then(response => {
@@ -46,6 +49,7 @@ self.addEventListener('fetch', event => {
       }
     )
   );
+  */
 });
 
 // Loads a file into the text field in the app's UI.
