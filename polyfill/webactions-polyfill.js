@@ -111,8 +111,9 @@ if (navigator_proto.webActions === undefined) {
   // Promise<Action> with an action object allowing further interaction with the
   // handler. Fails with AbortError if a connection could not be made.
   webActions.performAction = function(verb, options) {
+    // Get the URL of the handler to connect to. For now, this is just a fixed
+    // URL set by the client.
     var handlerUrl = webActions.polyfillHandlerUrl;
-
     if (handlerUrl === null) {
       throw new Error(
           'You need to set navigator.webActions.polyfillHandlerUrl ' +
@@ -120,9 +121,15 @@ if (navigator_proto.webActions === undefined) {
     }
 
     return new Promise((resolve, reject) => {
+      // Connect to the handler.
       navigator.services.connect(handlerUrl)
           .then(port => {
             var action = new webActions.Action(verb, options, port);
+
+            // Send the verb and options payload to the handler.
+            var message = {'type': 'request', 'verb': verb, 'options': options};
+            port.postMessage(message);
+
             resolve(action);
           }, err => reject(err))
     });
