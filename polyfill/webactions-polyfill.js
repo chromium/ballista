@@ -138,6 +138,15 @@ if (navigator_proto.webActions === undefined) {
       super(verb, data);
       this.client = client;
     }
+
+    // Sends an updated version of the data payload associated with this action
+    // back to the requester. This may be called multiple times per action, but
+    // should send a complete copy of the data on each call (this is not a
+    // stream protocol).
+    update(data) {
+      var message = {'type': 'update', 'data': data};
+      this.client.postMessage(message);
+    }
   };
 
   // Performs an action with a given |verb| and |data|. Returns a
