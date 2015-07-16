@@ -161,7 +161,7 @@ if (navigator_proto.webActions === undefined) {
 
     _updateInternal(data, isClosed) {
       var message =
-          {'type': 'update', 'data': data, 'id': this.id, 'isClosed': isClosed};
+          {type: 'update', data: data, id: this.id, isClosed: isClosed};
       this.client.postMessage(message);
     }
 
@@ -203,8 +203,7 @@ if (navigator_proto.webActions === undefined) {
             actionMap.set(id, action);
 
             // Send the verb and data payload to the handler.
-            var message =
-                {'type': 'action', 'verb': verb, 'data': data, 'id': id};
+            var message = {type: 'action', verb: verb, data: data, id: id};
             port.postMessage(message);
 
             resolve(action);
