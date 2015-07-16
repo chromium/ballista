@@ -138,9 +138,10 @@ if (navigator_proto.webActions === undefined) {
   // TODO(mgiuca): Should this extend ExtendableEvent? (Requires that the
   // requester is a service worker.)
   webActions.UpdateEvent = class extends Event {
-    constructor(data) {
+    constructor(data, isClosed) {
       super('update');
       this.data = data;
+      this.isClosed = isClosed;
     }
   }
 
@@ -158,13 +159,24 @@ if (navigator_proto.webActions === undefined) {
       this.client = client;
     }
 
+    _updateInternal(data, isClosed) {
+      var message =
+          {'type': 'update', 'data': data, 'id': this.id, 'isClosed': isClosed};
+      this.client.postMessage(message);
+    }
+
     // Sends an updated version of the data payload associated with this action
     // back to the requester. This may be called multiple times per action, but
     // should send a complete copy of the data on each call (this is not a
     // stream protocol).
     update(data) {
-      var message = {'type': 'update', 'data': data, 'id': this.id};
-      this.client.postMessage(message);
+      this._updateInternal(data, false);
+    }
+
+    // Same as update(), but also closes the action, signalling that no further
+    // updates are incoming.
+    close(data) {
+      this._updateInternal(data, true);
     }
   };
 
@@ -221,7 +233,7 @@ function onMessageReceived(data, client) {
       throw new Error('Received update for unknown action id ' + id);
 
     var action = actionMap.get(id);
-    var updateEvent = new webActions.UpdateEvent(data.data);
+    var updateEvent = new webActions.UpdateEvent(data.data, data.isClosed);
     action.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
