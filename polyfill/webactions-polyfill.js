@@ -6,6 +6,10 @@
  * API, by design, does things that aren't possible in a polyfill, so this will
  * be broken without specific browser hacks. All work-in-progress; don't get too
  * excited about it.
+ *
+ * Note: The requester needs to set navigator.webActions.polyfillHandlerUrl to a
+ * valid handler URL before calling performAction. This is a temporary
+ * requirement of the polyfill and won't be part of the final API.
  */
 
 (function() {
@@ -90,6 +94,11 @@ if (navigator_proto.webActions === undefined) {
   var webActions = {};
   navigator_proto.webActions = webActions;
 
+  // The URL of the handler to send requests to. The final API will have the
+  // user agent let the user choose a handler from a registered list. For now,
+  // we just let the client specify its URL by setting this variable.
+  webActions.polyfillHandlerUrl = null;
+
   // An Action is an object representing a web action in flight.
   // Inherit from EventTarget.
   webActions.Action = function(verb, options) {
@@ -101,14 +110,28 @@ if (navigator_proto.webActions === undefined) {
 
   // Performs an action with a given |verb| and |options|.
   webActions.performAction = function(verb, options) {
+    var handlerUrl = webActions.polyfillHandlerUrl;
+
+    if (handlerUrl === null) {
+      throw new Error(
+          'You need to set navigator.webActions.polyfillHandlerUrl ' +
+          '(temporary requirement of the polyfill only).');
+    }
+
     return new Promise(function(resolve, reject) {
-      // TODO: Implement this properly.
-      // For now, just log and resolve with an empty action object.
       console.log("webActions.performAction:", verb, options);
 
-      var action = new webActions.Action(verb, options);
+      navigator.services.connect(handlerUrl)
+          .then(port => {
+            console.log('Successful connection:', port);
 
-      resolve(action);
+            navigator.services.addEventListener(
+                'message',
+                event => {console.log('Received message:', event.data)});
+
+            var action = new webActions.Action(verb, options);
+            resolve(action);
+          }, err => reject(err))
     });
   };
 }

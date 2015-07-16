@@ -89,6 +89,10 @@ function debugCloseAction(action) {
 function onLoad() {
   document.getElementById('edit_button')
       .addEventListener('click', editButtonClick);
+
+  // Tell the polyfill which handler to use. This isn't part of the final API,
+  // just a temporary requirement of the polyfill.
+  navigator.webActions.polyfillHandlerUrl = 'http://localhost:8000/test';
 }
 
 window.addEventListener('load', onLoad, false);
