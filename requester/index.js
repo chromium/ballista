@@ -14,19 +14,6 @@ function setOpenState(isOpen) {
   status_p.innerHTML = status_line;
 }
 
-// Reads a blob as text. Returns a promise, which supplies the text.
-function readBlobAsText(blob) {
-  return new Promise((resolve, reject) => {
-    var reader = new FileReader();
-
-    reader.addEventListener('load', () => resolve(reader.result));
-    reader.addEventListener('abort', () => reject(new Error("aborted")));
-    reader.addEventListener('error', () => reject(reader.error));
-
-    reader.readAsText(blob);
-  });
-}
-
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
   return new Promise((resolve, reject) => {

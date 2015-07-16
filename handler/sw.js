@@ -13,19 +13,7 @@ var urlsToCache = [
 // Version number: 1
 // (Increment this when the script changes, to force a reload.)
 importScripts('webactions-polyfill.js');
-
-// Reads a blob as text. Returns a promise, which supplies the text.
-function readBlobAsText(blob) {
-  return new Promise((resolve, reject) => {
-    var reader = new FileReader();
-
-    reader.addEventListener('load', () => resolve(reader.result));
-    reader.addEventListener('abort', () => reject(new Error("aborted")));
-    reader.addEventListener('error', () => reject(reader.error));
-
-    reader.readAsText(blob);
-  });
-}
+importScripts('common.js');
 
 // Set the callback for the install step
 self.addEventListener('install', event => {
