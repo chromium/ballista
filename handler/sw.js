@@ -68,6 +68,8 @@ navigator.services.addEventListener('message', event => {
 self.addEventListener('crossoriginconnect', event => {
   console.log('global: Received crossoriginconnection on self:', event);
   event.acceptConnection(true);
+  var client = event.client;
+  client.postMessage('You are connected!');
 });
 
 self.addEventListener('crossoriginmessage', event => {
