@@ -91,6 +91,10 @@ class Action extends CustomEventTarget {
   }
 }
 
+// A map from origin strings to CrossOriginServiceWorkerClient objects.
+// Allows communication to a client based on the origin.
+var clientMap = new Map;
+
 // Polyfill Navigator.webActions.
 // The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
 // Web Workers. Support either case.
@@ -114,8 +118,10 @@ if (navigator_proto.webActions === undefined) {
   }
 
   webActions.HandlerAction = class extends Action {
-    constructor(verb, data) {
+    // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
+    constructor(verb, data, client) {
       super(verb, data);
+      this.client = client;
     }
   };
 
@@ -164,12 +170,13 @@ if (navigator_proto.webActions === undefined) {
 }
 
 // Called when a message is received (on both the host and client).
-function onMessageReceived(data) {
+// |client| is a CrossOriginServiceWorkerClient on the host; null on the client.
+function onMessageReceived(data, client) {
   if (data.type == 'request') {
     if (webActions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
-    var action = new webActions.HandlerAction(data.verb, data.data);
+    var action = new webActions.HandlerAction(data.verb, data.data, client);
 
     // Forward the event as an 'action' event to the global object.
     var actionEvent = new webActions.ActionEvent(action);
@@ -206,11 +213,17 @@ self.addEventListener('crossoriginconnect', event => {
   console.log('global: Received crossoriginconnection on self:', event);
   event.acceptConnection(true);
   var client = event.client;
+  clientMap.set(client.origin, client);
   client.postMessage('You are connected!');
 });
 
 self.addEventListener('crossoriginmessage', event => {
-  onMessageReceived(event.data);
+  var origin = event.origin;
+  if (!clientMap.has(event.origin))
+    throw new Error('Received message from unknown origin ' + origin);
+
+  var client = clientMap.get(event.origin);
+  onMessageReceived(event.data, client);
 });
 
 })();
