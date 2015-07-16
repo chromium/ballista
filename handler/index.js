@@ -1,6 +1,9 @@
 // Foreground page
 "use strict";
 
+var filename = null;
+var mimetype = null;
+
 function onLoad() {
 
   if ('serviceWorker' in navigator) {
@@ -21,6 +24,9 @@ function onLoad() {
     navigator.serviceWorker.controller.postMessage(message,
                                                    [messageChannel.port2]);
   }
+
+  document.getElementById('save_button')
+      .addEventListener('click', saveButtonClick);
 }
 
 function onMessage(event) {
@@ -29,6 +35,8 @@ function onMessage(event) {
   if (type == 'loadFile') {
     var file = data.file;
     updateUIFromFile(file);
+    filename = file.name;
+    mimetype = file.type;
   } else {
     console.log('Got unknown message:', data);
   }
@@ -45,6 +53,15 @@ function updateUIFromFile(file) {
       resolve();
     }, err => reject(err));
   });
+}
+
+function saveButtonClick() {
+  var contents_textfield = document.getElementById('contents_textfield');
+  var contents = contents_textfield.value;
+  var file = new File([contents], filename, {type: mimetype});
+
+  var message = {type: 'update', file: file};
+  navigator.serviceWorker.controller.postMessage(message);
 }
 
 window.addEventListener('load', onLoad, false);

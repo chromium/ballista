@@ -54,6 +54,9 @@ self.addEventListener('fetch', event => {
 // The most recently received File object.
 var mostRecentFile = null;
 
+// The most recently received action.
+var mostRecentAction = null;
+
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file) {
@@ -85,6 +88,11 @@ self.addEventListener('message', event => {
     var message = {type: 'loadFile', file: mostRecentFile};
     event.ports[0].postMessage(message);
     mostRecentFile = null;
+  } else if (type == 'update') {
+    var file = data.file;
+    // TODO(mgiuca): This is awful; we need to dispatch this to the correct
+    // action, not simply the most recent one.
+    mostRecentAction.update({file: file});
   } else {
     console.log('Got unknown message:', data);
   }
@@ -98,13 +106,7 @@ self.addEventListener('action', event => {
     }
 
     openFileInNewWindow(event.data.file);
-
-    // Immediately send an update (temp).
-    var contents = "Updated contents.";
-    event.action.close({
-      file: new File([contents], event.data.file.name,
-                     {type: event.data.file.type})
-    });
+    mostRecentAction = event.action;
   } else {
     console.log('Received unknown action:', event.verb);
   }
