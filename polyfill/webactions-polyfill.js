@@ -83,17 +83,27 @@ class CustomEventTarget {
 }
 
 // An Action is an object representing a web action in flight.
+// Each Action has an integer |id|, which is unique among all actions from the
+// requester that created it (different requesters can have actions of the same
+// ID).
 class Action extends CustomEventTarget {
-  constructor(verb, data) {
+  constructor(verb, data, id) {
     super();
     this.verb = verb;
     this.data = data;
+    this.id = id;
   }
 }
 
 // A map from origin strings to CrossOriginServiceWorkerClient objects.
-// Allows communication to a client based on the origin.
+// Allows communication to a client based on the origin. Handler only.
 var clientMap = new Map;
+
+// A map from action IDs to RequesterAction objects. Requester only.
+var actionMap = new Map;
+
+// The next action ID to use in |actionMap|.
+var nextActionId = 0;
 
 // Polyfill Navigator.webActions.
 // The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
@@ -135,16 +145,16 @@ if (navigator_proto.webActions === undefined) {
   }
 
   webActions.RequesterAction = class extends Action {
-    constructor(verb, data, port) {
-      super(verb, data);
+    constructor(verb, data, id, port) {
+      super(verb, data, id);
       this.port = port;
     }
   }
 
   webActions.HandlerAction = class extends Action {
     // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
-    constructor(verb, data, client) {
-      super(verb, data);
+    constructor(verb, data, id, client) {
+      super(verb, data, id);
       this.client = client;
     }
 
@@ -153,7 +163,7 @@ if (navigator_proto.webActions === undefined) {
     // should send a complete copy of the data on each call (this is not a
     // stream protocol).
     update(data) {
-      var message = {'type': 'update', 'data': data};
+      var message = {'type': 'update', 'data': data, 'id': this.id};
       this.client.postMessage(message);
     }
   };
@@ -175,10 +185,14 @@ if (navigator_proto.webActions === undefined) {
       // Connect to the handler.
       navigator.services.connect(handlerUrl)
           .then(port => {
-            var action = new webActions.RequesterAction(verb, data, port);
+            var id = nextActionId++;
+            var action = new webActions.RequesterAction(verb, data, id, port);
+
+            actionMap.set(id, action);
 
             // Send the verb and data payload to the handler.
-            var message = {'type': 'action', 'verb': verb, 'data': data};
+            var message =
+                {'type': 'action', 'verb': verb, 'data': data, 'id': id};
             port.postMessage(message);
 
             resolve(action);
@@ -194,16 +208,21 @@ function onMessageReceived(data, client) {
     if (webActions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
-    var action = new webActions.HandlerAction(data.verb, data.data, client);
+    var action =
+        new webActions.HandlerAction(data.verb, data.data, data.id, client);
 
     // Forward the event as an 'action' event to the global object.
     var actionEvent = new webActions.ActionEvent(action);
     self.dispatchEvent(actionEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
+    var id = data.id;
+    if (!actionMap.has(id))
+      throw new Error('Received update for unknown action id ' + id);
+
+    var action = actionMap.get(id);
     var updateEvent = new webActions.UpdateEvent(data.data);
-    // TODO(mgiuca): Send to the action, not the global object.
-    self.dispatchEvent(updateEvent);
+    action.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
   }
