@@ -13,9 +13,24 @@ function onLoad() {
       console.log('ServiceWorker registration failed: ', err);
     });
 
-    navigator.serviceWorker.addEventListener('message', event => {
-      console.log('message:', event);
-    });
+    var messageChannel = new MessageChannel();
+    // Note: You need to use 'onmessage'; addEventListener does not work here in
+    // Chrome 45. TODO(mgiuca): File a bug.
+    messageChannel.port1.onmessage = onMessage;
+    var message = {type: 'startup'};
+    navigator.serviceWorker.controller.postMessage(message,
+                                                   [messageChannel.port2]);
+  }
+}
+
+function onMessage(event) {
+  var data = event.data;
+  var type = data.type;
+  if (type == 'loadFile') {
+    var file = data.file;
+    console.log('Got file:', file);
+  } else {
+    console.log('Got unknown message:', data);
   }
 }
 

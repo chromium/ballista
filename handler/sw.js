@@ -52,6 +52,9 @@ self.addEventListener('fetch', event => {
   */
 });
 
+// The most recently received File object.
+var mostRecentFile = null;
+
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file) {
@@ -63,14 +66,33 @@ function openFileInNewWindow(file) {
     // in direct response to a user gesture. I have temporarily hacked Chromium
     // to allow this (an unmodified browser will fail here).
     clients.openWindow('/').then(client => {
-      // TODO(mgiuca): I think this is flaky because it will post a message to a
-      // client as it is starting up. Need to have the client call us with a
-      // port when ready. (Groan.)
-      client.postMessage(file);
+      mostRecentFile = file;
       resolve(client);
     }, err => reject(err));
   });
 }
+
+self.addEventListener('message', event => {
+  var data = event.data;
+  var type = data.type;
+
+  if (type == 'startup') {
+    // A client is starting up. Assume this is the most recently opened one and
+    // send it the most recent file.
+    // TODO(mgiuca): I'm really not happy with this approach but it seems we
+    // have no choice, as the incoming message has no Client object (and
+    // therefore, we are unable to figure out which File was originally intended
+    // for it).
+    if (mostRecentFile === null)
+      throw new Error('No file has been received.');
+
+    var message = {type: 'loadFile', file: mostRecentFile};
+    event.ports[0].postMessage(message);
+    mostRecentFile = null;
+  } else {
+    console.log('Got unknown message:', data);
+  }
+});
 
 self.addEventListener('action', event => {
   if (event.verb == 'edit') {
