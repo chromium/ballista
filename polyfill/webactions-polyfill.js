@@ -18,9 +18,7 @@
 // Not necessary in Chrome 45 with --enable-experimental-web-platform-features.
 if (Cache.prototype.addAll === undefined) {
   Cache.prototype.addAll = function(urls) {
-    return Promise.all(urls.map(function(url) {
-      return this.add(url);
-    }.bind(this)));
+    return Promise.all(urls.map(url => this.add(url)));
   }
 }
 
@@ -120,7 +118,7 @@ if (navigator_proto.webActions === undefined) {
           '(temporary requirement of the polyfill only).');
     }
 
-    return new Promise(function(resolve, reject) {
+    return new Promise((resolve, reject) => {
       console.log("webActions.performAction:", verb, options);
 
       navigator.services.connect(handlerUrl)

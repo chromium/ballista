@@ -15,20 +15,12 @@ function setOpenState(isOpen) {
 
 // Reads a blob as text. Returns a promise, which supplies the text.
 function readBlobAsText(blob) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     var reader = new FileReader();
 
-    reader.addEventListener('load', function() {
-      resolve(reader.result);
-    });
-
-    reader.addEventListener('abort', function() {
-      reject(new Error("aborted"));
-    });
-
-    reader.addEventListener('error', function() {
-      reject(reader.error);
-    });
+    reader.addEventListener('load', () => resolve(reader.result));
+    reader.addEventListener('abort', () => reject(new Error("aborted")));
+    reader.addEventListener('error', () => reject(reader.error));
 
     reader.readAsText(blob);
   });
@@ -36,14 +28,12 @@ function readBlobAsText(blob) {
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
-  return new Promise(function(resolve, reject) {
+  return new Promise((resolve, reject) => {
     var contents_textfield = document.getElementById('contents_textfield');
-    readBlobAsText(file).then(function(text) {
+    readBlobAsText(file).then(text => {
       contents_textfield.value = text;
       resolve();
-    }, function(err) {
-      reject(err);
-    });
+    }, err => reject(err));
   });
 }
 
@@ -54,14 +44,14 @@ function editButtonClick() {
   var file = new File([contents], filename, {type: "text/plain"});
 
   navigator.webActions.performAction(
-      "edit", {file: file}).then(function(action) {
+      "edit", {file: file}).then(action => {
     console.log('Action started:', action);
     setOpenState(true);
 
-    action.addEventListener('update', function(event) {
+    action.addEventListener('update', event => {
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
-      updateTextFromFile(event.data.file).then(function() {
+      updateTextFromFile(event.data.file).then(() => {
         if (event.isClosed) {
           console.log('Action completed:', action);
           // Update the UI.

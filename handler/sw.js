@@ -14,25 +14,25 @@ var urlsToCache = [
 importScripts('webactions-polyfill.js');
 
 // Set the callback for the install step
-self.addEventListener('install', function(event) {
+self.addEventListener('install', event => {
   // Perform install steps
   console.log('install');
 
-  event.waitUntil(caches.open(CACHE_NAME).then(function(cache) {
+  event.waitUntil(caches.open(CACHE_NAME).then(cache => {
     console.log('Opened cache');
     return cache.addAll(urlsToCache);
   }));
 });
 
-self.addEventListener('activate', function(event) {
+self.addEventListener('activate', event => {
   console.log('activate');
 });
 
-self.addEventListener('fetch', function(event) {
+self.addEventListener('fetch', event => {
   console.log('fetch: ' + event.request.url);
   event.respondWith(
     caches.match(event.request)
-      .then(function(response) {
+      .then(response => {
         // Cache hit - return response
         if (response) {
           console.log('cache hit: ' + event.request.url);
@@ -49,14 +49,14 @@ self.addEventListener('fetch', function(event) {
 // XXX: The 'connect' and 'message' events on navigator.services are the
 // currently spec'd way to receive events, but Chrome 45 does not implement this
 // event model.
-navigator.services.addEventListener('connect', function(event) {
+navigator.services.addEventListener('connect', event => {
   console.log('navigator.services: Received connect event for ' +
               event.targetURL + ' from ' + event.origin);
   event.respondWith({accept: true, name: 'the_connecter'})
       .then(port => port.postMessage('You are connected!'));
 });
 
-navigator.services.addEventListener('message', function(event) {
+navigator.services.addEventListener('message', event => {
   console.log('navigator.services: Received message event:', event);
 });
 
@@ -64,11 +64,11 @@ navigator.services.addEventListener('message', function(event) {
 // 'crossoriginmessage' events to the global object instead (Chrome's current
 // implementation as of 45 does this). I don't know how to send messages back to
 // the client in this model.
-self.addEventListener('crossoriginconnect', function(event) {
+self.addEventListener('crossoriginconnect', event => {
   console.log('global: Received crossoriginconnection on self:', event);
   event.acceptConnection(true);
 });
 
-self.addEventListener('crossoriginmessage', function(event) {
+self.addEventListener('crossoriginmessage', event => {
   console.log('global: Received crossoriginmessage event:', event);
 });
