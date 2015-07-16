@@ -99,18 +99,18 @@ if (navigator_proto.webActions === undefined) {
 
   // An Action is an object representing a web action in flight.
   webActions.Action = class extends CustomEventTarget {
-    constructor(verb, options, port) {
+    constructor(verb, data, port) {
       super();
       this.verb = verb;
-      this.options = options;
+      this.data = data;
       this.port = port;
     }
   };
 
-  // Performs an action with a given |verb| and |options|. Returns a
+  // Performs an action with a given |verb| and |data|. Returns a
   // Promise<Action> with an action object allowing further interaction with the
   // handler. Fails with AbortError if a connection could not be made.
-  webActions.performAction = function(verb, options) {
+  webActions.performAction = function(verb, data) {
     // Get the URL of the handler to connect to. For now, this is just a fixed
     // URL set by the client.
     var handlerUrl = webActions.polyfillHandlerUrl;
@@ -124,10 +124,10 @@ if (navigator_proto.webActions === undefined) {
       // Connect to the handler.
       navigator.services.connect(handlerUrl)
           .then(port => {
-            var action = new webActions.Action(verb, options, port);
+            var action = new webActions.Action(verb, data, port);
 
-            // Send the verb and options payload to the handler.
-            var message = {'type': 'request', 'verb': verb, 'options': options};
+            // Send the verb and data payload to the handler.
+            var message = {'type': 'request', 'verb': verb, 'data': data};
             port.postMessage(message);
 
             resolve(action);
