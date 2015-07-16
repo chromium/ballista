@@ -125,15 +125,43 @@ if (navigator_proto.webActions === undefined) {
           .then(port => {
             console.log('Successful connection:', port);
 
-            navigator.services.addEventListener(
-                'message',
-                event => {console.log('Received message:', event.data)});
-
             var action = new webActions.Action(verb, options);
             resolve(action);
           }, err => reject(err))
     });
   };
 }
+
+// XXX: The 'connect' event on navigator.services is the currently specified way
+// for the host to receive a connection, but in Chrome 45 it receives
+// 'crossoriginconnect' instead (see below).
+navigator.services.addEventListener('connect', event => {
+  console.log('navigator.services: Received connect event for ' +
+              event.targetURL + ' from ' + event.origin);
+  event.respondWith({accept: true, name: 'the_connecter'})
+      .then(port => port.postMessage('You are connected!'));
+});
+
+// XXX: The 'message' event on navigator.services is the specified way to
+// receive messages on both ends. In Chrome 45, only the client receives
+// messages with this event. The host receives 'crossoriginmessage' instead (see
+// below).
+navigator.services.addEventListener('message', event => {
+  console.log('navigator.services: Received message event:', event);
+});
+
+// XXX In Chrome 45, the host's global object receives 'crossoriginconnect' and
+// 'crossoriginmessage' events, instead of the above. (This is from an older
+// version of the spec.)
+self.addEventListener('crossoriginconnect', event => {
+  console.log('global: Received crossoriginconnection on self:', event);
+  event.acceptConnection(true);
+  var client = event.client;
+  client.postMessage('You are connected!');
+});
+
+self.addEventListener('crossoriginmessage', event => {
+  console.log('global: Received crossoriginmessage event:', event);
+});
 
 })();

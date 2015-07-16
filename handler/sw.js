@@ -46,32 +46,3 @@ self.addEventListener('fetch', event => {
     )
   );
 });
-
-// XXX: The 'connect' and 'message' events on navigator.services are the
-// currently spec'd way to receive events, but Chrome 45 does not implement this
-// event model.
-navigator.services.addEventListener('connect', event => {
-  console.log('navigator.services: Received connect event for ' +
-              event.targetURL + ' from ' + event.origin);
-  event.respondWith({accept: true, name: 'the_connecter'})
-      .then(port => port.postMessage('You are connected!'));
-});
-
-navigator.services.addEventListener('message', event => {
-  console.log('navigator.services: Received message event:', event);
-});
-
-// The older version of the standard passes 'crossoriginconnect' and
-// 'crossoriginmessage' events to the global object instead (Chrome's current
-// implementation as of 45 does this). I don't know how to send messages back to
-// the client in this model.
-self.addEventListener('crossoriginconnect', event => {
-  console.log('global: Received crossoriginconnection on self:', event);
-  event.acceptConnection(true);
-  var client = event.client;
-  client.postMessage('You are connected!');
-});
-
-self.addEventListener('crossoriginmessage', event => {
-  console.log('global: Received crossoriginmessage event:', event);
-});
