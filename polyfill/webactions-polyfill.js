@@ -108,7 +108,9 @@ if (navigator_proto.webActions === undefined) {
   };
   webActions.Action.prototype = Object.create(CustomEventTarget.prototype);
 
-  // Performs an action with a given |verb| and |options|.
+  // Performs an action with a given |verb| and |options|. Returns a
+  // Promise<Action> with an action object allowing further interaction with the
+  // handler. Fails with AbortError if a connection could not be made.
   webActions.performAction = function(verb, options) {
     var handlerUrl = webActions.polyfillHandlerUrl;
 
