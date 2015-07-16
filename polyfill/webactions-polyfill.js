@@ -136,6 +136,11 @@ if (navigator_proto.webActions === undefined) {
   };
 }
 
+// Called when a message is received (on both the host and client).
+function onMessageReceived(data) {
+  console.log('Received message:', data);
+}
+
 // XXX: The 'connect' event on navigator.services is the currently specified way
 // for the host to receive a connection, but in Chrome 45 it receives
 // 'crossoriginconnect' instead (see below).
@@ -151,7 +156,7 @@ navigator.services.addEventListener('connect', event => {
 // messages with this event. The host receives 'crossoriginmessage' instead (see
 // below).
 navigator.services.addEventListener('message', event => {
-  console.log('navigator.services: Received message event:', event);
+  onMessageReceived(event.data);
 });
 
 // XXX In Chrome 45, the host's global object receives 'crossoriginconnect' and
@@ -165,7 +170,7 @@ self.addEventListener('crossoriginconnect', event => {
 });
 
 self.addEventListener('crossoriginmessage', event => {
-  console.log('global: Received crossoriginmessage event:', event);
+  onMessageReceived(event.data);
 });
 
 })();
