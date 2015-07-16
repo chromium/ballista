@@ -1,4 +1,5 @@
 // Service Worker
+"use strict";
 
 // The name of the cache in the client-side cache database.
 var CACHE_NAME = 'my-site-cache-v1';

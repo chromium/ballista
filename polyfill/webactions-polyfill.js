@@ -11,6 +11,7 @@
  * valid handler URL before calling performAction. This is a temporary
  * requirement of the polyfill and won't be part of the final API.
  */
+"use strict";
 
 (function() {
 

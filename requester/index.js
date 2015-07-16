@@ -3,6 +3,7 @@
 // Not using a service worker. This means if the page closes,
 // the data is lost. We can also use a service worker to handle updates
 // even if the tab is closed.
+"use strict";
 
 // Sets whether the file is open in the external editor.
 function setOpenState(isOpen) {

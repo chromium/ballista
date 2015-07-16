@@ -1,4 +1,5 @@
 // Foreground page
+"use strict";
 
 function onLoad() {
 
