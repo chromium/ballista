@@ -160,7 +160,7 @@ if (navigator_proto.webActions === undefined) {
             var action = new webActions.RequesterAction(verb, data, port);
 
             // Send the verb and data payload to the handler.
-            var message = {'type': 'request', 'verb': verb, 'data': data};
+            var message = {'type': 'action', 'verb': verb, 'data': data};
             port.postMessage(message);
 
             resolve(action);
@@ -172,7 +172,7 @@ if (navigator_proto.webActions === undefined) {
 // Called when a message is received (on both the host and client).
 // |client| is a CrossOriginServiceWorkerClient on the host; null on the client.
 function onMessageReceived(data, client) {
-  if (data.type == 'request') {
+  if (data.type == 'action') {
     if (webActions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
