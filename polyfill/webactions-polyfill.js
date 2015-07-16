@@ -182,12 +182,14 @@ function onMessageReceived(data) {
 // XXX: The 'connect' event on navigator.services is the currently specified way
 // for the host to receive a connection, but in Chrome 45 it receives
 // 'crossoriginconnect' instead (see below).
+/*
 navigator.services.addEventListener('connect', event => {
   console.log('navigator.services: Received connect event for ' +
               event.targetURL + ' from ' + event.origin);
   event.respondWith({accept: true, name: 'the_connecter'})
       .then(port => port.postMessage('You are connected!'));
 });
+*/
 
 // XXX: The 'message' event on navigator.services is the specified way to
 // receive messages on both ends. In Chrome 45, only the client receives
