@@ -107,6 +107,21 @@ if (navigator_proto.webActions === undefined) {
     }
   };
 
+  // ActionEvent is only available when the global scope is a
+  // ServiceWorkerGlobalScope.
+  if (self.ExtendableEvent !== undefined) {
+    webActions.ActionEvent = class extends ExtendableEvent {
+      constructor(action) {
+        super('action');
+        this.action = action;
+        // Note: These seem redundant, but I think in the final API, Action's
+        // fields will be opaque, so we'll want to expose these in ActionEvent.
+        this.verb = action.verb;
+        this.data = action.data;
+      }
+    };
+  }
+
   // Performs an action with a given |verb| and |data|. Returns a
   // Promise<Action> with an action object allowing further interaction with the
   // handler. Fails with AbortError if a connection could not be made.
@@ -138,7 +153,20 @@ if (navigator_proto.webActions === undefined) {
 
 // Called when a message is received (on both the host and client).
 function onMessageReceived(data) {
-  console.log('Received message:', data);
+  if (data.type == 'request') {
+    if (webActions.ActionEvent === undefined)
+      throw new Error('Web Actions requests must go to a service worker.');
+
+    // XXX: |port| is null on the handler side. This is a limitation of the
+    // current implementation of navigator.connect (you don't get a port).
+    var action = new webActions.Action(data.verb, data.data, null);
+
+    // Forward the event as an 'action' event to the global object.
+    var actionEvent = new webActions.ActionEvent(action);
+    self.dispatchEvent(actionEvent);
+  } else {
+    console.log('Received unknown message:', data);
+  }
 }
 
 // XXX: The 'connect' event on navigator.services is the currently specified way
