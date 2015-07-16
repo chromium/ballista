@@ -64,7 +64,7 @@ self.addEventListener('action', event => {
 
     // Immediately send an update (temp).
     var contents = "Updated contents.";
-    event.action.update({
+    event.action.close({
       file: new File([contents], event.data.file.name,
                      {type: event.data.file.type})
     });
