@@ -51,9 +51,6 @@ self.addEventListener('fetch', event => {
   */
 });
 
-// The most recently received action.
-var mostRecentAction = null;
-
 // Map from client ID to Client.
 var clientIdToClientMap = new Map;
 
@@ -104,10 +101,12 @@ self.addEventListener('message', event => {
     event.ports[0].postMessage(message);
     clientIdToFileMap.delete(clientId);
   } else if (type == 'update') {
+    if (!clientIdToActionMap.has(clientId))
+      throw new Error('Unknown clientId: ' + clientId);
+    var action = clientIdToActionMap.get(clientId);
+
     var file = data.file;
-    // TODO(mgiuca): This is awful; we need to dispatch this to the correct
-    // action, not simply the most recent one.
-    mostRecentAction.update({file: file});
+    action.update({file: file});
   } else {
     console.log('Got unknown message:', data);
   }
@@ -130,7 +129,6 @@ self.addEventListener('action', event => {
     clientIdToActionMap.set(clientId, event.action);
 
     openFileInNewWindow(event.data.file, clientId);
-    mostRecentAction = event.action;
   } else {
     console.log('Received unknown action:', event.verb);
   }
