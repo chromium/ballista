@@ -92,13 +92,13 @@ self.addEventListener('message', event => {
   if (type == 'startup') {
     // A client is starting up. Assume this is the most recently opened one and
     // send it the most recent file.
-    if (!clientIdToFileMap.has(clientId))
+    if (!clientIdToFileMap.has(clientId) || !clientIdToClientMap.has(clientId))
       throw new Error('Unknown clientId: ' + clientId);
 
     var file = clientIdToFileMap.get(clientId);
+    var client = clientIdToClientMap.get(clientId);
     var message = {type: 'loadFile', file: file};
-    // TODO(mgiuca): Post to the Client, not the port.
-    event.ports[0].postMessage(message);
+    client.postMessage(message);
     clientIdToFileMap.delete(clientId);
   } else if (type == 'update') {
     if (!clientIdToActionMap.has(clientId))

@@ -23,13 +23,8 @@ function onLoad() {
     if (match !== null)
       clientId = Number(match[1]);
 
-    var messageChannel = new MessageChannel();
-    // Note: You need to use 'onmessage'; addEventListener does not work here in
-    // Chrome 45. TODO(mgiuca): File a bug.
-    messageChannel.port1.onmessage = onMessage;
     var message = {type: 'startup', clientId: clientId};
-    navigator.serviceWorker.controller.postMessage(message,
-                                                   [messageChannel.port2]);
+    navigator.serviceWorker.controller.postMessage(message);
   }
 
   document.getElementById('save_button')
@@ -72,3 +67,4 @@ function saveButtonClick() {
 }
 
 window.addEventListener('load', onLoad, false);
+navigator.serviceWorker.addEventListener('message', onMessage);
