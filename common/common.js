@@ -1,3 +1,5 @@
+"use strict";
+
 // Reads a blob as text. Returns a promise, which supplies the text.
 function readBlobAsText(blob) {
   return new Promise((resolve, reject) => {
