@@ -263,7 +263,6 @@ navigator.services.addEventListener('message', event => {
 // 'crossoriginmessage' events, instead of the above. (This is from an older
 // version of the spec.)
 self.addEventListener('crossoriginconnect', event => {
-  console.log('global: Received crossoriginconnection on self:', event);
   event.acceptConnection(true);
   var client = event.client;
   clientMap.set(client.origin, client);
