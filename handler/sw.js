@@ -51,21 +51,37 @@ self.addEventListener('fetch', event => {
   */
 });
 
-// The most recently received File object.
-var mostRecentFile = null;
-
 // The most recently received action.
 var mostRecentAction = null;
 
+// Map from client ID to Client.
+var clientIdToClientMap = new Map;
+
+// Map from client ID to Action.
+var clientIdToActionMap = new Map;
+
+// Map from client ID to File. Entries are removed from this map once the file
+// has been sent to the client.
+var clientIdToFileMap = new Map;
+
+var nextClientId = 0;
+
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
-function openFileInNewWindow(file) {
+function openFileInNewWindow(file, clientId) {
   return new Promise((resolve, reject) => {
+    clientIdToFileMap.set(clientId, file);
+
+    var url = '/#clientid=' + clientId;
+
     // TODO(mgiuca): Unfortunately, this is not allowed here because it is not
     // in direct response to a user gesture. I have temporarily hacked Chromium
     // to allow this (an unmodified browser will fail here).
-    clients.openWindow('/').then(client => {
-      mostRecentFile = file;
+    clients.openWindow(url).then(client => {
+      clientIdToClientMap.set(clientId, client);
+      // TODO(mgiuca): I'd like to simply post the File object to the client
+      // here, but the postMessage can get lost if the client is not yet
+      // initialized. File a bug about this.
       resolve(client);
     }, err => reject(err));
   });
@@ -74,20 +90,19 @@ function openFileInNewWindow(file) {
 self.addEventListener('message', event => {
   var data = event.data;
   var type = data.type;
+  var clientId = data.clientId;
 
   if (type == 'startup') {
     // A client is starting up. Assume this is the most recently opened one and
     // send it the most recent file.
-    // TODO(mgiuca): I'm really not happy with this approach but it seems we
-    // have no choice, as the incoming message has no Client object (and
-    // therefore, we are unable to figure out which File was originally intended
-    // for it).
-    if (mostRecentFile === null)
-      throw new Error('No file has been received.');
+    if (!clientIdToFileMap.has(clientId))
+      throw new Error('Unknown clientId: ' + clientId);
 
-    var message = {type: 'loadFile', file: mostRecentFile};
+    var file = clientIdToFileMap.get(clientId);
+    var message = {type: 'loadFile', file: file};
+    // TODO(mgiuca): Post to the Client, not the port.
     event.ports[0].postMessage(message);
-    mostRecentFile = null;
+    clientIdToFileMap.delete(clientId);
   } else if (type == 'update') {
     var file = data.file;
     // TODO(mgiuca): This is awful; we need to dispatch this to the correct
@@ -105,7 +120,16 @@ self.addEventListener('action', event => {
       return;
     }
 
-    openFileInNewWindow(event.data.file);
+    // Associate a unique client ID with a client. This is a hack because the
+    // messages we get back from the client do not include a 'source' (in Chrome
+    // 45) and therefore there is no way to know which client it is without an
+    // out-of-band ID.
+    // TODO(mgiuca): File a bug about this.
+    var clientId = nextClientId++;
+
+    clientIdToActionMap.set(clientId, event.action);
+
+    openFileInNewWindow(event.data.file, clientId);
     mostRecentAction = event.action;
   } else {
     console.log('Received unknown action:', event.verb);

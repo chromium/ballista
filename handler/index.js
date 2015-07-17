@@ -4,6 +4,8 @@
 var filename = null;
 var mimetype = null;
 
+var clientId = null;
+
 function onLoad() {
 
   if ('serviceWorker' in navigator) {
@@ -16,11 +18,16 @@ function onLoad() {
       console.log('ServiceWorker registration failed: ', err);
     });
 
+    // Get this client ID from the URL.
+    var match = document.location.hash.match(/clientid=(\d)/);
+    if (match !== null)
+      clientId = Number(match[1]);
+
     var messageChannel = new MessageChannel();
     // Note: You need to use 'onmessage'; addEventListener does not work here in
     // Chrome 45. TODO(mgiuca): File a bug.
     messageChannel.port1.onmessage = onMessage;
-    var message = {type: 'startup'};
+    var message = {type: 'startup', clientId: clientId};
     navigator.serviceWorker.controller.postMessage(message,
                                                    [messageChannel.port2]);
   }
@@ -60,7 +67,7 @@ function saveButtonClick() {
   var contents = contents_textfield.value;
   var file = new File([contents], filename, {type: mimetype});
 
-  var message = {type: 'update', file: file};
+  var message = {type: 'update', clientId: clientId, file: file};
   navigator.serviceWorker.controller.postMessage(message);
 }
 
