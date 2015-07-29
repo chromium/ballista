@@ -105,7 +105,7 @@ any tabs.
       "icons": [...],
       "actions": {
         "share": {}
-      },
+      }
     }
 
 #### serviceworker.js
@@ -179,12 +179,14 @@ we need a web app manifest and a service worker.
       "icons": [...],
       "actions": {
         "edit": {
-          // Means that the handler can send updates back to the requester.
           "bidirectional": true,
           "types": ["text/*"]
-        },
-      },
+        }
+      }
     }
+
+**Note:** `"bidirectional"` means that the handler can send updates back to the
+requester.
 
 #### serviceworker.js
 
