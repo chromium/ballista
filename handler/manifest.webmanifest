@@ -1,0 +1,17 @@
+{
+  "name": "Web Actions Handler Test",
+  "short_name": "Handler Test",
+  "icons": [
+    {
+      "src": "icon/32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ],
+  "actions": {
+    "edit": {
+      "bidirectional": true,
+      "types": ["text/*"]
+    }
+  }
+}
