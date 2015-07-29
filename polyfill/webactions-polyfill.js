@@ -1,16 +1,14 @@
-/**
- * Web Actions polyfill.
- * Author: Matt Giuca <mgiuca@chromium.org>
- *
- * Implements a (partial) Web Actions API for demonstration purposes. Note: This
- * API, by design, does things that aren't possible in a polyfill, so this will
- * be broken without specific browser hacks. All work-in-progress; don't get too
- * excited about it.
- *
- * Note: The requester needs to set navigator.webActions.polyfillHandlerUrl to a
- * valid handler URL before calling performAction. This is a temporary
- * requirement of the polyfill and won't be part of the final API.
- */
+// Web Actions polyfill.
+// Author: Matt Giuca <mgiuca@chromium.org>
+//
+// Implements a (partial) Web Actions API for demonstration purposes. Note: This
+// API, by design, does things that aren't possible in a polyfill, so this will
+// be broken without specific browser hacks. All work-in-progress; don't get too
+// excited about it.
+//
+// Note: The requester needs to set navigator.webActions.polyfillHandlerUrl to a
+// valid handler URL before calling performAction. This is a temporary
+// requirement of the polyfill and won't be part of the final API.
 "use strict";
 
 (function() {
