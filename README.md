@@ -22,7 +22,16 @@ desktop operating system, or in the intent picker on Android. A requester can
 use a native app to edit a document, or fire an intent at a native app on
 Android. And web requesters can also fire actions at web handlers.
 
-For more information, see [Web Actions Explained](docs/explainer.md).
+## Resources
+
+* For a detailed overview, see [Web Actions Explained](docs/explainer.md).
+* In the `polyfill` directory, there is a partial polyfill. This doesn't allow
+  websites to register as handlers, but is sufficient to set up a bidirectional
+  action flow between two participating sites.
+* In the `handler` and `requester` directories are sample apps that work
+  together.
+
+See the `README.md` file in each directory for details. Many caveats apply.
 
 ## Who is behind Web Actions?
 
