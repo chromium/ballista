@@ -37,6 +37,6 @@ See the `README.md` file in each directory for details. Many caveats apply.
 
 The Google Chrome team, including:
 
-* Ben Wells <benwells@chromium.org>
-* Matt Giuca <mgiuca@chromium.org>
-* Sam McNally <sammc@chromium.org>
+* Ben Wells <<benwells@chromium.org>>
+* Matt Giuca <<mgiuca@chromium.org>>
+* Sam McNally <<sammc@chromium.org>>
