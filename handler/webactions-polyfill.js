@@ -1,1 +1,0 @@
-../polyfill/webactions-polyfill.js
