@@ -22,6 +22,8 @@ desktop operating system, or in the intent picker on Android. A requester can
 use a native app to edit a document, or fire an intent at a native app on
 Android. And web requesters can also fire actions at web handlers.
 
+For more information, see [Web Actions Explained](docs/explainer.md).
+
 ## Who is behind Web Actions?
 
 The Google Chrome team, including:

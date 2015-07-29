@@ -1,0 +1,221 @@
+# Web Actions Explained
+
+**Date**: 2015-07-29
+
+Web Actions is a proposed JavaScript web API to allow inter-website
+communication, as well as communication between websites and native apps on
+mobile and desktop.
+
+Websites can use Web Actions in two different ways:
+
+* As a **Requester**: Websites can request an action be handled by another site
+  or app of the user's choosing. For example, a site can send a file to be
+  edited externally.
+* As a **Handler**: Websites can request to be registered as action handlers.
+  For example, a site registered as a handler may be called upon to edit a file
+  from another site or native file system.
+
+Typically, a site / app will be either a requester *or* a handler, but it can be
+both.
+
+Here are some things you can do with Web Actions:
+
+* A file storage provider (a cloud drive or a web-based IDE), as a
+  **requester**, can add an "edit" button that opens a file in an external
+  editor of the user's choosing; it could be a native app or a website that
+  implements the handler interface. When the user saves the file in the external
+  editor, it gets automatically synced back to the requester. No more
+  download/open/edit/save/upload workflows!
+* A web-based editing application (an image editor or text editor, for example)
+  can register as a **handler** for certain file types. Not only will it be
+  available for web requesters, it could also be registered in the host OS's
+  file type registry. This means you can have a web app registered as the
+  default handler for local files of a given type.
+* A **requester** can implement a generic "share" button that sends a URL to an
+  app of the user's choosing; again, this could be a native app (on Android, at
+  least), or a handler website. This could replace the currently growing wall of
+  service-specific share buttons seen on many sites.
+* A social networking website can register as a **handler** for the share verb.
+  This allows the user to choose that site as a target when choosing to "share"
+  from a native Android app, or from a requester site.
+
+Web Actions is all about helping web applications become first-class apps on
+desktop and mobile, interoperating with native apps and the underlying local
+file system, as well as with each other.
+
+## How is this different from Web Intents?
+
+You may be thinking that we've already tried this with [Web
+Intents](http://webintents.org), which is no longer under development. Indeed,
+this proposal covers the bulk of the use cases of Web Intents (and that's the
+point – we think Web Intents was a great idea!), but a few things are different
+now:
+
+* The web platform has gotten some new features since 2013 that solve some of
+  the issues of Web Intents: [Service
+  Workers](http://slightlyoff.github.io/ServiceWorker/spec/service_worker/) give
+  us a place for handlers to receive events without opening a foreground page,
+  and [Web App Manifests](https://w3c.github.io/manifest/) give us a place to
+  declaratively specify handlers.
+* Web Actions is designed to interoperate with native apps on mobile and
+  desktop, which solves the bootstrapping problem.
+* There is now a greater emphasis on building [installable app-like
+  websites](https://w3c.github.io/manifest/#installable-web-applications).
+  Installable apps should be registerable as file handlers.
+
+## Sample code
+
+### Sharing (requester)
+
+To let the user share the current page's URL with an app or website of their
+choosing, just attach this JavaScript code to a "share" button.
+
+> **TODO**: We may want to require the requester API to be called from a service
+> worker; this would resolve issues about updates coming through after the
+> foreground page has been closed.
+
+#### foreground.js
+
+    shareButton.addEventListener('click', () => {
+      navigator.webActions.performAction('share', {url: window.location.href})
+          .then(action => console.log(action));
+    });
+
+#### User experience
+
+1. The user clicks the "share" button. The browser shows a list of registered
+   share handlers, and the user can pick one.
+
+### Share handler
+
+Here's how to register a website to appear in the list of apps that can handle a
+"share" intent on Android, or a "share" action from another website.
+
+You need both a [web app manifest](https://w3c.github.io/manifest/) and a
+[service
+worker](http://slightlyoff.github.io/ServiceWorker/spec/service_worker/),
+so that your site can be contacted even when the user does not have it open in
+any tabs.
+
+#### manifest.webmanifest
+
+    {
+      "name": "Includinator",
+      "short_name": "includinator",
+      "icons": [...],
+      "actions": {
+        "share": {}
+      },
+    }
+
+#### serviceworker.js
+
+    self.addEventListener('action', event => {
+      if (event.verb == 'share') {
+        if (event.data.url === undefined)
+          throw new Error('Did not contain URL.');
+
+        includinate(event.data.url);
+      }
+    });
+
+#### User experience
+
+1. When the user is on your site, the browser provides a button to register the
+   app as a "share handler".
+2. The user clicks this button. The app is registered and appears in the list of
+   share handlers that the browser shows to the user.
+
+### Edit a file (requester)
+
+A web-based cloud drive can add an "edit" button to let the user edit a file
+with any registered editor for that file type.
+
+**Note:** Here we are not using a service worker, which means if the page closes
+while the user is editing the file, the data is lost. A better app would put
+this code in a service worker to handle updates even if the tab is closed.
+
+> **TODO**: As above, we may want to require the requester API to be called from
+> a service worker.
+
+#### foreground.js
+
+    editButton.addEventListener('click', () => {
+      var filename = selectedFilename;
+      getFileFromCloud(filename).then(file => {
+        // |file| is a File object.
+        navigator.webActions.performAction('edit', {file: file})
+            .then(action => {
+              action.addEventListener('update', event => {
+                // Can be called multiple times for a single action.
+                // |event.data.file| is a new File object with updated text.
+                storeFileInCloud(filename, event.data.file);
+              });
+            });
+      });
+    });
+
+#### User experience
+
+1. The user selects a file and clicks the "edit" button. The browser shows a
+   list of registered edit handlers for this file type, and the user can pick
+   one.
+2. The file opens in the external editor (which may be a native application, or
+   another browser tab).
+3. The user clicks "save" in the external editor. This fires the "update" event
+   to the requester's service worker, which in this case writes the updated file
+   to the cloud.
+
+### Text editor (handler)
+
+Here's how to register a website as a handler for editing text files. As above,
+we need a web app manifest and a service worker.
+
+#### manifest.webmanifest
+
+    {
+      "name": "WebEditor",
+      "short_name": "editor",
+      "icons": [...],
+      "actions": {
+        "edit": {
+          // Means that the handler can send updates back to the requester.
+          "bidirectional": true,
+          "types": ["text/*"]
+        },
+      },
+    }
+
+#### serviceworker.js
+
+    self.addEventListener('action', event => {
+      if (event.verb == 'edit') {
+        if (event.data.file === undefined)
+          throw new Error('Did not contain file.');
+
+        var action = event.action;
+        // This function in our service worker opens a new browser tab and
+        // returns a handle (in a promise) that receives a "save" event when the
+        // user clicks a button in the tab's foreground page.
+        openFileInNewWindow(event.data.file)
+            .then(client => {
+              client.addEventListener('save', event => {
+                action.update({file: new File([event.newText], ...)});
+              });
+            });
+      }
+    });
+
+#### User experience
+
+1. When the user is on your site, the browser provides a button to register the
+   app as an editor for text files.
+2. The user clicks this button. The app is registered and appears in the list of
+   text file editors that the browser shows to the user. It is also registered
+   as a file association for `*.txt` files in the host OS.
+3. When the user opens a text file from another website, the browser lets them
+   pick your app. Or, the user can right-click on a text file in their local
+   file browser and choose to open it with your app. Either way, this pops open
+   your app in a new browser tab.
+4. When the user clicks "Save" in your app, the updated file is passed back to
+   the requester website, or written back to disk.
