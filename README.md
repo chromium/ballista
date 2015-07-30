@@ -11,7 +11,8 @@ to register as handlers for files and data from other applications.
 There are two parts to Web Actions:
 
 * **Requester**: Websites can request an action be handled by another site or
-  app. For example, a site can send a file to be edited externally.
+  app of the user's choosing. For example, a site can send a file to be edited
+  externally.
 * **Handler**: Websites can request to be registered as action handlers. For
   example, a site registered as a handler may be called upon to edit a file from
   another site or native file system.

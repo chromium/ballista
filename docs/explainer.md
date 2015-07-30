@@ -59,7 +59,7 @@ now:
   declaratively specify handlers.
 * Web Actions is designed to interoperate with native apps on mobile and
   desktop, which solves the bootstrapping problem.
-* There is now a greater emphasis on building [installable app-like
+* There is now a push for building [installable app-like
   websites](https://w3c.github.io/manifest/#installable-web-applications).
   Installable apps should be registerable as file handlers.
 
@@ -101,7 +101,7 @@ any tabs.
 
     {
       "name": "Includinator",
-      "short_name": "includinator",
+      "short_name": "Includinator",
       "icons": [...],
       "actions": {
         "share": {}
@@ -161,7 +161,8 @@ this code in a service worker to handle updates even if the tab is closed.
    list of registered edit handlers for this file type, and the user can pick
    one.
 2. The file opens in the external editor (which may be a native application, or
-   another browser tab).
+   another browser tab). (For native editors, the file is stored in a temp
+   directory.)
 3. The user clicks "save" in the external editor. This fires the "update" event
    to the requester's service worker, which in this case writes the updated file
    to the cloud.
@@ -175,7 +176,7 @@ we need a web app manifest and a service worker.
 
     {
       "name": "WebEditor",
-      "short_name": "editor",
+      "short_name": "Editor",
       "icons": [...],
       "actions": {
         "edit": {
