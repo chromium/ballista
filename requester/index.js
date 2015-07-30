@@ -46,7 +46,7 @@ function editButtonClick() {
   var file = new File([contents], filename, {type: "text/plain"});
 
   navigator.webActions.performAction(
-      "edit", {file: file}).then(action => {
+      "open", {file: file}).then(action => {
     console.log('Action started:', action);
     setOpenState(true);
 

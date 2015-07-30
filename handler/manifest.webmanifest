@@ -9,7 +9,7 @@
     }
   ],
   "actions": {
-    "edit": {
+    "open": {
       "bidirectional": true,
       "types": ["text/*"]
     }

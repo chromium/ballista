@@ -127,7 +127,7 @@ self.addEventListener('message', event => {
 });
 
 self.addEventListener('action', event => {
-  if (event.verb == 'edit') {
+  if (event.verb == 'open') {
     if (event.data.file === undefined) {
       console.log('Did not contain file.');
       return;

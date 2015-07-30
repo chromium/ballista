@@ -144,7 +144,7 @@ this code in a service worker to handle updates even if the tab is closed.
       var filename = selectedFilename;
       getFileFromCloud(filename).then(file => {
         // |file| is a File object.
-        navigator.webActions.performAction('edit', {file: file})
+        navigator.webActions.performAction('open', {file: file})
             .then(action => {
               action.addEventListener('update', event => {
                 // Can be called multiple times for a single action.
@@ -179,7 +179,7 @@ we need a web app manifest and a service worker.
       "short_name": "Editor",
       "icons": [...],
       "actions": {
-        "edit": {
+        "open": {
           "bidirectional": true,
           "types": ["text/*"]
         }
@@ -192,7 +192,7 @@ requester.
 #### serviceworker.js
 
     self.addEventListener('action', event => {
-      if (event.verb == 'edit') {
+      if (event.verb == 'open') {
         if (event.data.file === undefined)
           throw new Error('Did not contain file.');
 
