@@ -132,6 +132,8 @@ if (navigator_proto.actions === undefined) {
   // we just let the client specify its URL by setting this variable.
   actions.polyfillHandlerUrl = null;
 
+  var event_or_extendable_event = Event;
+
   // ActionEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
@@ -145,11 +147,13 @@ if (navigator_proto.actions === undefined) {
         this.data = action.data;
       }
     };
+
+    event_or_extendable_event = ExtendableEvent;
   }
 
-  // TODO(mgiuca): Should this extend ExtendableEvent? (Requires that the
-  // requester is a service worker.)
-  actions.UpdateEvent = class extends Event {
+  // UpdateEvent is an ExtendableEvent when the global scope is a
+  // ServiceWorkerGlobalScope; otherwise it is just an Event.
+  actions.UpdateEvent = class extends event_or_extendable_event {
     constructor(data, isClosed) {
       super('update');
       this.data = data;
