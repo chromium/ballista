@@ -42,6 +42,9 @@ The Google Chrome team, including:
 * Matt Giuca <<mgiuca@chromium.org>>
 * Sam McNally <<sammc@chromium.org>>
 
+This is not an official Google product (experimental or otherwise), it is just
+code that happens to be owned by Google.
+
 Copyright 2015 Google Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
