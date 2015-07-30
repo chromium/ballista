@@ -36,7 +36,7 @@ flag in Chrome (required to use `navigator.connect`).
 1. Add `webactions-polyfill.js` to your requester or handler JavaScript context
    (as a `<script>` in HTML for foreground pages, and using `importScripts` from
    service workers).
-2. In the requester, set `navigator.webActions.polyfillHandlerUrl` to a valid
+2. In the requester, set `navigator.actions.polyfillHandlerUrl` to a valid
    handler URL before calling performAction. This is a temporary requirement of
    the polyfill and won't be part of the final API. (It means you need to build
    your requester with a specific handler in mind, rather than allowing the user

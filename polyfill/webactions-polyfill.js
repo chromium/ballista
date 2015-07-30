@@ -20,7 +20,7 @@
 // be broken without specific browser hacks. All work-in-progress; don't get too
 // excited about it.
 //
-// Note: The requester needs to set navigator.webActions.polyfillHandlerUrl to a
+// Note: The requester needs to set navigator.actions.polyfillHandlerUrl to a
 // valid handler URL before calling performAction. This is a temporary
 // requirement of the polyfill and won't be part of the final API.
 "use strict";
@@ -117,25 +117,25 @@ var actionMap = new Map;
 // The next action ID to use in |actionMap|.
 var nextActionId = 0;
 
-// Polyfill Navigator.webActions.
+// Polyfill Navigator.actions.
 // The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
 // Web Workers. Support either case.
 var navigator_proto =
     (self.WorkerNavigator !== undefined ? WorkerNavigator : Navigator)
         .prototype;
-if (navigator_proto.webActions === undefined) {
-  var webActions = {};
-  navigator_proto.webActions = webActions;
+if (navigator_proto.actions === undefined) {
+  var actions = {};
+  navigator_proto.actions = actions;
 
   // The URL of the handler to send requests to. The final API will have the
   // user agent let the user choose a handler from a registered list. For now,
   // we just let the client specify its URL by setting this variable.
-  webActions.polyfillHandlerUrl = null;
+  actions.polyfillHandlerUrl = null;
 
   // ActionEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
-    webActions.ActionEvent = class extends ExtendableEvent {
+    actions.ActionEvent = class extends ExtendableEvent {
       constructor(action) {
         super('action');
         this.action = action;
@@ -149,7 +149,7 @@ if (navigator_proto.webActions === undefined) {
 
   // TODO(mgiuca): Should this extend ExtendableEvent? (Requires that the
   // requester is a service worker.)
-  webActions.UpdateEvent = class extends Event {
+  actions.UpdateEvent = class extends Event {
     constructor(data, isClosed) {
       super('update');
       this.data = data;
@@ -157,14 +157,14 @@ if (navigator_proto.webActions === undefined) {
     }
   }
 
-  webActions.RequesterAction = class extends Action {
+  actions.RequesterAction = class extends Action {
     constructor(verb, data, id, port) {
       super(verb, data, id);
       this.port = port;
     }
   }
 
-  webActions.HandlerAction = class extends Action {
+  actions.HandlerAction = class extends Action {
     // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
     constructor(verb, data, id, client) {
       super(verb, data, id);
@@ -195,13 +195,13 @@ if (navigator_proto.webActions === undefined) {
   // Performs an action with a given |verb| and |data|. Returns a
   // Promise<Action> with an action object allowing further interaction with the
   // handler. Fails with AbortError if a connection could not be made.
-  webActions.performAction = function(verb, data) {
+  actions.performAction = function(verb, data) {
     // Get the URL of the handler to connect to. For now, this is just a fixed
     // URL set by the client.
-    var handlerUrl = webActions.polyfillHandlerUrl;
+    var handlerUrl = actions.polyfillHandlerUrl;
     if (handlerUrl === null) {
       throw new Error(
-          'You need to set navigator.webActions.polyfillHandlerUrl ' +
+          'You need to set navigator.actions.polyfillHandlerUrl ' +
           '(temporary requirement of the polyfill only).');
     }
 
@@ -210,7 +210,7 @@ if (navigator_proto.webActions === undefined) {
       navigator.services.connect(handlerUrl)
           .then(port => {
             var id = nextActionId++;
-            var action = new webActions.RequesterAction(verb, data, id, port);
+            var action = new actions.RequesterAction(verb, data, id, port);
 
             actionMap.set(id, action);
 
@@ -228,14 +228,14 @@ if (navigator_proto.webActions === undefined) {
 // |client| is a CrossOriginServiceWorkerClient on the host; null on the client.
 function onMessageReceived(data, client) {
   if (data.type == 'action') {
-    if (webActions.ActionEvent === undefined)
+    if (actions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
     var action =
-        new webActions.HandlerAction(data.verb, data.data, data.id, client);
+        new actions.HandlerAction(data.verb, data.data, data.id, client);
 
     // Forward the event as an 'action' event to the global object.
-    var actionEvent = new webActions.ActionEvent(action);
+    var actionEvent = new actions.ActionEvent(action);
     self.dispatchEvent(actionEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
@@ -244,7 +244,7 @@ function onMessageReceived(data, client) {
       throw new Error('Received update for unknown action id ' + id);
 
     var action = actionMap.get(id);
-    var updateEvent = new webActions.UpdateEvent(data.data, data.isClosed);
+    var updateEvent = new actions.UpdateEvent(data.data, data.isClosed);
     action.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);

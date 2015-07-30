@@ -45,8 +45,8 @@ function editButtonClick() {
   var filename = document.getElementById('filename_textfield').value;
   var file = new File([contents], filename, {type: "text/plain"});
 
-  navigator.webActions.performAction(
-      "open", {file: file}).then(action => {
+  navigator.actions.performAction("open", {file: file})
+      .then(action => {
     console.log('Action started:', action);
     setOpenState(true);
 
@@ -84,7 +84,7 @@ function onLoad() {
 
   // Tell the polyfill which handler to use. This isn't part of the final API,
   // just a temporary requirement of the polyfill.
-  navigator.webActions.polyfillHandlerUrl = 'http://localhost:8000/test';
+  navigator.actions.polyfillHandlerUrl = 'http://localhost:8000/test';
 }
 
 window.addEventListener('load', onLoad, false);

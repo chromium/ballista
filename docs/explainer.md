@@ -77,7 +77,7 @@ choosing, just attach this JavaScript code to a "share" button.
 #### foreground.js
 
     shareButton.addEventListener('click', () => {
-      navigator.webActions.performAction('share', {url: window.location.href})
+      navigator.actions.performAction('share', {url: window.location.href})
           .then(action => console.log(action));
     });
 
@@ -144,7 +144,7 @@ this code in a service worker to handle updates even if the tab is closed.
       var filename = selectedFilename;
       getFileFromCloud(filename).then(file => {
         // |file| is a File object.
-        navigator.webActions.performAction('open', {file: file})
+        navigator.actions.performAction('open', {file: file})
             .then(action => {
               action.addEventListener('update', event => {
                 // Can be called multiple times for a single action.
