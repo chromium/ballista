@@ -108,7 +108,7 @@ class Action extends CustomEventTarget {
 }
 
 // A map from origin strings to CrossOriginServiceWorkerClient objects.
-// Allows communication to a client based on the origin. Handler only.
+// Allows communication to a requester based on the origin. Handler only.
 var clientMap = new Map;
 
 // A map from action IDs to RequesterAction objects. Requester only.
@@ -129,7 +129,7 @@ if (navigator_proto.actions === undefined) {
 
   // The URL of the handler to send requests to. The final API will have the
   // user agent let the user choose a handler from a registered list. For now,
-  // we just let the client specify its URL by setting this variable.
+  // we just let the requester specify its URL by setting this variable.
   actions.polyfillHandlerUrl = null;
 
   var event_or_extendable_event = Event;
@@ -201,7 +201,7 @@ if (navigator_proto.actions === undefined) {
   // handler. Fails with AbortError if a connection could not be made.
   actions.performAction = function(verb, data) {
     // Get the URL of the handler to connect to. For now, this is just a fixed
-    // URL set by the client.
+    // URL set by the requester.
     var handlerUrl = actions.polyfillHandlerUrl;
     if (handlerUrl === null) {
       throw new Error(
@@ -228,8 +228,9 @@ if (navigator_proto.actions === undefined) {
   };
 }
 
-// Called when a message is received (on both the host and client).
-// |client| is a CrossOriginServiceWorkerClient on the host; null on the client.
+// Called when a message is received (on both the handler and requester).
+// |client| is a CrossOriginServiceWorkerClient on the handler; null on the
+// requester.
 function onMessageReceived(data, client) {
   if (data.type == 'action') {
     if (actions.ActionEvent === undefined)
@@ -268,15 +269,15 @@ navigator.services.addEventListener('connect', event => {
 */
 
 // XXX: The 'message' event on navigator.services is the specified way to
-// receive messages on both ends. In Chrome 45, only the client receives
-// messages with this event. The host receives 'crossoriginmessage' instead (see
-// below).
+// receive messages on both ends. In Chrome 45, only the requester receives
+// messages with this event. The handler receives 'crossoriginmessage' instead
+// (see below).
 navigator.services.addEventListener('message', event => {
   onMessageReceived(event.data);
 });
 
-// XXX In Chrome 45, the host's global object receives 'crossoriginconnect' and
-// 'crossoriginmessage' events, instead of the above. (This is from an older
+// XXX In Chrome 45, the handler's global object receives 'crossoriginconnect'
+// and 'crossoriginmessage' events, instead of the above. (This is from an older
 // version of the spec.)
 self.addEventListener('crossoriginconnect', event => {
   event.acceptConnection(true);
