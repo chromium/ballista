@@ -107,9 +107,9 @@ class Action extends CustomEventTarget {
   }
 }
 
-// A map from origin strings to CrossOriginServiceWorkerClient objects.
+// A map from origin strings to MessagePort objects.
 // Allows communication to a requester based on the origin. Handler only.
-var clientMap = new Map;
+var portMap = new Map;
 
 // A map from action IDs to RequesterAction objects. Requester only.
 var actionMap = new Map;
@@ -169,16 +169,16 @@ if (navigator_proto.actions === undefined) {
   }
 
   actions.HandlerAction = class extends Action {
-    // |client| is a CrossOriginServiceWorkerClient that this action belongs to.
-    constructor(verb, data, id, client) {
+    // |port| is a MessagePort for the requester that this action belongs to.
+    constructor(verb, data, id, port) {
       super(verb, data, id);
-      this.client = client;
+      this.port = port;
     }
 
     _updateInternal(data, isClosed) {
       var message =
           {type: 'update', data: data, id: this.id, isClosed: isClosed};
-      this.client.postMessage(message);
+      this.port.postMessage(message);
     }
 
     // Sends an updated version of the data payload associated with this action
@@ -229,15 +229,14 @@ if (navigator_proto.actions === undefined) {
 }
 
 // Called when a message is received (on both the handler and requester).
-// |client| is a CrossOriginServiceWorkerClient on the handler; null on the
-// requester.
-function onMessageReceived(data, client) {
+// |port| is a MessagePort on the handler; null on the requester.
+function onMessageReceived(data, port) {
   if (data.type == 'action') {
     if (actions.ActionEvent === undefined)
       throw new Error('Web Actions requests must go to a service worker.');
 
     var action =
-        new actions.HandlerAction(data.verb, data.data, data.id, client);
+        new actions.HandlerAction(data.verb, data.data, data.id, port);
 
     // Forward the event as an 'action' event to the global object.
     var actionEvent = new actions.ActionEvent(action);
@@ -282,17 +281,20 @@ navigator.services.addEventListener('message', event => {
 self.addEventListener('crossoriginconnect', event => {
   event.acceptConnection(true);
   var client = event.client;
-  clientMap.set(client.origin, client);
+  // |client| is a CrossOriginServiceWorkerClient; a MessagePort is expected.
+  // This is OK because the client has a postMessage method. (The new API does
+  // have a MessagePort here.)
+  portMap.set(client.origin, client);
   client.postMessage('You are connected!');
 });
 
 self.addEventListener('crossoriginmessage', event => {
   var origin = event.origin;
-  if (!clientMap.has(event.origin))
+  if (!portMap.has(event.origin))
     throw new Error('Received message from unknown origin ' + origin);
 
-  var client = clientMap.get(event.origin);
-  onMessageReceived(event.data, client);
+  var port = portMap.get(event.origin);
+  onMessageReceived(event.data, port);
 });
 
 })();
