@@ -135,9 +135,8 @@ self.addEventListener('action', event => {
 
     // Associate a unique client ID with a client. This is a hack because the
     // messages we get back from the client do not include a 'source' (in Chrome
-    // 45) and therefore there is no way to know which client it is without an
-    // out-of-band ID.
-    // TODO(mgiuca): File a bug about this.
+    // 46) and therefore there is no way to know which client it is without an
+    // out-of-band ID. (http://crbug.com/515741).
     var clientId = nextClientId++;
 
     clientIdToActionMap.set(clientId, event.action);
