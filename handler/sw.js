@@ -73,6 +73,22 @@ var clientIdToActionMap = new Map;
 
 var nextClientId = 0;
 
+// Finds the most recently opened top-level client belonging to this service
+// worker. Returns a promise. Rejects the promise if none found.
+function findLastTopLevelClient() {
+  return new Promise((resolve, reject) => {
+    clients.matchAll().then(allClients => {
+      for (var i = allClients.length - 1; i >= 0; i--) {
+        if (allClients[i].frameType == 'top-level') {
+          resolve(allClients[i]);
+          return;
+        }
+      }
+      reject(new Error('No available clients; please open a tab.'));
+    });
+  });
+}
+
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file, clientId) {
@@ -81,14 +97,7 @@ function openFileInNewWindow(file, clientId) {
     // here. Unfortunately, this is not allowed here because it is not in direct
     // response to a user gesture. Hopefully, the final API will allow it, but
     // for the polyfill, we just need to take control of an existing client.
-    clients.matchAll().then(allClients => {
-      if (allClients.length == 0) {
-        reject(new Error('No available clients; please open a tab.'));
-        return;
-      }
-
-      // Take over the most recently opened client.
-      var client = allClients[allClients.length - 1];
+    findLastTopLevelClient().then(client => {
       clientIdToClientMap.set(clientId, client);
       var message = {type: 'loadFile', file: file, clientId: clientId};
       client.postMessage(message);
