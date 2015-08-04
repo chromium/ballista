@@ -71,28 +71,25 @@ var clientIdToClientMap = new Map;
 // Map from client ID to Action.
 var clientIdToActionMap = new Map;
 
-// Map from client ID to File. Entries are removed from this map once the file
-// has been sent to the client.
-var clientIdToFileMap = new Map;
-
 var nextClientId = 0;
 
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file, clientId) {
   return new Promise((resolve, reject) => {
-    clientIdToFileMap.set(clientId, file);
+    // TODO(mgiuca): We'd like to use clients.openWindow() to open a new client
+    // here. Unfortunately, this is not allowed here because it is not in direct
+    // response to a user gesture. Hopefully, the final API will allow it, but
+    // for the polyfill, we just need to take control of an existing client.
+    clients.matchAll().then(allClients => {
+      if (allClients.length == 0)
+        reject(new Error('No available clients; please open a tab.'));
 
-    var url = '/#clientid=' + clientId;
-
-    // TODO(mgiuca): Unfortunately, this is not allowed here because it is not
-    // in direct response to a user gesture. I have temporarily hacked Chromium
-    // to allow this (an unmodified browser will fail here).
-    clients.openWindow(url).then(client => {
+      // Take over the most recently opened client.
+      var client = allClients[allClients.length - 1];
       clientIdToClientMap.set(clientId, client);
-      // TODO(mgiuca): I'd like to simply post the File object to the client
-      // here, but the postMessage can get lost if the client is not yet
-      // initialized. File a bug about this.
+      var message = {type: 'loadFile', file: file, clientId: clientId};
+      client.postMessage(message);
       resolve(client);
     }, err => reject(err));
   });
@@ -103,18 +100,7 @@ self.addEventListener('message', event => {
   var type = data.type;
   var clientId = data.clientId;
 
-  if (type == 'startup') {
-    // A client is starting up. Assume this is the most recently opened one and
-    // send it the most recent file.
-    if (!clientIdToFileMap.has(clientId) || !clientIdToClientMap.has(clientId))
-      throw new Error('Unknown clientId: ' + clientId);
-
-    var file = clientIdToFileMap.get(clientId);
-    var client = clientIdToClientMap.get(clientId);
-    var message = {type: 'loadFile', file: file};
-    client.postMessage(message);
-    clientIdToFileMap.delete(clientId);
-  } else if (type == 'update') {
+  if (type == 'update') {
     if (!clientIdToActionMap.has(clientId))
       throw new Error('Unknown clientId: ' + clientId);
     var action = clientIdToActionMap.get(clientId);

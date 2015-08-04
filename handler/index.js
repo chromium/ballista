@@ -31,14 +31,6 @@ function onLoad() {
       // registration failed :(
       console.log('ServiceWorker registration failed: ', err);
     });
-
-    // Get this client ID from the URL.
-    var match = document.location.hash.match(/clientid=(\d)/);
-    if (match !== null)
-      clientId = Number(match[1]);
-
-    var message = {type: 'startup', clientId: clientId};
-    navigator.serviceWorker.controller.postMessage(message);
   }
 
   document.getElementById('save_button')
@@ -53,6 +45,7 @@ function onMessage(event) {
     updateUIFromFile(file);
     filename = file.name;
     mimetype = file.type;
+    clientId = data.clientId;
   } else {
     console.log('Got unknown message:', data);
   }
