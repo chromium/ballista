@@ -82,8 +82,10 @@ function openFileInNewWindow(file, clientId) {
     // response to a user gesture. Hopefully, the final API will allow it, but
     // for the polyfill, we just need to take control of an existing client.
     clients.matchAll().then(allClients => {
-      if (allClients.length == 0)
+      if (allClients.length == 0) {
         reject(new Error('No available clients; please open a tab.'));
+        return;
+      }
 
       // Take over the most recently opened client.
       var client = allClients[allClients.length - 1];
