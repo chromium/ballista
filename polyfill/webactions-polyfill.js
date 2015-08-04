@@ -27,6 +27,108 @@
 
 (function() {
 
+// Portions are copied (and heavily modified) from tha navigator-connect
+// polyfill by mkruisselbrink and reillyeon:
+// https://github.com/mkruisselbrink/navigator-connect
+
+var kProxyUrlSuffix = '?actions-handler-proxy';
+
+// The handler's service worker provides a special proxy page that will be
+// embedded in an iframe in the requester (by connectToHandler).
+//
+// This page proxies messages between the requester foreground page and the
+// handler service worker.
+function onFetch(event) {
+  var targetUrl = event.request.url;
+  if (targetUrl.indexOf(kProxyUrlSuffix, targetUrl.length - kProxyUrlSuffix.length) === -1) {
+    // Not a navigator-connect attempt
+    return;
+  }
+  // In the real world this should not reply to all fetches.
+  event.respondWith(
+    new Response("<!DOCTYPE html><script>" +
+      "window.onmessage = function(e) {\n" +
+//      "console.log(e);\n" +
+        "if ('connect' in e.data) {\n" +
+          "var service_channel = new MessageChannel();\n" +
+          "service_channel.port1.onmessage = function(ep) {\n" +
+//          "console.log(ep);\n" +
+            "if (!ep.data.connectResult) {\n" +
+              "e.data.connect.postMessage({connected: false});\n" +
+              "return;\n" +
+            "}\n" +
+            "var client_channel = new MessageChannel();\n" +
+            "client_channel.port1.onmessage = function(ec) {\n" +
+              "var msg_channel = new MessageChannel();\n" +
+              "msg_channel.port1.onmessage = function(em) {\n" +
+                "client_channel.port1.postMessage(em.data, em.ports);\n" +
+              "};\n" +
+              "navigator.serviceWorker.controller.postMessage({type: 'crossOriginMessage', url: document.location.href, origin: ec.origin, data: ec.data, port: msg_channel.port2}, [msg_channel.port2]);\n" +
+            "};\n" +
+            "e.data.connect.postMessage({connected: client_channel.port2}, [client_channel.port2]);\n" +
+          "};\n" +
+          "navigator.serviceWorker.controller.postMessage({type: 'crossOriginConnect', url: document.location.href, origin: e.origin, port: service_channel.port2}, [service_channel.port2]);\n" +
+        "}\n" +
+      "};</script>",
+                 {headers: {'content-type': 'text/html'}})
+  );
+  event.stopImmediatePropagation();
+}
+
+function onMessage(event) {
+  if (typeof event != 'object')
+    return;
+
+  var data = event.data;
+
+  if (data === undefined)
+    return;
+
+  if (data.type == 'crossOriginConnect') {
+    data.port.postMessage({connectResult: true});
+    event.stopImmediatePropagation();
+    return;
+  }
+
+  if (data.type == 'crossOriginMessage') {
+    onMessageReceived(event.data.data, event.data.port);
+    event.stopImmediatePropagation();
+    return;
+  }
+}
+
+// Listen for 'fetch' and 'message', if in a service worker.
+if (self.WorkerNavigator !== undefined) {
+  self.addEventListener('fetch', onFetch);
+  self.addEventListener('message', onMessage);
+}
+
+// Establish a connection with the polyfill handler (by embedding a page from
+// the handler's domain in an iframe). Returns (in a promise) a MessagePort on
+// succesful connection to the handler.
+function connectToHandler(url) {
+  var slashIdx = url.indexOf('/', 10);
+  var origin = url.substr(0, slashIdx);
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  var p = new Promise(function(resolve, reject) {
+    iframe.onload = function(event) {
+      var channel = new MessageChannel();
+      channel.port1.onmessage = function(event) {
+        if (event.data.connected)
+          resolve(event.data.connected);
+        else
+          reject({code: 20});
+      };
+      iframe.contentWindow.postMessage({connect: channel.port2}, '*',
+                                       [channel.port2]);
+    };
+  });
+  iframe.setAttribute('src', url + kProxyUrlSuffix);
+  document.body.appendChild(iframe);
+  return p;
+};
+
 // Polyfill Cache.addAll.
 // Not necessary in Chrome 45 with --enable-experimental-web-platform-features.
 if (Cache.prototype.addAll === undefined) {
@@ -107,10 +209,6 @@ function Action(verb, data, id) {
   this.id = id;
 }
 Action.prototype = Object.create(CustomEventTarget.prototype);
-
-// A map from origin strings to MessagePort objects.
-// Allows communication to a requester based on the origin. Handler only.
-var portMap = new Map;
 
 // A map from action IDs to RequesterAction objects. Requester only.
 var actionMap = new Map;
@@ -209,8 +307,7 @@ if (navigator_proto.actions === undefined) {
     }
 
     return new Promise((resolve, reject) => {
-      // Connect to the handler.
-      navigator.services.connect(handlerUrl)
+      connectToHandler(handlerUrl)
           .then(port => {
             var id = nextActionId++;
             var action = new actions.RequesterAction(verb, data, id, port);
@@ -220,6 +317,7 @@ if (navigator_proto.actions === undefined) {
             // Send the verb and data payload to the handler.
             var message = {type: 'action', verb: verb, data: data, id: id};
             port.postMessage(message);
+            port.onmessage = m => onMessageReceived(m.data, null);
 
             resolve(action);
           }, err => reject(err))
@@ -253,32 +351,5 @@ function onMessageReceived(data, port) {
     console.log('Received unknown message:', data);
   }
 }
-
-navigator.services.addEventListener('connect', event => {
-  event.respondWith({accept: true, name: 'requester'})
-      .then(port => {
-        portMap.set(event.origin, port);
-        port.postMessage('You are connected!');
-      });
-});
-
-// XXX: The 'message' event on navigator.services is the specified way to
-// receive messages on both ends. In Chrome 46, only the requester receives
-// messages with this event. The handler receives 'crossoriginmessage' instead
-// (see below).
-navigator.services.addEventListener('message', event => {
-  onMessageReceived(event.data);
-});
-
-// XXX In Chrome 46, the handler's global object receives 'crossoriginmessage'
-// events, instead of the above. (This is from an older version of the spec.)
-self.addEventListener('crossoriginmessage', event => {
-  var origin = event.origin;
-  if (!portMap.has(event.origin))
-    throw new Error('Received message from unknown origin ' + origin);
-
-  var port = portMap.get(event.origin);
-  onMessageReceived(event.data, port);
-});
 
 })();
