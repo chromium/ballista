@@ -35,77 +35,78 @@ if (Cache.prototype.addAll === undefined) {
   }
 }
 
+// TODO(mgiuca): Rewrite prototype-based "classes" using actual ES6 classes.
+// This is blocked on Firefox implementing the "super" keyword.
+// See: https://bugzilla.mozilla.org/show_bug.cgi?id=1066239
+
 // A base class that implements the EventTarget interface.
-class CustomEventTarget {
-  constructor() {
-    // Map from event type to list of listeners.
-    this._listeners = {};
-  }
-
-  addEventListener(type, listener, useCapture) {
-    var listeners = this._listeners;
-    var listeners_of_type = listeners[type];
-    if (listeners_of_type === undefined) {
-      listeners[type] = listeners_of_type = [];
-    }
-
-    for (var i = 0; i < listeners_of_type.length; i++) {
-      if (listeners_of_type[i] === listener)
-        return;
-    }
-
-    listeners_of_type.push(listener);
-  }
-
-  removeEventListener(type, listener, useCapture) {
-    var listeners = this._listeners;
-    var listeners_of_type = listeners[type];
-    if (listeners_of_type === undefined) {
-      listeners[type] = listeners_of_type = [];
-    }
-
-    for (var i = 0; i < listeners_of_type.length; i++) {
-      if (listeners_of_type[i] === listener) {
-        listeners_of_type.splice(i, 1);
-
-        if (listeners_of_type.length == 0)
-          delete listeners[type];
-
-        return;
-      }
-    }
-  }
-
-  dispatchEvent(evt) {
-    var listeners = this._listeners;
-    var listeners_of_type = listeners[evt.type];
-    if (listeners_of_type === undefined) {
-      listeners[evt.type] = listeners_of_type = [];
-    }
-
-    for (var i = 0; i < listeners_of_type.length; i++) {
-      var listener = listeners_of_type[i];
-      if (listener.handleEvent !== undefined) {
-        listener.handleEvent(evt);
-      } else {
-        listener.call(evt.target, evt);
-      }
-    }
-  }
+function CustomEventTarget() {
+  // Map from event type to list of listeners.
+  this._listeners = {};
 }
+
+CustomEventTarget.prototype.addEventListener = function(type, listener,
+                                                        useCapture) {
+  var listeners = this._listeners;
+  var listeners_of_type = listeners[type];
+  if (listeners_of_type === undefined) {
+    listeners[type] = listeners_of_type = [];
+  }
+
+  for (var i = 0; i < listeners_of_type.length; i++) {
+    if (listeners_of_type[i] === listener) return;
+  }
+
+  listeners_of_type.push(listener);
+};
+
+CustomEventTarget.prototype.removeEventListener = function(type, listener,
+                                                           useCapture) {
+  var listeners = this._listeners;
+  var listeners_of_type = listeners[type];
+  if (listeners_of_type === undefined) {
+    listeners[type] = listeners_of_type = [];
+  }
+
+  for (var i = 0; i < listeners_of_type.length; i++) {
+    if (listeners_of_type[i] === listener) {
+      listeners_of_type.splice(i, 1);
+
+      if (listeners_of_type.length == 0) delete listeners[type];
+
+      return;
+    }
+  }
+};
+
+CustomEventTarget.prototype.dispatchEvent = function(evt) {
+  var listeners = this._listeners;
+  var listeners_of_type = listeners[evt.type];
+  if (listeners_of_type === undefined) {
+    listeners[evt.type] = listeners_of_type = [];
+  }
+
+  for (var i = 0; i < listeners_of_type.length; i++) {
+    var listener = listeners_of_type[i];
+    if (listener.handleEvent !== undefined) {
+      listener.handleEvent(evt);
+    } else {
+      listener.call(evt.target, evt);
+    }
+  }
+};
 
 // An Action is an object representing a web action in flight.
 // Each Action has an integer |id|, which is unique among all actions from the
 // requester that created it (different requesters can have actions of the same
 // ID).
-class Action extends CustomEventTarget {
-  constructor(verb, data, id) {
-    super();
-    this.verb = verb;
-    this.data = data;
-    this.id = id;
-  }
+function Action(verb, data, id) {
+  CustomEventTarget.call(this);
+  this.verb = verb;
+  this.data = data;
+  this.id = id;
 }
+Action.prototype = Object.create(CustomEventTarget.prototype);
 
 // A map from origin strings to MessagePort objects.
 // Allows communication to a requester based on the origin. Handler only.
@@ -116,6 +117,9 @@ var actionMap = new Map;
 
 // The next action ID to use in |actionMap|.
 var nextActionId = 0;
+
+var newActionEvent = null;
+var newUpdateEvent = null;
 
 // Polyfill Navigator.actions.
 // The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
@@ -137,63 +141,58 @@ if (navigator_proto.actions === undefined) {
   // ActionEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
-    actions.ActionEvent = class extends ExtendableEvent {
-      constructor(action) {
-        super('action');
-        this.action = action;
-        // Note: These seem redundant, but I think in the final API, Action's
-        // fields will be opaque, so we'll want to expose these in ActionEvent.
-        this.verb = action.verb;
-        this.data = action.data;
-      }
-    };
+    newActionEvent = function(action) {
+      var event = new ExtendableEvent('action');
+      event.action = action;
+      // Note: These seem redundant, but I think in the final API, Action's
+      // fields will be opaque, so we'll want to expose these in ActionEvent.
+      event.verb = action.verb;
+      event.data = action.data;
+      return event;
+    }
 
     event_or_extendable_event = ExtendableEvent;
   }
 
   // UpdateEvent is an ExtendableEvent when the global scope is a
   // ServiceWorkerGlobalScope; otherwise it is just an Event.
-  actions.UpdateEvent = class extends event_or_extendable_event {
-    constructor(data, isClosed) {
-      super('update');
-      this.data = data;
-      this.isClosed = isClosed;
-    }
+  newUpdateEvent = function(data, isClosed) {
+    var event = new event_or_extendable_event('update');
+    event.data = data;
+    event.isClosed = isClosed;
+    return event;
   }
 
-  actions.RequesterAction = class extends Action {
-    constructor(verb, data, id, port) {
-      super(verb, data, id);
-      this.port = port;
-    }
-  }
+  actions.RequesterAction = function(verb, data, id, port) {
+    Action.call(this, verb, data, id);
+    this.port = port;
+  };
+  actions.RequesterAction.prototype = Object.create(Action.prototype);
 
-  actions.HandlerAction = class extends Action {
-    // |port| is a MessagePort for the requester that this action belongs to.
-    constructor(verb, data, id, port) {
-      super(verb, data, id);
-      this.port = port;
-    }
+  // |port| is a MessagePort for the requester that this action belongs to.
+  actions.HandlerAction = function(verb, data, id, port) {
+    Action.call(this, verb, data, id);
+    this.port = port;
+  };
+  actions.HandlerAction.prototype = Object.create(Action.prototype);
 
-    _updateInternal(data, isClosed) {
-      var message =
-          {type: 'update', data: data, id: this.id, isClosed: isClosed};
-      this.port.postMessage(message);
-    }
+  actions.HandlerAction.prototype._updateInternal = function(data, isClosed) {
+    var message = {type: 'update', data: data, id: this.id, isClosed: isClosed};
+    this.port.postMessage(message);
+  };
 
-    // Sends an updated version of the data payload associated with this action
-    // back to the requester. This may be called multiple times per action, but
-    // should send a complete copy of the data on each call (this is not a
-    // stream protocol).
-    update(data) {
-      this._updateInternal(data, false);
-    }
+  // Sends an updated version of the data payload associated with this action
+  // back to the requester. This may be called multiple times per action, but
+  // should send a complete copy of the data on each call (this is not a
+  // stream protocol).
+  actions.HandlerAction.prototype.update = function(data) {
+    this._updateInternal(data, false);
+  };
 
-    // Same as update(), but also closes the action, signalling that no further
-    // updates are incoming.
-    close(data) {
-      this._updateInternal(data, true);
-    }
+  // Same as update(), but also closes the action, signalling that no further
+  // updates are incoming.
+  actions.HandlerAction.prototype.close = function(data) {
+    this._updateInternal(data, true);
   };
 
   // Performs an action with a given |verb| and |data|. Returns a
@@ -232,14 +231,14 @@ if (navigator_proto.actions === undefined) {
 // |port| is a MessagePort on the handler; null on the requester.
 function onMessageReceived(data, port) {
   if (data.type == 'action') {
-    if (actions.ActionEvent === undefined)
+    if (newActionEvent === null)
       throw new Error('Web Actions requests must go to a service worker.');
 
     var action =
         new actions.HandlerAction(data.verb, data.data, data.id, port);
 
     // Forward the event as an 'action' event to the global object.
-    var actionEvent = new actions.ActionEvent(action);
+    var actionEvent = newActionEvent(action);
     self.dispatchEvent(actionEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
@@ -248,7 +247,7 @@ function onMessageReceived(data, port) {
       throw new Error('Received update for unknown action id ' + id);
 
     var action = actionMap.get(id);
-    var updateEvent = new actions.UpdateEvent(data.data, data.isClosed);
+    var updateEvent = newUpdateEvent(data.data, data.isClosed);
     action.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
