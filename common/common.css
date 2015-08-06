@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-body.requester {
-  background-color: #cdf;
+body {
+  background-color: #efefef;
 }
 
-body.handler {
-  background-color: #cfd;
+.webactions .mdl-layout__header-row {
+  padding-left: 40px;
+}
+
+#contents_textfield {
+  width: 600px;
 }

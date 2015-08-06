@@ -18,21 +18,50 @@ limitations under the License.
 <html>
   <head>
     <title>Web Actions Handler Demo</title>
-    <link rel="manifest" href="manifest.webmanifest">
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.min.js"></script>
+    <script type="text/javascript" src="polyfill/webactions-polyfill.js"></script>
     <script type="text/javascript" src="common/common.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <link rel="icon" sizes="32x32" href="icon/32.png">
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.light_green-light_blue.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" type="text/css" href="common/common.css">
   </head>
-  <body class="handler">
-    <h1>Web Actions Handler Demo</h1>
-    <p>This text field contains a file given to use via <strong>Web
-      Actions</strong>:</p>
-    <div>
-      <textarea id="contents_textfield" rows="25" cols="80">(nothing so far)</textarea>
+  <body class="webactions requester">
+    <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
+      <header class="mdl-layout__header">
+        <div class="webactions mdl-layout__header-row">
+          <h1 class="mdl-layout-title">Web Actions Handler Demo</span>
+        </div>
+      </header>
+      <main class="mdl-layout__content">
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--12-col">
+            This text field contains a file given to use via <strong>Web Actions</strong>:
+          </div>
+        </div>
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--12-col">
+            <div class="mdl-textfield mdl-js-textfield">
+              <textarea id="contents_textfield" class="mdl-textfield__input" type="text" rows="15">(nothing so far)</textarea>
+            </div>
+          </div>
+        </div>
+        <div class="mdl-grid">
+          <div class="mdl-cell mdl-cell--2-col">
+            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-demo">
+              <input class="mdl-textfield__input" type="text" id="filename_textfield" value=" " />
+              <label class="mdl-textfield__label" for="filename_textfield">File name</label>
+            </div>
+          </div>
+          <div class="mdl-cell mdl-cell--2-col">
+            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" id="save_button">Save</button>
+            <div class="mdl-tooltip" for="save_button">
+              Save the file back to the requester using <strong>Web Actions</strong>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
-    <p>File name: <input id="filename_textfield" readonly /></p>
-    <p>This button saves the file back to the requester using <strong>Web
-      Actions</strong>: <input type="button" id="save_button" value="Save" /></p>
   </body>
 </html>
