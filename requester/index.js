@@ -84,7 +84,7 @@ function onLoad() {
 
   // Tell the polyfill which handler to use. This isn't part of the final API,
   // just a temporary requirement of the polyfill.
-  navigator.actions.polyfillHandlerUrl = 'http://localhost:8000/test';
+  navigator.actions.polyfillHandlerUrl = 'http://localhost:8080/test';
 }
 
 window.addEventListener('load', onLoad, false);

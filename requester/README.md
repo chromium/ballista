@@ -14,15 +14,17 @@ This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
 
 ## Usage instructions
 
-1. Serve the handler on `localhost:8000` (the requester expects the app to be
-   running on this origin). One way of doing this is to `cd` to the `handler`
-   directory and run `python -m SimpleHTTPServer 8000`.
-2. Serve the requester from a web server. One way of doing this is to `cd` to
-   the `requester` directory and run `python -m SimpleHTTPServer 8001`.
-3. Open the [handler](http://localhost:8000) in a supported browser. This will
+The demo runs on [Google App Engine](https://cloud.google.com/appengine/docs).
+You can try it out locally using the App Engine dev appserver.
+
+1. Download and install the [App Engine Python
+   SDK](https://cloud.google.com/appengine/downloads).
+2. `cd` to the `webactions` directory.
+3. Run the dev appserver: `dev_appserver.py handler.yaml requester.yaml`.
+4. Open the [handler](http://localhost:8080) in a supported browser. This will
    register its service worker. You need to keep the handler app open (due to
    limitations of the polyfill).
-4. Open the [requester](http://localhost:8001) in another tab.
-5. From the requester, click "Edit". This opens the file in the handler's tab.
-6. Edit the text in the handler, then click "Save".
-7. The new text will be visible in the requester.
+5. Open the [requester](http://localhost:8081) in another tab.
+6. From the requester, click "Edit". This opens the file in the handler's tab.
+7. Edit the text in the handler, then click "Save".
+8. The new text will be visible in the requester.
