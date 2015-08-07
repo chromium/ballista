@@ -8,24 +8,18 @@ that aren't possible in a polyfill, so we can't support everything.
 
 ## Supported browsers
 
-The polyfill currently requires Google Chrome / Chromium 45 (no earlier, no
-later). This is because it relies on the
-[navigator.connect](https://mkruisselbrink.github.io/navigator-connect/) API
-which is currently
-[Chrome-only](https://www.chromestatus.com/feature/5709330426888192).
-
-You must turn on the
-[#enable-experimental-web-platform-features](chrome://flags/#enable-experimental-web-platform-features)
-flag in Chrome (required to use `navigator.connect`).
-
-> **TODO:** Update to use the new API from Chrome 46.0.2459.0 onwards.
-> Alternatively, we could probably use the `navigator.connect` polyfill so that
-> it will work on different browsers.
+The polyfill requires a web browser with support for [Service
+Workers](http://www.w3.org/TR/service-workers/) and [Arrow
+functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/Arrow_functions).
+This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
+(Tested on Chrome 46 and Firefox 42.)
 
 ## Limitations of the polyfill
 
 * No registration of handlers (the web app manifest is not used). Instead, the
   requester must explicitly nominate the URL of the handler.
+* Cannot use requester API (`navigator.actions.performAction`) from a service
+  worker (must be used from a foreground page).
 * No handler picking UI. Each requester is tied to a single handler.
 * Not possible to use `clients.openWindow` from the `'action'` event handler
   (when the handler's service worker receives an action). This means your apps
