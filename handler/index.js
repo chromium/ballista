@@ -58,7 +58,8 @@ function updateUIFromFile(file) {
     var filename_textfield = document.getElementById('filename_textfield');
     readBlobAsText(file).then(text => {
       contents_textfield.value = text;
-      filename_textfield.value = file.name;
+      // Need to call this method to update the placeholder text.
+      filename_textfield.parentNode.MaterialTextfield.change(file.name);
       resolve();
     }, err => reject(err));
   });
