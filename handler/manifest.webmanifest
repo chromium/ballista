@@ -1,6 +1,6 @@
 {
-  "name": "Web Actions Handler Test",
-  "short_name": "Handler Test",
+  "name": "Web Actions Handler Demo",
+  "short_name": "Handler Demo",
   "icons": [
     {
       "src": "icon/32.png",
