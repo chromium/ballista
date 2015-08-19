@@ -40,7 +40,11 @@ var kProxyUrlSuffix = '?actions-handler-proxy';
 // handler service worker.
 function onFetch(event) {
   var targetUrl = event.request.url;
-  if (targetUrl.indexOf(kProxyUrlSuffix, targetUrl.length - kProxyUrlSuffix.length) === -1) {
+  // Detect whether kProxyUrlSuffix appears in the query string.
+  var proxySuffixIndex = targetUrl.indexOf(kProxyUrlSuffix);
+  if (proxySuffixIndex === -1 ||
+      (proxySuffixIndex + kProxyUrlSuffix.length != targetUrl.length &&
+       targetUrl[proxySuffixIndex + kProxyUrlSuffix.length] != '&')) {
     // Not a navigator-connect attempt
     return;
   }
