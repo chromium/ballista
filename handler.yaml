@@ -24,7 +24,7 @@ handlers:
   static_dir: handler/icon
 
 - url: /common
-  static_dir: handler/common
+  static_dir: common
 
 - url: /polyfill
-  static_dir: handler/polyfill
+  static_dir: polyfill
