@@ -4,6 +4,27 @@ runtime: python27
 api_version: 1
 threadsafe: true
 
+# Cannot use top-level static_dir due to / -> index.html redirect.
 handlers:
+- url: /([^/]*\.js)
+  mime_type: text/javascript
+  static_files: handler/\1
+  upload: handler/.*\.js
+
+- url: /([^/]*\.webmanifest)
+  mime_type: application/manifest+json
+  static_files: handler/\1
+  upload: handler/.*\.webmanifest
+
 - url: /
-  static_dir: handler
+  static_files: handler/index.html
+  upload: handler/index.html
+
+- url: /icon
+  static_dir: handler/icon
+
+- url: /common
+  static_dir: handler/common
+
+- url: /polyfill
+  static_dir: handler/polyfill
