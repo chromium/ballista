@@ -333,8 +333,10 @@ if (navigator_proto.actions === undefined) {
 // |port| is a MessagePort on the handler; null on the requester.
 function onMessageReceived(data, port) {
   if (data.type == 'action') {
-    if (newActionEvent === null)
-      throw new Error('Web Actions requests must go to a service worker.');
+    if (newActionEvent === null) {
+      throw new Error(
+          'navigator.actions requests must go to a service worker.');
+    }
 
     var action =
         new actions.HandlerAction(data.verb, data.data, data.id, port);
