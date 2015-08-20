@@ -27,7 +27,7 @@ This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
 
 ## Usage instructions
 
-1. Add `webactions-polyfill.js` to your requester or handler JavaScript context
+1. Add `ballista-polyfill.js` to your requester or handler JavaScript context
    (as a `<script>` in HTML for foreground pages, and using `importScripts` from
    service workers).
 2. In the requester, set `navigator.actions.polyfillHandlerUrl` to a valid

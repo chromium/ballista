@@ -26,7 +26,7 @@ var urlsToCache = [
 
 // Version number: 1
 // (Increment this when the script changes, to force a reload.)
-importScripts('polyfill/webactions-polyfill.js');
+importScripts('polyfill/ballista-polyfill.js');
 
 // Set the callback for the install step
 self.addEventListener('install', event => {
