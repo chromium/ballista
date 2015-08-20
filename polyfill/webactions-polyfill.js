@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Web Actions polyfill.
+// Ballista polyfill.
 // Author: Matt Giuca <mgiuca@chromium.org>
 //
-// Implements a (partial) Web Actions API for demonstration purposes. Note: This
+// Implements a (partial) Ballista API for demonstration purposes. Note: This
 // API, by design, does things that aren't possible in a polyfill, so this will
 // be broken without specific browser hacks. All work-in-progress; don't get too
 // excited about it.

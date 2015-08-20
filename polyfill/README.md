@@ -1,10 +1,10 @@
-# Web Actions polyfill
+# Ballista polyfill
 
 **Author:** Matt Giuca <<mgiuca@chromium.org>>
 
-This partial polyfill lets you try out Web Actions right now, with some
-(serious) limitations, in supported browsers. By design, the API does things
-that aren't possible in a polyfill, so we can't support everything.
+This partial polyfill lets you try out Ballista right now, with some (serious)
+limitations, in supported browsers. By design, the API does things that aren't
+possible in a polyfill, so we can't support everything.
 
 ## Supported browsers
 

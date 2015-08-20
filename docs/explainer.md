@@ -1,15 +1,14 @@
-# Web Actions Explained
+# Ballista Explained
 
 **Date**: 2015-07-29
 
-Web Actions is a proposed JavaScript web API to allow inter-website
-communication, as well as communication between websites and native apps on
-mobile and desktop.
+Ballista is a proposed JavaScript web API to allow inter-website communication,
+as well as communication between websites and native apps on mobile and desktop.
 
-Websites can use Web Actions in two different ways:
+Websites can use Ballista in two different ways:
 
-* As a **Requester**: Websites can request an action be handled by another site
-  or app of the user's choosing. For example, a site can send a file to be
+* As a **Requester**: Websites can request an "action" be handled by another
+  site or app of the user's choosing. For example, a site can send a file to be
   edited externally.
 * As a **Handler**: Websites can request to be registered as action handlers.
   For example, a site registered as a handler may be called upon to edit a file
@@ -18,7 +17,7 @@ Websites can use Web Actions in two different ways:
 Typically, a site / app will be either a requester *or* a handler, but it can be
 both.
 
-Here are some things you can do with Web Actions:
+Here are some things you can do with Ballista:
 
 * A file storage provider (a cloud drive or a web-based IDE), as a
   **requester**, can add an "edit" button that opens a file in an external
@@ -39,7 +38,7 @@ Here are some things you can do with Web Actions:
   This allows the user to choose that site as a target when choosing to "share"
   from a native Android app, or from a requester site.
 
-Web Actions is all about helping web applications become first-class apps on
+Ballista is all about helping web applications become first-class apps on
 desktop and mobile, interoperating with native apps and the underlying local
 file system, as well as with each other.
 
@@ -57,8 +56,8 @@ now:
   us a place for handlers to receive events without opening a foreground page,
   and [Web App Manifests](https://w3c.github.io/manifest/) give us a place to
   declaratively specify handlers.
-* Web Actions is designed to interoperate with native apps on mobile and
-  desktop, which solves the bootstrapping problem.
+* Ballista is designed to interoperate with native apps on mobile and desktop,
+  which solves the bootstrapping problem.
 * There is now a push for building [installable app-like
   websites](https://w3c.github.io/manifest/#installable-web-applications).
   Installable apps should be registerable as file handlers.

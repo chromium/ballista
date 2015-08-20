@@ -1,16 +1,21 @@
-# Web Actions
+# Ballista
 
 **Date**: 2015-07-29
 
-Web Actions is a proposal for a standard web API, revisiting of the concepts
-behind [Web Intents](http://webintents.org): allowing websites to open files and
-share data with other applications (native and web), and also allowing websites
-to register as handlers for files and data from other applications.
+Ballista is a proposal for a standard web API, revisiting of the concepts behind
+[Web Intents](http://webintents.org): allowing websites to open files and share
+data with other applications (native and web), and also allowing websites to
+register as handlers for files and data from other applications.
+
+The codename "[Ballista](https://en.wikipedia.org/wiki/Ballista)" is about
+launching things at other things; we hope to settle on a proper name over the
+course of the standardization process. The current API lives in
+`navigator.actions`, but we aren't particularly attached to that name.
 
 ## How does it work?
-There are two parts to Web Actions:
+There are two parts to Ballista:
 
-* **Requester**: Websites can request an action be handled by another site or
+* **Requester**: Websites can request an "action" be handled by another site or
   app of the user's choosing. For example, a site can send a file to be edited
   externally.
 * **Handler**: Websites can request to be registered as action handlers. For
@@ -25,7 +30,7 @@ Android. And web requesters can also fire actions at web handlers.
 
 ## Resources
 
-* For a detailed overview, see [Web Actions Explained](docs/explainer.md).
+* For a detailed overview, see [Ballista Explained](docs/explainer.md).
 * In the `polyfill` directory, there is a partial polyfill. This doesn't allow
   websites to register as handlers, but is sufficient to set up a bidirectional
   action flow between two participating sites.
@@ -34,7 +39,7 @@ Android. And web requesters can also fire actions at web handlers.
 
 See the `README.md` file in each directory for details. Many caveats apply.
 
-## Who is behind Web Actions?
+## Who is behind Ballista?
 
 The Google Chrome team, including:
 

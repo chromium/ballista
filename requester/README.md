@@ -1,9 +1,9 @@
-# Web Actions sample requester
+# Ballista sample requester
 
 **Author:** Matt Giuca <<mgiuca@chromium.org>>
 
 This is a simple web app with a text file, that allows you to open the text file
-in an external editor using Web Actions. As it uses the Web Actions polyfill, it
+in an external editor using Ballista. As it uses the Ballista polyfill, it
 currently only works in conjunction with the app in the `handler` directory.
 
 The app requires a web browser with support for [Service
@@ -19,7 +19,7 @@ You can try it out locally using the App Engine dev appserver.
 
 1. Download and install the [App Engine Python
    SDK](https://cloud.google.com/appengine/downloads).
-2. `cd` to the `webactions` directory.
+2. `cd` to the `ballista` directory.
 3. Run the dev appserver: `dev_appserver.py handler.yaml requester.yaml`.
 4. Open the [handler](http://localhost:8080) in a supported browser. This will
    register its service worker. You need to keep the handler app open (due to

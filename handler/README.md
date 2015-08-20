@@ -1,9 +1,9 @@
-# Web Actions sample handler
+# Ballista sample handler
 
 **Author:** Matt Giuca <<mgiuca@chromium.org>>
 
-This is a simple web-based text editor that registers as a Web Actions handler
-for text files. It is designed to be used in conjunction with the app in the
+This is a simple web-based text editor that registers as a Ballista handler for
+text files. It is designed to be used in conjunction with the app in the
 `requester` directory.
 
 The app requires a web browser with support for [Service

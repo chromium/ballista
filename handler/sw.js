@@ -138,8 +138,8 @@ self.addEventListener('action', event => {
 
     clientIdToActionMap.set(clientId, event.action);
 
-    // TODO(mgiuca): This can fail, but the current Web Actions API provides no
-    // way for a handler to designate failure when handling an 'action' event.
+    // TODO(mgiuca): This can fail, but the current Ballista API provides no way
+    // for a handler to designate failure when handling an 'action' event.
     openFileInNewWindow(event.data.file, clientId);
   } else {
     console.log('Received unknown action:', event.verb);
