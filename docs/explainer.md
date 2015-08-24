@@ -69,9 +69,7 @@ now:
 To let the user share the current page's URL with an app or website of their
 choosing, just attach this JavaScript code to a "share" button.
 
-> **TODO**: We may want to require the requester API to be called from a service
-> worker; this would resolve issues about updates coming through after the
-> foreground page has been closed.
+> **Note:** Only one-way actions can be requested from a foreground page.
 
 #### foreground.js
 
@@ -130,27 +128,37 @@ any tabs.
 A web-based cloud drive can add an "edit" button to let the user edit a file
 with any registered editor for that file type.
 
-**Note:** Here we are not using a service worker, which means if the page closes
-while the user is editing the file, the data is lost. A better app would put
-this code in a service worker to handle updates even if the tab is closed.
-
-> **TODO**: As above, we may want to require the requester API to be called from
-> a service worker.
-
 #### foreground.js
 
     editButton.addEventListener('click', () => {
-      var filename = selectedFilename;
+      navigator.serviceWorker.controller.postMessage(
+          {type: 'open', filename: selectedFilename});
+    });
+
+#### serviceworker.js
+
+    self.addEventListener('message', event => {
+      if (event.data.type != 'open')
+        return;
+
+      var filename = event.data.filename;
       getFileFromCloud(filename).then(file => {
         // |file| is a File object.
-        navigator.actions.performAction('open', {file: file})
+        self.actions.performAction(
+            {verb: 'open', bidirectional: true, type: file.type}, {file: file})
             .then(action => {
-              action.addEventListener('update', event => {
-                // Can be called multiple times for a single action.
-                // |event.data.file| is a new File object with updated text.
-                storeFileInCloud(filename, event.data.file);
-              });
-            });
+          var updateHandler = event => {
+            if (event.id != action.id)
+              return;
+
+            // Can be called multiple times for a single action.
+            // |event.data.file| is a new File object with updated text.
+            storeFileInCloud(filename, event.data.file);
+            if (event.final)
+              self.actions.removeEventListener('update', updateHandler);
+          };
+          self.actions.addEventListener('update', updateHandler);
+        });
       });
     });
 
@@ -190,19 +198,21 @@ requester.
 
 #### serviceworker.js
 
-    self.addEventListener('action', event => {
-      if (event.verb == 'open') {
-        if (event.data.file === undefined)
-          throw new Error('Did not contain file.');
+    self.actions.addEventListener('handle', event => {
+      if (event.options.verb == 'open') {
+        if (event.data.file === undefined) {
+          event.reject(new Error('Did not contain file.'));
+          return;
+        }
 
-        var action = event.action;
+        var id = event.id;
         // This function in our service worker opens a new browser tab and
         // returns a handle (in a promise) that receives a "save" event when the
         // user clicks a button in the tab's foreground page.
         openFileInNewWindow(event.data.file)
             .then(client => {
               client.addEventListener('save', event => {
-                action.update({file: new File([event.newText], ...)});
+                self.actions.update(id, {file: new File([event.newText], ...)});
               });
             });
       }
