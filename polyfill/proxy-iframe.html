@@ -16,43 +16,13 @@ limitations under the License.
 
 <!DOCTYPE html>
 <script>
+// This page runs from the handler's domain in an iframe inside the requester's
+// foreground page. Upon receiving a MessagePort from the requester, it forwards
+// it onto the handler's service worker. The iframe does not need to remain
+// alive after the exchange has taken place.
 window.onmessage = function(e) {
-  //console.log(e);
-  if ('connect' in e.data) {
-    var service_channel = new MessageChannel();
-    service_channel.port1.onmessage = function(ep) {
-      //console.log(ep);
-      if (!ep.data.connectResult) {
-        e.data.connect.postMessage({connected: false});
-        return;
-      }
-      var client_channel = new MessageChannel();
-      client_channel.port1.onmessage = function(ec) {
-        var msg_channel = new MessageChannel();
-        msg_channel.port1.onmessage = function(em) {
-          client_channel.port1.postMessage(em.data, em.ports);
-        };
-        navigator.serviceWorker.controller.postMessage(
-            {
-              type: 'crossOriginMessage',
-              url: document.location.href,
-              origin: ec.origin,
-              data: ec.data,
-              port: msg_channel.port2
-            },
-            [msg_channel.port2]);
-      };
-      e.data.connect.postMessage({connected: client_channel.port2},
-                                 [client_channel.port2]);
-    };
-    navigator.serviceWorker.controller.postMessage(
-        {
-          type: 'crossOriginConnect',
-          url: document.location.href,
-          origin: e.origin,
-          port: service_channel.port2
-        },
-        [service_channel.port2]);
-  }
+  var port = e.data.port;
+  navigator.serviceWorker.controller.postMessage(
+      {type: 'connect', port: port}, [port]);
 };
 </script>

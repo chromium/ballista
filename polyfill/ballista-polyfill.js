@@ -62,14 +62,11 @@ function onMessage(event) {
   if (data === undefined)
     return;
 
-  if (data.type == 'crossOriginConnect') {
-    data.port.postMessage({connectResult: true});
-    event.stopImmediatePropagation();
-    return;
-  }
-
-  if (data.type == 'crossOriginMessage') {
-    onMessageReceived(event.data.data, event.data.port);
+  if (data.type == 'connect') {
+    data.port.postMessage({connected: true});
+    data.port.onmessage = e => {
+      onMessageReceived(e.data, data.port);
+    }
     event.stopImmediatePropagation();
     return;
   }
@@ -92,13 +89,17 @@ function connectToHandler(url) {
   var p = new Promise(function(resolve, reject) {
     iframe.onload = function(event) {
       var channel = new MessageChannel();
-      channel.port1.onmessage = function(event) {
-        if (event.data.connected)
-          resolve(event.data.connected);
-        else
-          reject({code: 20});
+      channel.port1.onmessage = e => {
+        // Destroy the iframe (it is not needed after this handshake).
+        document.body.removeChild(iframe);
+        if (e.data.connected) {
+          channel.port1.onmessage = null;
+          resolve(channel.port1);
+        } else {
+          reject(new Error("Received unexpected response from handler."));
+        }
       };
-      iframe.contentWindow.postMessage({connect: channel.port2}, '*',
+      iframe.contentWindow.postMessage({port: channel.port2}, '*',
                                        [channel.port2]);
     };
   });
