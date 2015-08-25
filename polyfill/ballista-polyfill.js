@@ -49,33 +49,7 @@ function onFetch(event) {
     return;
   }
   // In the real world this should not reply to all fetches.
-  event.respondWith(
-    new Response("<!DOCTYPE html><script>" +
-      "window.onmessage = function(e) {\n" +
-//      "console.log(e);\n" +
-        "if ('connect' in e.data) {\n" +
-          "var service_channel = new MessageChannel();\n" +
-          "service_channel.port1.onmessage = function(ep) {\n" +
-//          "console.log(ep);\n" +
-            "if (!ep.data.connectResult) {\n" +
-              "e.data.connect.postMessage({connected: false});\n" +
-              "return;\n" +
-            "}\n" +
-            "var client_channel = new MessageChannel();\n" +
-            "client_channel.port1.onmessage = function(ec) {\n" +
-              "var msg_channel = new MessageChannel();\n" +
-              "msg_channel.port1.onmessage = function(em) {\n" +
-                "client_channel.port1.postMessage(em.data, em.ports);\n" +
-              "};\n" +
-              "navigator.serviceWorker.controller.postMessage({type: 'crossOriginMessage', url: document.location.href, origin: ec.origin, data: ec.data, port: msg_channel.port2}, [msg_channel.port2]);\n" +
-            "};\n" +
-            "e.data.connect.postMessage({connected: client_channel.port2}, [client_channel.port2]);\n" +
-          "};\n" +
-          "navigator.serviceWorker.controller.postMessage({type: 'crossOriginConnect', url: document.location.href, origin: e.origin, port: service_channel.port2}, [service_channel.port2]);\n" +
-        "}\n" +
-      "};</script>",
-                 {headers: {'content-type': 'text/html'}})
-  );
+  event.respondWith(fetch('polyfill/proxy-iframe.html'));
   event.stopImmediatePropagation();
 }
 
