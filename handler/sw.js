@@ -65,11 +65,6 @@ self.addEventListener('fetch', event => {
   */
 });
 
-// Map from client ID to Action.
-var clientIdToActionMap = new Map;
-
-var nextClientId = 0;
-
 // Finds the most recently opened top-level client belonging to this service
 // worker. Returns a promise. Rejects the promise if none found.
 function findLastTopLevelClient() {
@@ -88,14 +83,14 @@ function findLastTopLevelClient() {
 
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
-function openFileInNewWindow(file, clientId) {
+function openFileInNewWindow(file, actionId) {
   return new Promise((resolve, reject) => {
     // TODO(mgiuca): We'd like to use clients.openWindow() to open a new client
     // here. Unfortunately, this is not allowed here because it is not in direct
     // response to a user gesture. Hopefully, the final API will allow it, but
     // for the polyfill, we just need to take control of an existing client.
     findLastTopLevelClient().then(client => {
-      var message = {type: 'loadFile', file: file, clientId: clientId};
+      var message = {type: 'loadFile', file: file, actionId: actionId};
       client.postMessage(message);
       resolve(client);
     }, err => reject(err));
@@ -105,15 +100,11 @@ function openFileInNewWindow(file, clientId) {
 self.addEventListener('message', event => {
   var data = event.data;
   var type = data.type;
-  var clientId = data.clientId;
+  var actionId = data.actionId;
 
   if (type == 'update') {
-    if (!clientIdToActionMap.has(clientId))
-      throw new Error('Unknown clientId: ' + clientId);
-    var action = clientIdToActionMap.get(clientId);
-
     var file = data.file;
-    navigator.actions.update(action.id, {file: file});
+    navigator.actions.update(actionId, {file: file});
   } else {
     console.log('Got unknown message:', data);
   }
@@ -126,17 +117,9 @@ navigator.actions.addEventListener('handle', event => {
       return;
     }
 
-    // Associate a unique client ID with a client. This is a hack because the
-    // messages we get back from the client do not include a 'source' (in Chrome
-    // 46) and therefore there is no way to know which client it is without an
-    // out-of-band ID. (http://crbug.com/515741).
-    var clientId = nextClientId++;
-
-    clientIdToActionMap.set(clientId, event.action);
-
     // TODO(mgiuca): This can fail, but the current Ballista API provides no way
     // for a handler to designate failure when handling an 'action' event.
-    openFileInNewWindow(event.data.file, clientId);
+    openFileInNewWindow(event.data.file, event.action.id);
   } else {
     console.log('Received unknown action:', event.options.verb);
   }
