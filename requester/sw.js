@@ -47,6 +47,19 @@ function editFile(file, port) {
   });
 }
 
+// For testing/debugging purposes: send an "update" event to an action with a
+// dummy file contents.
+function debugCloseAction(id) {
+  var evt = new Event('update');
+  evt.id = id;
+  evt.data = {};
+  var contents = 'Updated file contents.';
+  evt.data.file = new File([contents], '');
+  evt.done = true;
+
+  navigator.actions.dispatchEvent(evt);
+}
+
 self.addEventListener('message', event => {
   var data = event.data;
   var type = data.type;
