@@ -147,7 +147,8 @@ with any registered editor for that file type.
         navigator.actions.performAction(
             {verb: 'open', bidirectional: true, type: file.type}, {file: file})
             .then(action => {
-          var updateHandler = event => {
+          var onUpdate = event => {
+            // Only respond to updates to the current action.
             if (event.id != action.id)
               return;
 
@@ -155,9 +156,9 @@ with any registered editor for that file type.
             // |event.data.file| is a new File object with updated text.
             storeFileInCloud(filename, event.data.file);
             if (event.done)
-              navigator.actions.removeEventListener('update', updateHandler);
+              navigator.actions.removeEventListener('update', onUpdate);
           };
-          navigator.actions.addEventListener('update', updateHandler);
+          navigator.actions.addEventListener('update', onUpdate);
         });
       });
     });
