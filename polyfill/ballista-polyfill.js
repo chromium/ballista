@@ -269,6 +269,10 @@ if (navigator_proto.actions === undefined) {
       event.id = id;
       event.options = options;
       event.data = data;
+      event.reject = message => {
+        // TODO(mgiuca): Cause the promise to be rejected.
+        throw new Error(message);
+      }
       return event;
     }
 
