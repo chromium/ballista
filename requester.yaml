@@ -19,6 +19,7 @@ handlers:
 - url: /
   static_files: requester/index.html
   upload: requester/index.html
+  mime_type: text/html; charset=utf-8
 
 - url: /icon
   static_dir: requester/icon
