@@ -231,7 +231,7 @@ function Action(options, data, id) {
   this.id = id;
 }
 
-// A map from action IDs to Action objects.
+// A map from action IDs to HandlerAction objects. Handler only.
 var actionMap = new Map;
 
 // The next action ID to use.
@@ -300,25 +300,6 @@ if (navigator_proto.actions === undefined) {
   };
   actions.HandlerAction.prototype = Object.create(Action.prototype);
 
-  actions.HandlerAction.prototype._updateInternal = function(data, done) {
-    var message = {type: 'update', data: data, id: this.id, done: done};
-    this.port.postMessage(message);
-  };
-
-  // Sends an updated version of the data payload associated with this action
-  // back to the requester. This may be called multiple times per action, but
-  // should send a complete copy of the data on each call (this is not a
-  // stream protocol).
-  actions.HandlerAction.prototype.update = function(data) {
-    this._updateInternal(data, false);
-  };
-
-  // Same as update(), but also closes the action, signalling that no further
-  // updates are incoming.
-  actions.HandlerAction.prototype.close = function(data) {
-    this._updateInternal(data, true);
-  };
-
   // Performs an action with a given |options| and |data|. |options| is either
   // a verb (string) or a dictionary of various fields used to identify which
   // handlers can be used. |data| is an arbitrary object to be passed to the
@@ -355,6 +336,19 @@ if (navigator_proto.actions === undefined) {
           }, err => reject(err))
     });
   };
+
+  // Sends an updated version of the data payload associated with an action back
+  // to the requester. This may be called multiple times per action, but should
+  // send a complete copy of the data on each call (this is not a stream
+  // protocol). |id| is the id of the action.
+  actions.update = function(id, data, done) {
+    if (!actionMap.has(id))
+      throw new Error('No such action id: ' + id);
+
+    var action = actionMap.get(id);
+    var message = {type: 'update', data: data, id: id, done: done == true};
+    action.port.postMessage(message);
+  };
 }
 
 // Called when a message is received (on both the handler and requester).
@@ -368,6 +362,7 @@ function onMessageReceived(data, port) {
 
     var action =
         new actions.HandlerAction(data.options, data.data, data.id, port);
+    actionMap.set(data.id, action);
 
     // Forward the event as a 'handle' event to the global object.
     var handleEvent = newHandleEvent(action);

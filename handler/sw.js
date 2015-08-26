@@ -117,7 +117,7 @@ self.addEventListener('message', event => {
     var action = clientIdToActionMap.get(clientId);
 
     var file = data.file;
-    action.update({file: file});
+    navigator.actions.update(action.id, {file: file});
   } else {
     console.log('Got unknown message:', data);
   }
