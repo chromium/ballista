@@ -226,12 +226,10 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
 // requester that created it (different requesters can have actions of the same
 // ID).
 function Action(options, data, id) {
-  CustomEventTarget.call(this);
   this.options = options;
   this.data = data;
   this.id = id;
 }
-Action.prototype = Object.create(CustomEventTarget.prototype);
 
 // A map from action IDs to Action objects.
 var actionMap = new Map;
