@@ -113,7 +113,7 @@ self.addEventListener('message', event => {
 navigator.actions.addEventListener('handle', event => {
   if (event.options.verb == 'open') {
     if (event.data.file === undefined) {
-      event.reject('Did not contain file.');
+      event.reject(new Error('Did not contain file.'));
       return;
     }
 
