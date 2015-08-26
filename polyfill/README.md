@@ -18,8 +18,9 @@ This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
 
 * No registration of handlers (the web app manifest is not used). Instead, the
   requester must explicitly nominate the URL of the handler.
-* Cannot use requester API (`navigator.actions.performAction`) from a service
-  worker (must be used from a foreground page).
+* If the requester API (`navigator.actions.performAction`) is used from a
+  service worker, a foreground page on that domain must be open (but it does not
+  need to remain open to receive updates).
 * No handler picking UI. Each requester is tied to a single handler.
 * Not possible to use `clients.openWindow` from the `'action'` event handler
   (when the handler's service worker receives an action). This means your apps
