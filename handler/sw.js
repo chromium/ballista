@@ -124,7 +124,7 @@ self.addEventListener('message', event => {
 });
 
 self.addEventListener('action', event => {
-  if (event.verb == 'open') {
+  if (event.options.verb == 'open') {
     if (event.data.file === undefined) {
       console.log('Did not contain file.');
       return;
@@ -142,6 +142,6 @@ self.addEventListener('action', event => {
     // for a handler to designate failure when handling an 'action' event.
     openFileInNewWindow(event.data.file, clientId);
   } else {
-    console.log('Received unknown action:', event.verb);
+    console.log('Received unknown action:', event.options.verb);
   }
 });

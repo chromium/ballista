@@ -225,9 +225,9 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
 // Each Action has an integer |id|, which is unique among all actions from the
 // requester that created it (different requesters can have actions of the same
 // ID).
-function Action(verb, data, id) {
+function Action(options, data, id) {
   CustomEventTarget.call(this);
-  this.verb = verb;
+  this.options = options;
   this.data = data;
   this.id = id;
 }
@@ -267,7 +267,7 @@ if (navigator_proto.actions === undefined) {
       event.action = action;
       // Note: These seem redundant, but I think in the final API, Action's
       // fields will be opaque, so we'll want to expose these in ActionEvent.
-      event.verb = action.verb;
+      event.options = action.options;
       event.data = action.data;
       return event;
     }
@@ -284,15 +284,15 @@ if (navigator_proto.actions === undefined) {
     return event;
   }
 
-  actions.RequesterAction = function(verb, data, id, port) {
-    Action.call(this, verb, data, id);
+  actions.RequesterAction = function(options, data, id, port) {
+    Action.call(this, options, data, id);
     this.port = port;
   };
   actions.RequesterAction.prototype = Object.create(Action.prototype);
 
   // |port| is a MessagePort for the requester that this action belongs to.
-  actions.HandlerAction = function(verb, data, id, port) {
-    Action.call(this, verb, data, id);
+  actions.HandlerAction = function(options, data, id, port) {
+    Action.call(this, options, data, id);
     this.port = port;
   };
   actions.HandlerAction.prototype = Object.create(Action.prototype);
@@ -338,17 +338,15 @@ if (navigator_proto.actions === undefined) {
       connectToHandler(handlerUrl)
           .then(port => {
             var id = nextActionId++;
-            var verb;
             if (typeof options == 'string')
-              verb = options;
-            else
-              verb = options.verb;
-            var action = new actions.RequesterAction(verb, data, id, port);
+              options = {verb: options};
+            var action = new actions.RequesterAction(options, data, id, port);
 
             actionMap.set(id, action);
 
-            // Send the verb and data payload to the handler.
-            var message = {type: 'action', verb: verb, data: data, id: id};
+            // Send the options and data payload to the handler.
+            var message =
+                {type: 'action', options: options, data: data, id: id};
             port.postMessage(message);
             port.onmessage = m => onMessageReceived(m.data, null);
 
@@ -368,7 +366,7 @@ function onMessageReceived(data, port) {
     }
 
     var action =
-        new actions.HandlerAction(data.verb, data.data, data.id, port);
+        new actions.HandlerAction(data.options, data.data, data.id, port);
 
     // Forward the event as an 'action' event to the global object.
     var actionEvent = newActionEvent(action);
