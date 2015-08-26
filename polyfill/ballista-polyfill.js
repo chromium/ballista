@@ -82,11 +82,11 @@ if (self.WorkerNavigator !== undefined) {
 // the handler's domain in an iframe). Returns (in a promise) a MessagePort on
 // succesful connection to the handler.
 function connectToHandler(url) {
-  var slashIdx = url.indexOf('/', 10);
-  var origin = url.substr(0, slashIdx);
-  var iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  var p = new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) {
+    var slashIdx = url.indexOf('/', 10);
+    var origin = url.substr(0, slashIdx);
+    var iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
     iframe.onload = function(event) {
       var channel = new MessageChannel();
       channel.port1.onmessage = e => {
@@ -102,10 +102,10 @@ function connectToHandler(url) {
       iframe.contentWindow.postMessage({port: channel.port2}, '*',
                                        [channel.port2]);
     };
+
+    iframe.setAttribute('src', url + kProxyUrlSuffix);
+    document.body.appendChild(iframe);
   });
-  iframe.setAttribute('src', url + kProxyUrlSuffix);
-  document.body.appendChild(iframe);
-  return p;
 };
 
 // Polyfill Cache.addAll.
