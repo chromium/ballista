@@ -28,23 +28,8 @@ function setOpenState(isOpen) {
   status_p.innerHTML = status_line;
 }
 
-// Updates |contents_textfield| with the contents of |file|, asynchronously.
-function updateTextFromFile(file) {
-  return new Promise((resolve, reject) => {
-    var contents_textfield = document.getElementById('contents_textfield');
-    readBlobAsText(file).then(text => {
-      contents_textfield.value = text;
-      resolve();
-    }, err => reject(err));
-  });
-}
-
-function editButtonClick() {
-  var contents_textfield = document.getElementById('contents_textfield');
-  var contents = contents_textfield.value;
-  var filename = document.getElementById('filename_textfield').value;
-  var file = new File([contents], filename, {type: "text/plain"});
-
+// Opens |file| for editing in an external editor.
+function editFile(file) {
   navigator.actions.performAction("open", {file: file})
       .then(action => {
     console.log('Action started:', action);
@@ -64,6 +49,25 @@ function editButtonClick() {
       });
     });
   });
+}
+
+// Updates |contents_textfield| with the contents of |file|, asynchronously.
+function updateTextFromFile(file) {
+  return new Promise((resolve, reject) => {
+    var contents_textfield = document.getElementById('contents_textfield');
+    readBlobAsText(file).then(text => {
+      contents_textfield.value = text;
+      resolve();
+    }, err => reject(err));
+  });
+}
+
+function editButtonClick() {
+  var contents_textfield = document.getElementById('contents_textfield');
+  var contents = contents_textfield.value;
+  var filename = document.getElementById('filename_textfield').value;
+  var file = new File([contents], filename, {type: "text/plain"});
+  editFile(file);
 }
 
 // For testing/debugging purposes: send an "update" event to an action with a
