@@ -316,10 +316,15 @@ if (navigator_proto.actions === undefined) {
     this._updateInternal(data, true);
   };
 
-  // Performs an action with a given |verb| and |data|. Returns a
-  // Promise<Action> with an action object allowing further interaction with the
-  // handler. Fails with AbortError if a connection could not be made.
-  actions.performAction = function(verb, data) {
+  // Performs an action with a given |options| and |data|. |options| is either
+  // a verb (string) or a dictionary of various fields used to identify which
+  // handlers can be used. |data| is an arbitrary object to be passed to the
+  // handler.
+  //
+  // Returns a Promise<Action> with an action object allowing further
+  // interaction with the handler. Fails with AbortError if a connection could
+  // not be made.
+  actions.performAction = function(options, data) {
     // Get the URL of the handler to connect to. For now, this is just a fixed
     // URL set by the requester.
     var handlerUrl = actions.polyfillHandlerUrl;
@@ -333,6 +338,11 @@ if (navigator_proto.actions === undefined) {
       connectToHandler(handlerUrl)
           .then(port => {
             var id = nextActionId++;
+            var verb;
+            if (typeof options == 'string')
+              verb = options;
+            else
+              verb = options.verb;
             var action = new actions.RequesterAction(verb, data, id, port);
 
             actionMap.set(id, action);

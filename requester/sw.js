@@ -20,7 +20,8 @@ importScripts('polyfill/ballista-polyfill.js');
 
 // Opens |file| for editing in an external editor.
 function editFile(file, port) {
-  navigator.actions.performAction("open", {file: file})
+  navigator.actions.performAction(
+      {verb: 'open', bidirectional: true, type: file.type}, {file: file})
       .then(action => {
     console.log('Action started:', action);
     port.postMessage({type: 'update', openState: true});
