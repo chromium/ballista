@@ -231,7 +231,7 @@ function Action(options, data, id) {
   this.id = id;
 }
 
-// A map from action IDs to HandlerAction objects. Handler only.
+// A map from action IDs to MessagePort objects. Handler only.
 var actionMap = new Map;
 
 // The next action ID to use.
@@ -291,13 +291,6 @@ if (navigator_proto.actions === undefined) {
   };
   actions.RequesterAction.prototype = Object.create(Action.prototype);
 
-  // |port| is a MessagePort for the requester that this action belongs to.
-  actions.HandlerAction = function(options, data, id, port) {
-    Action.call(this, options, data, id);
-    this.port = port;
-  };
-  actions.HandlerAction.prototype = Object.create(Action.prototype);
-
   // Performs an action with a given |options| and |data|. |options| is either
   // a verb (string) or a dictionary of various fields used to identify which
   // handlers can be used. |data| is an arbitrary object to be passed to the
@@ -343,9 +336,9 @@ if (navigator_proto.actions === undefined) {
     if (!actionMap.has(id))
       throw new Error('No such action id: ' + id);
 
-    var action = actionMap.get(id);
+    var port = actionMap.get(id);
     var message = {type: 'update', data: data, id: id, done: done == true};
-    action.port.postMessage(message);
+    port.postMessage(message);
   };
 }
 
@@ -358,9 +351,7 @@ function onMessageReceived(data, port) {
           'navigator.actions requests must go to a service worker.');
     }
 
-    var action =
-        new actions.HandlerAction(data.options, data.data, data.id, port);
-    actionMap.set(data.id, action);
+    actionMap.set(data.id, port);
 
     // Forward the event as a 'handle' event to the global object.
     var handleEvent = newHandleEvent(data.id, data.options, data.data);
