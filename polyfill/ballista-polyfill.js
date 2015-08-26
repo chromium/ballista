@@ -289,12 +289,6 @@ if (navigator_proto.actions === undefined) {
     return event;
   }
 
-  actions.RequesterAction = function(options, data, id, port) {
-    Action.call(this, options, data, id);
-    this.port = port;
-  };
-  actions.RequesterAction.prototype = Object.create(Action.prototype);
-
   // Performs an action with a given |options| and |data|. |options| is either
   // a verb (string) or a dictionary of various fields used to identify which
   // handlers can be used. |data| is an arbitrary object to be passed to the
@@ -319,7 +313,7 @@ if (navigator_proto.actions === undefined) {
             var id = nextActionId++;
             if (typeof options == 'string')
               options = {verb: options};
-            var action = new actions.RequesterAction(options, data, id, port);
+            var action = new Action(options, data, id);
 
             // Send the options and data payload to the handler.
             var message =
