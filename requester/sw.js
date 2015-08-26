@@ -20,23 +20,44 @@ importScripts('polyfill/ballista-polyfill.js');
 
 // Opens |file| for editing in an external editor.
 function editFile(file, port) {
-  navigator.actions.performAction("open", {file: file})
+  navigator.actions.performAction(
+      {verb: 'open', bidirectional: true, type: file.type}, {file: file})
       .then(action => {
     console.log('Action started:', action);
     port.postMessage({type: 'update', openState: true});
 
-    action.addEventListener('update', event => {
+    var onUpdate = event => {
+      // Only respond to updates to the current action.
+      if (event.id != action.id)
+        return;
+
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
       port.postMessage(
-          {type: 'update', openState: !event.isClosed, file: event.data.file});
+          {type: 'update', openState: !event.done, file: event.data.file});
 
-      if (event.isClosed)
+      if (event.done) {
         console.log('Action completed:', action);
-      else
+        navigator.actions.removeEventListener('update', onUpdate);
+      } else {
         console.log('Action updated:', action);
-    });
+      }
+    };
+    navigator.actions.addEventListener('update', onUpdate);
   });
+}
+
+// For testing/debugging purposes: send an "update" event to an action with a
+// dummy file contents.
+function debugCloseAction(id) {
+  var evt = new Event('update');
+  evt.id = id;
+  evt.data = {};
+  var contents = 'Updated file contents.';
+  evt.data.file = new File([contents], '');
+  evt.done = true;
+
+  navigator.actions.dispatchEvent(evt);
 }
 
 self.addEventListener('message', event => {

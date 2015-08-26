@@ -58,18 +58,6 @@ function editButtonClick() {
       {type: 'open', file: file, port: channel.port2}, [channel.port2]);
 }
 
-// For testing/debugging purposes: send an "update" event to an action with a
-// dummy file contents.
-function debugCloseAction(action) {
-  var evt = new Event('update');
-  evt.data = {};
-  var contents = 'Updated file contents.';
-  evt.data.file = new File([contents], '');
-  evt.isClosed = true;
-
-  action.dispatchEvent(evt);
-}
-
 function onLoad() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').then(registration => {

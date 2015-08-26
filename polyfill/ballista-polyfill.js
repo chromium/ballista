@@ -224,22 +224,18 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
 // An Action is an object representing a web action in flight.
 // Each Action has an integer |id|, which is unique among all actions from the
 // requester that created it (different requesters can have actions of the same
-// ID).
-function Action(verb, data, id) {
-  CustomEventTarget.call(this);
-  this.verb = verb;
-  this.data = data;
+// ID). This id is exposed to the client.
+function Action(id) {
   this.id = id;
 }
-Action.prototype = Object.create(CustomEventTarget.prototype);
 
-// A map from action IDs to RequesterAction objects. Requester only.
+// A map from action IDs to MessagePort objects. Handler only.
 var actionMap = new Map;
 
-// The next action ID to use in |actionMap|.
+// The next action ID to use.
 var nextActionId = 0;
 
-var newActionEvent = null;
+var newHandleEvent = null;
 var newUpdateEvent = null;
 
 // Polyfill Navigator.actions.
@@ -249,7 +245,11 @@ var navigator_proto =
     (self.WorkerNavigator !== undefined ? WorkerNavigator : Navigator)
         .prototype;
 if (navigator_proto.actions === undefined) {
-  var actions = {};
+  var NavigatorActions = function() {
+    CustomEventTarget.call(this);
+  };
+  NavigatorActions.prototype = Object.create(CustomEventTarget.prototype);
+  var actions = new NavigatorActions();
   navigator_proto.actions = actions;
 
   // The URL of the handler to send requests to. The final API will have the
@@ -259,16 +259,18 @@ if (navigator_proto.actions === undefined) {
 
   var event_or_extendable_event = Event;
 
-  // ActionEvent is only available when the global scope is a
+  // HandleEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
-    newActionEvent = function(action) {
-      var event = new ExtendableEvent('action');
-      event.action = action;
-      // Note: These seem redundant, but I think in the final API, Action's
-      // fields will be opaque, so we'll want to expose these in ActionEvent.
-      event.verb = action.verb;
-      event.data = action.data;
+    newHandleEvent = function(id, options, data) {
+      var event = new ExtendableEvent('handle');
+      event.id = id;
+      event.options = options;
+      event.data = data;
+      event.reject = err => {
+        // TODO(mgiuca): Cause the promise to be rejected.
+        throw err;
+      }
       return event;
     }
 
@@ -277,49 +279,23 @@ if (navigator_proto.actions === undefined) {
 
   // UpdateEvent is an ExtendableEvent when the global scope is a
   // ServiceWorkerGlobalScope; otherwise it is just an Event.
-  newUpdateEvent = function(data, isClosed) {
+  newUpdateEvent = function(id, data, done) {
     var event = new event_or_extendable_event('update');
+    event.id = id;
     event.data = data;
-    event.isClosed = isClosed;
+    event.done = done;
     return event;
   }
 
-  actions.RequesterAction = function(verb, data, id, port) {
-    Action.call(this, verb, data, id);
-    this.port = port;
-  };
-  actions.RequesterAction.prototype = Object.create(Action.prototype);
-
-  // |port| is a MessagePort for the requester that this action belongs to.
-  actions.HandlerAction = function(verb, data, id, port) {
-    Action.call(this, verb, data, id);
-    this.port = port;
-  };
-  actions.HandlerAction.prototype = Object.create(Action.prototype);
-
-  actions.HandlerAction.prototype._updateInternal = function(data, isClosed) {
-    var message = {type: 'update', data: data, id: this.id, isClosed: isClosed};
-    this.port.postMessage(message);
-  };
-
-  // Sends an updated version of the data payload associated with this action
-  // back to the requester. This may be called multiple times per action, but
-  // should send a complete copy of the data on each call (this is not a
-  // stream protocol).
-  actions.HandlerAction.prototype.update = function(data) {
-    this._updateInternal(data, false);
-  };
-
-  // Same as update(), but also closes the action, signalling that no further
-  // updates are incoming.
-  actions.HandlerAction.prototype.close = function(data) {
-    this._updateInternal(data, true);
-  };
-
-  // Performs an action with a given |verb| and |data|. Returns a
-  // Promise<Action> with an action object allowing further interaction with the
-  // handler. Fails with AbortError if a connection could not be made.
-  actions.performAction = function(verb, data) {
+  // Performs an action with a given |options| and |data|. |options| is either
+  // a verb (string) or a dictionary of various fields used to identify which
+  // handlers can be used. |data| is an arbitrary object to be passed to the
+  // handler.
+  //
+  // Returns a Promise<Action> with an action object allowing further
+  // interaction with the handler. Fails with AbortError if a connection could
+  // not be made.
+  actions.performAction = function(options, data) {
     // Get the URL of the handler to connect to. For now, this is just a fixed
     // URL set by the requester.
     var handlerUrl = actions.polyfillHandlerUrl;
@@ -333,12 +309,13 @@ if (navigator_proto.actions === undefined) {
       connectToHandler(handlerUrl)
           .then(port => {
             var id = nextActionId++;
-            var action = new actions.RequesterAction(verb, data, id, port);
+            if (typeof options == 'string')
+              options = {verb: options};
+            var action = new Action(id);
 
-            actionMap.set(id, action);
-
-            // Send the verb and data payload to the handler.
-            var message = {type: 'action', verb: verb, data: data, id: id};
+            // Send the options and data payload to the handler.
+            var message =
+                {type: 'action', options: options, data: data, id: id};
             port.postMessage(message);
             port.onmessage = m => onMessageReceived(m.data, null);
 
@@ -346,32 +323,39 @@ if (navigator_proto.actions === undefined) {
           }, err => reject(err))
     });
   };
+
+  // Sends an updated version of the data payload associated with an action back
+  // to the requester. This may be called multiple times per action, but should
+  // send a complete copy of the data on each call (this is not a stream
+  // protocol). |id| is the id of the action.
+  actions.update = function(id, data, done) {
+    if (!actionMap.has(id))
+      throw new Error('No such action id: ' + id);
+
+    var port = actionMap.get(id);
+    var message = {type: 'update', data: data, id: id, done: done == true};
+    port.postMessage(message);
+  };
 }
 
 // Called when a message is received (on both the handler and requester).
 // |port| is a MessagePort on the handler; null on the requester.
 function onMessageReceived(data, port) {
   if (data.type == 'action') {
-    if (newActionEvent === null) {
+    if (newHandleEvent === null) {
       throw new Error(
           'navigator.actions requests must go to a service worker.');
     }
 
-    var action =
-        new actions.HandlerAction(data.verb, data.data, data.id, port);
+    actionMap.set(data.id, port);
 
-    // Forward the event as an 'action' event to the global object.
-    var actionEvent = newActionEvent(action);
-    self.dispatchEvent(actionEvent);
+    // Forward the event as a 'handle' event to the global object.
+    var handleEvent = newHandleEvent(data.id, data.options, data.data);
+    actions.dispatchEvent(handleEvent);
   } else if (data.type == 'update') {
-    // Forward the event as an 'update' event to the action object.
-    var id = data.id;
-    if (!actionMap.has(id))
-      throw new Error('Received update for unknown action id ' + id);
-
-    var action = actionMap.get(id);
-    var updateEvent = newUpdateEvent(data.data, data.isClosed);
-    action.dispatchEvent(updateEvent);
+    // Forward the event as an 'update' event to navigator.actions.
+    var updateEvent = newUpdateEvent(data.id, data.data, data.done);
+    actions.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
   }

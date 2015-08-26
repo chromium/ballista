@@ -18,7 +18,8 @@
 var filename = null;
 var mimetype = null;
 
-var clientId = null;
+// ID of the currently open action.
+var actionId = null;
 
 function onLoad() {
 
@@ -45,7 +46,7 @@ function onMessage(event) {
     updateUIFromFile(file);
     filename = file.name;
     mimetype = file.type;
-    clientId = data.clientId;
+    actionId = data.actionId;
   } else {
     console.log('Got unknown message:', data);
   }
@@ -70,7 +71,7 @@ function saveButtonClick() {
   var contents = contents_textfield.value;
   var file = new File([contents], filename, {type: mimetype});
 
-  var message = {type: 'update', clientId: clientId, file: file};
+  var message = {type: 'update', actionId: actionId, file: file};
   navigator.serviceWorker.controller.postMessage(message);
 }
 
