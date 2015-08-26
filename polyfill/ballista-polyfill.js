@@ -69,13 +69,69 @@ function onMessage(event) {
     }
     event.stopImmediatePropagation();
     return;
+  } else if (data.type == 'sendPortToHandler') {
+    sendPortToHandler(data.url, data.port);
   }
 }
+
+var findLastTopLevelClient = undefined;
 
 // Listen for 'fetch' and 'message', if in a service worker.
 if (self.WorkerNavigator !== undefined) {
   self.addEventListener('fetch', onFetch);
   self.addEventListener('message', onMessage);
+
+  // Finds the most recently opened top-level client belonging to this service
+  // worker. Returns a promise. Rejects the promise if none found.
+  findLastTopLevelClient = () => {
+    return new Promise((resolve, reject) => {
+      clients.matchAll().then(allClients => {
+        for (var i = allClients.length - 1; i >= 0; i--) {
+          if (allClients[i].frameType == 'top-level') {
+            resolve(allClients[i]);
+            return;
+          }
+        }
+        reject(new Error('No available clients; please open a tab.'));
+      });
+    });
+  }
+} else {
+  // Receive messages from the service worker.
+  navigator.serviceWorker.addEventListener('message', onMessage);
+}
+
+// Establishes a connection with the polyfill handler (by embedding a page from
+// the handler's domain in an iframe), and posts a MessagePort object to it.
+// Asynchronous; no return value.
+function sendPortToHandler(url, port) {
+  if (self.document === undefined) {
+    // We are in a service worker. No way to create an iframe here (needed to
+    // establish a connection to handler service worker), so connect to a random
+    // foreground page and establish a connection there (it does not need to be
+    // the same foreground page that initiated the action, as long as it is
+    // running this polyfill code). If there is no open requester foreground
+    // page, this will fail. This *should not* happen in the real API, but there
+    // is no way around this in the polyfill.
+    findLastTopLevelClient().then(client => {
+      client.postMessage({type: 'sendPortToHandler', url: url, port: port},
+                         [port]);
+    });
+    return;
+  }
+
+  var slashIdx = url.indexOf('/', 10);
+  var origin = url.substr(0, slashIdx);
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.onload = function(event) {
+    iframe.contentWindow.postMessage({port: port}, '*', [port]);
+  };
+
+  iframe.setAttribute('src', url + kProxyUrlSuffix);
+  document.body.appendChild(iframe);
+
+  // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
 }
 
 // Establish a connection with the polyfill handler (by embedding a page from
@@ -83,28 +139,16 @@ if (self.WorkerNavigator !== undefined) {
 // succesful connection to the handler.
 function connectToHandler(url) {
   return new Promise(function(resolve, reject) {
-    var slashIdx = url.indexOf('/', 10);
-    var origin = url.substr(0, slashIdx);
-    var iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.onload = function(event) {
-      var channel = new MessageChannel();
-      channel.port1.onmessage = e => {
-        // Destroy the iframe (it is not needed after this handshake).
-        document.body.removeChild(iframe);
-        if (e.data.connected) {
-          channel.port1.onmessage = null;
-          resolve(channel.port1);
-        } else {
-          reject(new Error("Received unexpected response from handler."));
-        }
-      };
-      iframe.contentWindow.postMessage({port: channel.port2}, '*',
-                                       [channel.port2]);
+    var channel = new MessageChannel();
+    channel.port1.onmessage = e => {
+      if (e.data.connected) {
+        channel.port1.onmessage = null;
+        resolve(channel.port1);
+      } else {
+        reject(new Error("Received unexpected response from handler."));
+      }
     };
-
-    iframe.setAttribute('src', url + kProxyUrlSuffix);
-    document.body.appendChild(iframe);
+    sendPortToHandler(url, channel.port2);
   });
 };
 
