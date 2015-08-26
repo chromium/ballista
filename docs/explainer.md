@@ -144,7 +144,7 @@ with any registered editor for that file type.
       var filename = event.data.filename;
       getFileFromCloud(filename).then(file => {
         // |file| is a File object.
-        self.actions.performAction(
+        navigator.actions.performAction(
             {verb: 'open', bidirectional: true, type: file.type}, {file: file})
             .then(action => {
           var updateHandler = event => {
@@ -154,10 +154,10 @@ with any registered editor for that file type.
             // Can be called multiple times for a single action.
             // |event.data.file| is a new File object with updated text.
             storeFileInCloud(filename, event.data.file);
-            if (event.final)
-              self.actions.removeEventListener('update', updateHandler);
+            if (event.isClosed)
+              navigator.actions.removeEventListener('update', updateHandler);
           };
-          self.actions.addEventListener('update', updateHandler);
+          navigator.actions.addEventListener('update', updateHandler);
         });
       });
     });
@@ -198,7 +198,7 @@ requester.
 
 #### serviceworker.js
 
-    self.actions.addEventListener('handle', event => {
+    navigator.actions.addEventListener('handle', event => {
       if (event.options.verb == 'open') {
         if (event.data.file === undefined) {
           event.reject(new Error('Did not contain file.'));
@@ -212,7 +212,7 @@ requester.
         openFileInNewWindow(event.data.file)
             .then(client => {
               client.addEventListener('save', event => {
-                self.actions.update(id, {file: new File([event.newText], ...)});
+                navigator.actions.update(id, {file: new File([event.newText], ...)});
               });
             });
       }
