@@ -123,7 +123,7 @@ self.addEventListener('message', event => {
   }
 });
 
-self.addEventListener('action', event => {
+navigator.actions.addEventListener('handle', event => {
   if (event.options.verb == 'open') {
     if (event.data.file === undefined) {
       console.log('Did not contain file.');

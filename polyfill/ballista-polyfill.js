@@ -237,7 +237,7 @@ var actionMap = new Map;
 // The next action ID to use.
 var nextActionId = 0;
 
-var newActionEvent = null;
+var newHandleEvent = null;
 var newUpdateEvent = null;
 
 // Polyfill Navigator.actions.
@@ -261,14 +261,14 @@ if (navigator_proto.actions === undefined) {
 
   var event_or_extendable_event = Event;
 
-  // ActionEvent is only available when the global scope is a
+  // HandleEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
-    newActionEvent = function(action) {
-      var event = new ExtendableEvent('action');
+    newHandleEvent = function(action) {
+      var event = new ExtendableEvent('handle');
       event.action = action;
       // Note: These seem redundant, but I think in the final API, Action's
-      // fields will be opaque, so we'll want to expose these in ActionEvent.
+      // fields will be opaque, so we'll want to expose these in HandleEvent.
       event.options = action.options;
       event.data = action.data;
       return event;
@@ -361,7 +361,7 @@ if (navigator_proto.actions === undefined) {
 // |port| is a MessagePort on the handler; null on the requester.
 function onMessageReceived(data, port) {
   if (data.type == 'action') {
-    if (newActionEvent === null) {
+    if (newHandleEvent === null) {
       throw new Error(
           'navigator.actions requests must go to a service worker.');
     }
@@ -369,9 +369,9 @@ function onMessageReceived(data, port) {
     var action =
         new actions.HandlerAction(data.options, data.data, data.id, port);
 
-    // Forward the event as an 'action' event to the global object.
-    var actionEvent = newActionEvent(action);
-    self.dispatchEvent(actionEvent);
+    // Forward the event as a 'handle' event to the global object.
+    var handleEvent = newHandleEvent(action);
+    actions.dispatchEvent(handleEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
     var updateEvent = newUpdateEvent(data.id, data.data, data.done);
