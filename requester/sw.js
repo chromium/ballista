@@ -30,9 +30,9 @@ function editFile(file, port) {
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
       port.postMessage(
-          {type: 'update', openState: !event.isClosed, file: event.data.file});
+          {type: 'update', openState: !event.done, file: event.data.file});
 
-      if (event.isClosed)
+      if (event.done)
         console.log('Action completed:', action);
       else
         console.log('Action updated:', action);

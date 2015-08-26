@@ -154,7 +154,7 @@ with any registered editor for that file type.
             // Can be called multiple times for a single action.
             // |event.data.file| is a new File object with updated text.
             storeFileInCloud(filename, event.data.file);
-            if (event.isClosed)
+            if (event.done)
               navigator.actions.removeEventListener('update', updateHandler);
           };
           navigator.actions.addEventListener('update', updateHandler);

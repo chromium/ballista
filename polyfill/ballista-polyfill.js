@@ -277,10 +277,10 @@ if (navigator_proto.actions === undefined) {
 
   // UpdateEvent is an ExtendableEvent when the global scope is a
   // ServiceWorkerGlobalScope; otherwise it is just an Event.
-  newUpdateEvent = function(data, isClosed) {
+  newUpdateEvent = function(data, done) {
     var event = new event_or_extendable_event('update');
     event.data = data;
-    event.isClosed = isClosed;
+    event.done = done;
     return event;
   }
 
@@ -297,8 +297,8 @@ if (navigator_proto.actions === undefined) {
   };
   actions.HandlerAction.prototype = Object.create(Action.prototype);
 
-  actions.HandlerAction.prototype._updateInternal = function(data, isClosed) {
-    var message = {type: 'update', data: data, id: this.id, isClosed: isClosed};
+  actions.HandlerAction.prototype._updateInternal = function(data, done) {
+    var message = {type: 'update', data: data, id: this.id, done: done};
     this.port.postMessage(message);
   };
 
@@ -380,7 +380,7 @@ function onMessageReceived(data, port) {
       throw new Error('Received update for unknown action id ' + id);
 
     var action = actionMap.get(id);
-    var updateEvent = newUpdateEvent(data.data, data.isClosed);
+    var updateEvent = newUpdateEvent(data.data, data.done);
     action.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);

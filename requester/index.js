@@ -65,7 +65,7 @@ function debugCloseAction(action) {
   evt.data = {};
   var contents = 'Updated file contents.';
   evt.data.file = new File([contents], '');
-  evt.isClosed = true;
+  evt.done = true;
 
   action.dispatchEvent(evt);
 }
