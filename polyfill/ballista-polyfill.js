@@ -78,33 +78,39 @@ if (self.WorkerNavigator !== undefined) {
   self.addEventListener('message', onMessage);
 }
 
+// Establishes a connection with the polyfill handler (by embedding a page from
+// the handler's domain in an iframe), and posts a MessagePort object to it.
+// Asynchronous; no return value.
+function sendPortToHandler(url, port) {
+  var slashIdx = url.indexOf('/', 10);
+  var origin = url.substr(0, slashIdx);
+  var iframe = document.createElement('iframe');
+  iframe.style.display = 'none';
+  iframe.onload = function(event) {
+    iframe.contentWindow.postMessage({port: port}, '*', [port]);
+  };
+
+  iframe.setAttribute('src', url + kProxyUrlSuffix);
+  document.body.appendChild(iframe);
+
+  // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
+}
+
 // Establish a connection with the polyfill handler (by embedding a page from
 // the handler's domain in an iframe). Returns (in a promise) a MessagePort on
 // succesful connection to the handler.
 function connectToHandler(url) {
   return new Promise(function(resolve, reject) {
-    var slashIdx = url.indexOf('/', 10);
-    var origin = url.substr(0, slashIdx);
-    var iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.onload = function(event) {
-      var channel = new MessageChannel();
-      channel.port1.onmessage = e => {
-        // Destroy the iframe (it is not needed after this handshake).
-        document.body.removeChild(iframe);
-        if (e.data.connected) {
-          channel.port1.onmessage = null;
-          resolve(channel.port1);
-        } else {
-          reject(new Error("Received unexpected response from handler."));
-        }
-      };
-      iframe.contentWindow.postMessage({port: channel.port2}, '*',
-                                       [channel.port2]);
+    var channel = new MessageChannel();
+    channel.port1.onmessage = e => {
+      if (e.data.connected) {
+        channel.port1.onmessage = null;
+        resolve(channel.port1);
+      } else {
+        reject(new Error("Received unexpected response from handler."));
+      }
     };
-
-    iframe.setAttribute('src', url + kProxyUrlSuffix);
-    document.body.appendChild(iframe);
+    sendPortToHandler(url, channel.port2);
   });
 };
 
