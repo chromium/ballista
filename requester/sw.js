@@ -26,7 +26,10 @@ function editFile(file, port) {
     console.log('Action started:', action);
     port.postMessage({type: 'update', openState: true});
 
-    action.addEventListener('update', event => {
+    navigator.actions.addEventListener('update', event => {
+      if (event.id != action.id)
+        return;
+
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
       port.postMessage(

@@ -233,10 +233,10 @@ function Action(options, data, id) {
 }
 Action.prototype = Object.create(CustomEventTarget.prototype);
 
-// A map from action IDs to RequesterAction objects. Requester only.
+// A map from action IDs to Action objects.
 var actionMap = new Map;
 
-// The next action ID to use in |actionMap|.
+// The next action ID to use.
 var nextActionId = 0;
 
 var newActionEvent = null;
@@ -281,8 +281,9 @@ if (navigator_proto.actions === undefined) {
 
   // UpdateEvent is an ExtendableEvent when the global scope is a
   // ServiceWorkerGlobalScope; otherwise it is just an Event.
-  newUpdateEvent = function(data, done) {
+  newUpdateEvent = function(id, data, done) {
     var event = new event_or_extendable_event('update');
+    event.id = id;
     event.data = data;
     event.done = done;
     return event;
@@ -346,8 +347,6 @@ if (navigator_proto.actions === undefined) {
               options = {verb: options};
             var action = new actions.RequesterAction(options, data, id, port);
 
-            actionMap.set(id, action);
-
             // Send the options and data payload to the handler.
             var message =
                 {type: 'action', options: options, data: data, id: id};
@@ -377,13 +376,8 @@ function onMessageReceived(data, port) {
     self.dispatchEvent(actionEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
-    var id = data.id;
-    if (!actionMap.has(id))
-      throw new Error('Received update for unknown action id ' + id);
-
-    var action = actionMap.get(id);
-    var updateEvent = newUpdateEvent(data.data, data.done);
-    action.dispatchEvent(updateEvent);
+    var updateEvent = newUpdateEvent(data.id, data.data, data.done);
+    actions.dispatchEvent(updateEvent);
   } else {
     console.log('Received unknown message:', data);
   }
