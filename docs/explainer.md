@@ -206,12 +206,12 @@ requester.
           return;
         }
 
-        var id = event.id;
         // This function in our service worker opens a new browser tab and
         // returns a handle (in a promise) that receives a "save" event when the
         // user clicks a button in the tab's foreground page.
         openFileInNewWindow(event.data.file)
             .then(client => {
+              var id = event.id;
               client.addEventListener('save', event => {
                 navigator.actions.update(id, {file: new File([event.newText], ...)});
               });
