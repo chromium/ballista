@@ -119,7 +119,7 @@ navigator.actions.addEventListener('handle', event => {
 
     // TODO(mgiuca): This can fail, but the current Ballista API provides no way
     // for a handler to designate failure when handling an 'action' event.
-    openFileInNewWindow(event.data.file, event.action.id);
+    openFileInNewWindow(event.data.file, event.id);
   } else {
     console.log('Received unknown action:', event.options.verb);
   }

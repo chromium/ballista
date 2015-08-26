@@ -264,13 +264,11 @@ if (navigator_proto.actions === undefined) {
   // HandleEvent is only available when the global scope is a
   // ServiceWorkerGlobalScope.
   if (self.ExtendableEvent !== undefined) {
-    newHandleEvent = function(action) {
+    newHandleEvent = function(id, options, data) {
       var event = new ExtendableEvent('handle');
-      event.action = action;
-      // Note: These seem redundant, but I think in the final API, Action's
-      // fields will be opaque, so we'll want to expose these in HandleEvent.
-      event.options = action.options;
-      event.data = action.data;
+      event.id = id;
+      event.options = options;
+      event.data = data;
       return event;
     }
 
@@ -365,7 +363,7 @@ function onMessageReceived(data, port) {
     actionMap.set(data.id, action);
 
     // Forward the event as a 'handle' event to the global object.
-    var handleEvent = newHandleEvent(action);
+    var handleEvent = newHandleEvent(data.id, data.options, data.data);
     actions.dispatchEvent(handleEvent);
   } else if (data.type == 'update') {
     // Forward the event as an 'update' event to the action object.
