@@ -224,10 +224,8 @@ CustomEventTarget.prototype.dispatchEvent = function(evt) {
 // An Action is an object representing a web action in flight.
 // Each Action has an integer |id|, which is unique among all actions from the
 // requester that created it (different requesters can have actions of the same
-// ID).
-function Action(options, data, id) {
-  this.options = options;
-  this.data = data;
+// ID). This id is exposed to the client.
+function Action(id) {
   this.id = id;
 }
 
@@ -313,7 +311,7 @@ if (navigator_proto.actions === undefined) {
             var id = nextActionId++;
             if (typeof options == 'string')
               options = {verb: options};
-            var action = new Action(options, data, id);
+            var action = new Action(id);
 
             // Send the options and data payload to the handler.
             var message =
