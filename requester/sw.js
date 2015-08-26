@@ -26,7 +26,8 @@ function editFile(file, port) {
     console.log('Action started:', action);
     port.postMessage({type: 'update', openState: true});
 
-    navigator.actions.addEventListener('update', event => {
+    var onUpdate = event => {
+      // Only respond to updates to the current action.
       if (event.id != action.id)
         return;
 
@@ -35,11 +36,14 @@ function editFile(file, port) {
       port.postMessage(
           {type: 'update', openState: !event.done, file: event.data.file});
 
-      if (event.done)
+      if (event.done) {
         console.log('Action completed:', action);
-      else
+        navigator.actions.removeEventListener('update', onUpdate);
+      } else {
         console.log('Action updated:', action);
-    });
+      }
+    };
+    navigator.actions.addEventListener('update', onUpdate);
   });
 }
 
