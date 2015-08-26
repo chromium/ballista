@@ -13,10 +13,6 @@
 // limitations under the License.
 
 // Foreground page
-//
-// Not using a service worker. This means if the page closes,
-// the data is lost. We can also use a service worker to handle updates
-// even if the tab is closed.
 "use strict";
 
 // Sets whether the file is open in the external editor.
@@ -26,29 +22,6 @@ function setOpenState(isOpen) {
   status_line =
       isOpen ? 'File is open in external editor.' : 'File is not being edited.';
   status_p.innerHTML = status_line;
-}
-
-// Opens |file| for editing in an external editor.
-function editFile(file) {
-  navigator.actions.performAction("open", {file: file})
-      .then(action => {
-    console.log('Action started:', action);
-    setOpenState(true);
-
-    action.addEventListener('update', event => {
-      // Can be called multiple times for a single action.
-      // |event.data.file| is a new File with updated text.
-      updateTextFromFile(event.data.file).then(() => {
-        if (event.isClosed) {
-          console.log('Action completed:', action);
-          // Update the UI.
-          setOpenState(false);
-        } else {
-          console.log('Action updated:', action);
-        }
-      });
-    });
-  });
 }
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
@@ -67,7 +40,7 @@ function editButtonClick() {
   var contents = contents_textfield.value;
   var filename = document.getElementById('filename_textfield').value;
   var file = new File([contents], filename, {type: "text/plain"});
-  editFile(file);
+  navigator.serviceWorker.controller.postMessage({type: 'open', file: file});
 }
 
 // For testing/debugging purposes: send an "update" event to an action with a
@@ -96,10 +69,18 @@ function onLoad() {
 
   document.getElementById('edit_button')
       .addEventListener('click', editButtonClick);
+}
 
-  // Tell the polyfill which handler to use. This isn't part of the final API,
-  // just a temporary requirement of the polyfill.
-  navigator.actions.polyfillHandlerUrl = 'http://localhost:8080/test';
+function onMessage() {
+  var data = event.data;
+  var type = data.type;
+
+  if (type == 'open') {
+    var file = data.file;
+
+    editFile(file);
+  }
 }
 
 window.addEventListener('load', onLoad, false);
+navigator.serviceWorker.addEventListener('message', onMessage);
