@@ -249,7 +249,11 @@ var navigator_proto =
     (self.WorkerNavigator !== undefined ? WorkerNavigator : Navigator)
         .prototype;
 if (navigator_proto.actions === undefined) {
-  var actions = {};
+  var NavigatorActions = function() {
+    CustomEventTarget.call(this);
+  };
+  NavigatorActions.prototype = Object.create(CustomEventTarget.prototype);
+  var actions = new NavigatorActions();
   navigator_proto.actions = actions;
 
   // The URL of the handler to send requests to. The final API will have the
