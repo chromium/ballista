@@ -65,9 +65,6 @@ self.addEventListener('fetch', event => {
   */
 });
 
-// Map from client ID to Client.
-var clientIdToClientMap = new Map;
-
 // Map from client ID to Action.
 var clientIdToActionMap = new Map;
 
@@ -98,7 +95,6 @@ function openFileInNewWindow(file, clientId) {
     // response to a user gesture. Hopefully, the final API will allow it, but
     // for the polyfill, we just need to take control of an existing client.
     findLastTopLevelClient().then(client => {
-      clientIdToClientMap.set(clientId, client);
       var message = {type: 'loadFile', file: file, clientId: clientId};
       client.postMessage(message);
       resolve(client);
