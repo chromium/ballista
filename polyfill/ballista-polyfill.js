@@ -361,7 +361,7 @@ function onMessageReceived(data, port) {
     var handleEvent = newHandleEvent(data.id, data.options, data.data);
     actions.dispatchEvent(handleEvent);
   } else if (data.type == 'update') {
-    // Forward the event as an 'update' event to the action object.
+    // Forward the event as an 'update' event to navigator.actions.
     var updateEvent = newUpdateEvent(data.id, data.data, data.done);
     actions.dispatchEvent(updateEvent);
   } else {
