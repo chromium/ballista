@@ -18,39 +18,23 @@
 importScripts('common/common.js');
 importScripts('polyfill/ballista-polyfill.js');
 
-// Sets whether the file is open in the external editor.
-function setOpenState(isOpen) {
-  console.log('Requester SW: setOpenState:', isOpen);
-}
-
-// Updates |contents_textfield| with the contents of |file|, asynchronously.
-function updateTextFromFile(file) {
-  return new Promise((resolve, reject) => {
-    readBlobAsText(file).then(text => {
-      console.log('Requester SW: updateTextFromFile:', text);
-    }, err => reject(err));
-  });
-}
-
 // Opens |file| for editing in an external editor.
-function editFile(file) {
+function editFile(file, port) {
   navigator.actions.performAction("open", {file: file})
       .then(action => {
     console.log('Action started:', action);
-    setOpenState(true);
+    port.postMessage({type: 'update', openState: true});
 
     action.addEventListener('update', event => {
       // Can be called multiple times for a single action.
       // |event.data.file| is a new File with updated text.
-      updateTextFromFile(event.data.file).then(() => {
-        if (event.isClosed) {
-          console.log('Action completed:', action);
-          // Update the UI.
-          setOpenState(false);
-        } else {
-          console.log('Action updated:', action);
-        }
-      });
+      port.postMessage(
+          {type: 'update', openState: !event.isClosed, file: event.data.file});
+
+      if (event.isClosed)
+        console.log('Action completed:', action);
+      else
+        console.log('Action updated:', action);
     });
   });
 }
@@ -59,10 +43,8 @@ self.addEventListener('message', event => {
   var data = event.data;
   var type = data.type;
 
-  if (type == 'open') {
-    var file = data.file;
-    editFile(file);
-  }
+  if (type == 'open')
+    editFile(data.file, data.port);
 });
 
 // Tell the polyfill which handler to use. This isn't part of the final API,

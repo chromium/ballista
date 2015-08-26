@@ -40,7 +40,22 @@ function editButtonClick() {
   var contents = contents_textfield.value;
   var filename = document.getElementById('filename_textfield').value;
   var file = new File([contents], filename, {type: "text/plain"});
-  navigator.serviceWorker.controller.postMessage({type: 'open', file: file});
+
+  var channel = new MessageChannel();
+  channel.port1.onmessage = event => {
+    var data = event.data;
+    var type = data.type;
+
+    if (type == 'update') {
+      if (data.openState !== undefined)
+        setOpenState(data.openState);
+
+      if (data.file !== undefined)
+        updateTextFromFile(data.file);
+    }
+  }
+  navigator.serviceWorker.controller.postMessage(
+      {type: 'open', file: file, port: channel.port2}, [channel.port2]);
 }
 
 // For testing/debugging purposes: send an "update" event to an action with a
@@ -71,16 +86,4 @@ function onLoad() {
       .addEventListener('click', editButtonClick);
 }
 
-function onMessage() {
-  var data = event.data;
-  var type = data.type;
-
-  if (type == 'open') {
-    var file = data.file;
-
-    editFile(file);
-  }
-}
-
 window.addEventListener('load', onLoad, false);
-navigator.serviceWorker.addEventListener('message', onMessage);
