@@ -29,9 +29,9 @@ See the `README.md` file in each directory for details. Many caveats apply.
 
 The Google Chrome team, including:
 
-* Ben Wells <<benwells@chromium.org>>
 * Matt Giuca <<mgiuca@chromium.org>>
 * Sam McNally <<sammc@chromium.org>>
+* Ben Wells <<benwells@chromium.org>>
 
 This is not an official Google product (experimental or otherwise), it is just
 code that happens to be owned by Google.
