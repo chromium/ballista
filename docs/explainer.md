@@ -2,41 +2,30 @@
 
 **Date**: 2015-09-25
 
-Ballista is a proposed JavaScript web API to allow inter-website communication,
-as well as communication between websites and native apps on mobile and desktop.
+**Ballista** is a project to explore inter-website communication; specifically,
+communication between one website and another site of the user's choosing.
+Imagine being able to:
 
-Websites can use Ballista in two different ways:
+* Click a "share" button, then choose which social network or other web app to
+  share it with, based on which apps *you* have installed (not a pre-defined
+  list chosen by the site you're on).
+* Click an "edit" button on a photo or document in a cloud drive or web IDE,
+  then choose a web app or native app to edit it with.
+* Click an "attach" button in a webmail app, then pick a photo or file from a
+  cloud photo collection or drive, instead of your local disk.
+* Register a web editor as the default editor for certain file types in the
+  native file browser.
 
-* As a **Requester**: Websites can request an "action" be handled by another
-  site or app of the user's choosing. For example, a site can send a file to be
-  edited externally.
-* As a **Handler**: Websites can request to be registered as action handlers.
-  For example, a site registered as a handler may be called upon to edit a file
-  from another site or native file system.
+We want to enable all of these use cases, and more like them. And, we want to be
+able to integrate with native apps where it makes sense (for example, using a
+native app to edit a document directly from the web). Essentially, we want to
+create an **intents system for the web**.
 
-Typically, a site / app will be either a requester *or* a handler, but it can be
-both.
-
-Here are some things you can do with Ballista:
-
-* A file storage provider (a cloud drive or a web-based IDE), as a
-  **requester**, can add an "edit" button that opens a file in an external
-  editor of the user's choosing; it could be a native app or a website that
-  implements the handler interface. When the user saves the file in the external
-  editor, it gets automatically synced back to the requester. No more
-  download/open/edit/save/upload workflows!
-* A web-based editing application (an image editor or text editor, for example)
-  can register as a **handler** for certain file types. Not only will it be
-  available for web requesters, it could also be registered in the host OS's
-  file type registry. This means you can have a web app registered as the
-  default handler for local files of a given type.
-* A **requester** can implement a generic "share" button that sends a URL to an
-  app of the user's choosing; again, this could be a native app (on Android, at
-  least), or a handler website. This could replace the currently growing wall of
-  service-specific share buttons seen on many sites.
-* A social networking website can register as a **handler** for the share verb.
-  This allows the user to choose that site as a target when choosing to "share"
-  from a native Android app, or from a requester site.
+We've come up with a basic API as a first cut at solving this problem. That API
+is detailed below, and a polyfill is provided in this repository. But it's early
+days, and we expect it to evolve over time. We're less interested in pushing
+this particular API than we are in restarting the conversation in this problem
+space.
 
 Ballista is all about helping web applications become first-class apps on
 desktop and mobile, interoperating with native apps and the underlying local
@@ -61,6 +50,36 @@ now:
 * There is now a push for building [installable app-like
   websites](https://w3c.github.io/manifest/#installable-web-applications).
   Installable apps should be registerable as file handlers.
+
+## Overview
+
+The rest of this document outlines our current thinking about the shape of the
+Ballista API.
+
+Websites can use Ballista in two different ways:
+
+* As a **Requester**: Websites can request an "action" be handled by another
+  site or app of the user's choosing. For example, a site can send a file to be
+  edited externally.
+* As a **Handler**: Websites can request to be registered as action handlers.
+  For example, a site registered as a handler may be called upon to edit a file
+  from another site or native file system.
+
+A site / app can be either a requester or a handler, or both.
+
+**Note**: The native integration would be an implementation detail of browsers,
+not part of the standard. In essence, a browser could act as a special requester
+or register itself as a special handler and act as a proxy to the underlying OS;
+this would be allowed by the spec but not required.
+
+* A basic action is **one-way**: the requester sends a *single message* (with
+  optional payload) to an appropriate handler of the user's choice. It receives
+  confirmation that the action was sent, but doesn't expect a response from the
+  handler.
+* Actions can also be **bidirectional**: after the initial action, the handler
+  can send *updates* back to the requester. The handler can send multiple
+  updates; each is a newer version of the object being edited (it is not a data
+  stream).
 
 ## Sample code
 
