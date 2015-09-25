@@ -1,6 +1,6 @@
 # Ballista Explained
 
-**Date**: 2015-07-29
+**Date**: 2015-09-25
 
 Ballista is a proposed JavaScript web API to allow inter-website communication,
 as well as communication between websites and native apps on mobile and desktop.

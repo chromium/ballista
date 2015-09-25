@@ -1,6 +1,6 @@
 # Ballista
 
-**Date**: 2015-07-29
+**Date**: 2015-09-25
 
 Ballista is a proposal for a standard web API, revisiting of the concepts behind
 [Web Intents](http://webintents.org): allowing websites to open files and share
