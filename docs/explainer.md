@@ -31,25 +31,41 @@ Ballista is all about helping web applications become first-class apps on
 desktop and mobile, interoperating with native apps and the underlying local
 file system, as well as with each other.
 
-## How is this different from Web Intents?
+## How is this different from other web intents systems?
 
-You may be thinking that we've already tried this with [Web
-Intents](http://webintents.org), which is no longer under development. Indeed,
-this proposal covers the bulk of the use cases of Web Intents (and that's the
-point – we think Web Intents was a great idea!), but a few things are different
-now:
+There have been several past attempts at doing this, notably [Web
+Intents](http://webintents.org), which is no longer under development, and
+Mozilla's [Web
+Activities](https://developer.mozilla.org/en-US/docs/Web/API/Web_Activities),
+which is proprietary to Firefox OS and Firefox for Android.
+
+Indeed, this proposal covers the bulk of the use cases of Web Intents and Web
+Activities, but a few things are different now:
 
 * The web platform has gotten some new features since 2013 that solve some of
   the issues of Web Intents: [Service
   Workers](http://slightlyoff.github.io/ServiceWorker/spec/service_worker/) give
   us a place for handlers to receive events without opening a foreground page,
-  and [Web App Manifests](https://w3c.github.io/manifest/) give us a place to
+  and for requesters to receive responses to even if the user has closed their
+  tabs. [Web App Manifests](https://w3c.github.io/manifest/) give us a place to
   declaratively specify handlers.
 * Ballista is designed to interoperate with native apps on mobile and desktop,
-  which solves the bootstrapping problem.
+  which solves the bootstrapping problem. Ballista is also designed to address
+  the use case of a handler sending multiple updates back.
 * There is now a push for building [installable app-like
   websites](https://w3c.github.io/manifest/#installable-web-applications).
   Installable apps should be registerable as file handlers.
+
+OK, what about some less ambitious approaches?
+
+* [intent:// URLs](https://developer.chrome.com/multidevice/android/intents):
+  Works today, but it's specific to Chrome on Android, and only allows us to
+  send intents to native apps.
+* [registerProtocolHandler](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler)
+  and registerContentHandler: Can be [used for this
+  purpose](https://blog.mozilla.org/webdev/2010/07/26/registerprotocolhandler-enhancing-the-federated-web/),
+  but it's a hack. We'd rather design an API that properly solves these use
+  cases.
 
 ## Overview
 
