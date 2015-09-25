@@ -2,31 +2,17 @@
 
 **Date**: 2015-09-25
 
-Ballista is a proposal for a standard web API, revisiting of the concepts behind
-[Web Intents](http://webintents.org): allowing websites to open files and share
-data with other applications (native and web), and also allowing websites to
-register as handlers for files and data from other applications.
+**Ballista** is a project to explore inter-website communication; specifically,
+communication between one website and another site of the user's choosing. We
+want the user to be able to *share* or *edit* documents in another website that
+the first website has never even heard of, *choose* documents from another
+website, or register a website as a *native file handler*. Essentially, we want
+to create an **intents system for the web**.
 
-The codename "[Ballista](https://en.wikipedia.org/wiki/Ballista)" is about
-launching things at other things; we hope to settle on a proper name over the
-course of the standardization process. The current API lives in
-`navigator.actions`, but we aren't particularly attached to that name.
-
-## How does it work?
-There are two parts to Ballista:
-
-* **Requester**: Websites can request an "action" be handled by another site or
-  app of the user's choosing. For example, a site can send a file to be edited
-  externally.
-* **Handler**: Websites can request to be registered as action handlers. For
-  example, a site registered as a handler may be called upon to edit a file from
-  another site or native file system.
-
-This combines the desktop concept of file associations with the mobile concept
-of intents. A handler could appear in the "open with" menu in a traditional
-desktop operating system, or in the intent picker on Android. A requester can
-use a native app to edit a document, or fire an intent at a native app on
-Android. And web requesters can also fire actions at web handlers.
+Our [explainer document](docs/explainer.md) dives deeper into the problem space
+and outlines an API that we think solves this problem. But this is less about
+proposing an API, and more about starting a conversation, so take a look, and
+let us know what you think (contact details below).
 
 ## Resources
 
