@@ -67,10 +67,10 @@ Websites can use Ballista in two different ways:
 
 A site / app can be either a requester or a handler, or both.
 
-**Note**: The native integration would be an implementation detail of browsers,
-not part of the standard. In essence, a browser could act as a special requester
-or register itself as a special handler and act as a proxy to the underlying OS;
-this would be allowed by the spec but not required.
+> **Note**: The native integration would be an implementation detail of
+> browsers, not part of the standard. In essence, a browser could act as a
+> special requester or register itself as a special handler and act as a proxy
+> to the underlying OS; this would be allowed by the spec but not required.
 
 * A basic action is **one-way**: the requester sends a *single message* (with
   optional payload) to an appropriate handler of the user's choice. It receives
@@ -213,8 +213,8 @@ we need a web app manifest and a service worker.
       }
     }
 
-**Note:** `"bidirectional"` means that the handler can send updates back to the
-requester.
+> **Note:** `"bidirectional"` means that the handler can send updates back to
+> the requester.
 
 #### serviceworker.js
 
