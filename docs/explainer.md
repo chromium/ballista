@@ -108,10 +108,12 @@ choosing, just attach this JavaScript code to a "share" button.
 
 #### foreground.js
 
-    shareButton.addEventListener('click', () => {
-      navigator.actions.performAction('share', {url: window.location.href})
-          .then(action => console.log(action));
-    });
+```js
+shareButton.addEventListener('click', () => {
+  navigator.actions.performAction('share', {url: window.location.href})
+      .then(action => console.log(action));
+});
+```
 
 #### User experience
 
@@ -131,25 +133,29 @@ any tabs.
 
 #### manifest.webmanifest
 
-    {
-      "name": "Includinator",
-      "short_name": "Includinator",
-      "icons": [...],
-      "actions": {
-        "share": {}
-      }
-    }
+```js
+{
+  "name": "Includinator",
+  "short_name": "Includinator",
+  "icons": [...],
+  "actions": {
+    "share": {}
+  }
+}
+```
 
 #### serviceworker.js
 
-    self.addEventListener('action', event => {
-      if (event.verb == 'share') {
-        if (event.data.url === undefined)
-          throw new Error('Did not contain URL.');
+```js
+self.addEventListener('action', event => {
+  if (event.verb == 'share') {
+    if (event.data.url === undefined)
+      throw new Error('Did not contain URL.');
 
-        includinate(event.data.url);
-      }
-    });
+    includinate(event.data.url);
+  }
+});
+```
 
 #### User experience
 
@@ -165,38 +171,42 @@ with any registered editor for that file type.
 
 #### foreground.js
 
-    editButton.addEventListener('click', () => {
-      navigator.serviceWorker.controller.postMessage(
-          {type: 'open', filename: selectedFilename});
-    });
+```js
+editButton.addEventListener('click', () => {
+  navigator.serviceWorker.controller.postMessage(
+      {type: 'open', filename: selectedFilename});
+});
+```
 
 #### serviceworker.js
 
-    self.addEventListener('message', event => {
-      if (event.data.type != 'open')
-        return;
+```js
+self.addEventListener('message', event => {
+  if (event.data.type != 'open')
+    return;
 
-      var filename = event.data.filename;
-      getFileFromCloud(filename).then(file => {
-        // |file| is a File object.
-        navigator.actions.performAction(
-            {verb: 'open', bidirectional: true, type: file.type}, {file: file})
-            .then(action => {
-          var onUpdate = event => {
-            // Only respond to updates to the current action.
-            if (event.id != action.id)
-              return;
+  var filename = event.data.filename;
+  getFileFromCloud(filename).then(file => {
+    // |file| is a File object.
+    navigator.actions.performAction(
+        {verb: 'open', bidirectional: true, type: file.type}, {file: file})
+        .then(action => {
+      var onUpdate = event => {
+        // Only respond to updates to the current action.
+        if (event.id != action.id)
+          return;
 
-            // Can be called multiple times for a single action.
-            // |event.data.file| is a new File object with updated text.
-            storeFileInCloud(filename, event.data.file);
-            if (event.done)
-              navigator.actions.removeEventListener('update', onUpdate);
-          };
-          navigator.actions.addEventListener('update', onUpdate);
-        });
-      });
+        // Can be called multiple times for a single action.
+        // |event.data.file| is a new File object with updated text.
+        storeFileInCloud(filename, event.data.file);
+        if (event.done)
+          navigator.actions.removeEventListener('update', onUpdate);
+      };
+      navigator.actions.addEventListener('update', onUpdate);
     });
+  });
+});
+```
 
 #### User experience
 
@@ -217,42 +227,46 @@ we need a web app manifest and a service worker.
 
 #### manifest.webmanifest
 
-    {
-      "name": "WebEditor",
-      "short_name": "Editor",
-      "icons": [...],
-      "actions": {
-        "open": {
-          "bidirectional": true,
-          "types": ["text/*"]
-        }
-      }
+```js
+{
+  "name": "WebEditor",
+  "short_name": "Editor",
+  "icons": [...],
+  "actions": {
+    "open": {
+      "bidirectional": true,
+      "types": ["text/*"]
     }
+  }
+}
+```
 
 > **Note:** `"bidirectional"` means that the handler can send updates back to
 > the requester.
 
 #### serviceworker.js
 
-    navigator.actions.addEventListener('handle', event => {
-      if (event.options.verb == 'open') {
-        if (event.data.file === undefined) {
-          event.reject(new Error('Did not contain file.'));
-          return;
-        }
+```js
+navigator.actions.addEventListener('handle', event => {
+  if (event.options.verb == 'open') {
+    if (event.data.file === undefined) {
+      event.reject(new Error('Did not contain file.'));
+      return;
+    }
 
-        // This function in our service worker opens a new browser tab and
-        // returns a handle (in a promise) that receives a "save" event when the
-        // user clicks a button in the tab's foreground page.
-        openFileInNewWindow(event.data.file)
-            .then(client => {
-              var id = event.id;
-              client.addEventListener('save', event => {
-                navigator.actions.update(id, {file: new File([event.newText], ...)});
-              });
-            });
-      }
-    });
+    // This function in our service worker opens a new browser tab and
+    // returns a handle (in a promise) that receives a "save" event when the
+    // user clicks a button in the tab's foreground page.
+    openFileInNewWindow(event.data.file)
+        .then(client => {
+          var id = event.id;
+          client.addEventListener('save', event => {
+            navigator.actions.update(id, {file: new File([event.newText], ...)});
+          });
+        });
+  }
+});
+```
 
 #### User experience
 
