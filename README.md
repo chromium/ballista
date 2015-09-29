@@ -2,6 +2,8 @@
 
 **Date**: 2015-09-25
 
+![A ballista](docs/images/ballista-300.png)
+
 **Ballista** is a project to explore inter-website communication; specifically,
 communication between one website and another site of the user's choosing. We
 want the user to be able to *share* or *edit* documents in another website that
