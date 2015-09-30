@@ -19,7 +19,7 @@ Imagine being able to:
 We want to enable all of these use cases, and more like them. And, we want to be
 able to integrate with native apps where it makes sense (for example, using a
 native app to edit a document directly from the web). Essentially, we want to
-create an **intents system for the web**.
+create an **interoperability system for the web**.
 
 We've come up with a basic API as a first cut at solving this problem. That API
 is detailed below, and a polyfill is provided in this repository. But it's early
@@ -31,7 +31,7 @@ Ballista is all about helping web applications become first-class apps on
 desktop and mobile, interoperating with native apps and the underlying local
 file system, as well as with each other.
 
-## How is this different from other web intents systems?
+## How is this different from other web interoperability systems?
 
 There have been several past attempts at doing this, notably [Web
 Intents](http://webintents.org), which is no longer under development, and
