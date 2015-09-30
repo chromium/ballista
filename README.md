@@ -9,7 +9,7 @@ communication between one website and another site of the user's choosing. We
 want the user to be able to *share* or *edit* documents in another website that
 the first website has never even heard of, *choose* documents from another
 website, or register a website as a *native file handler*. Essentially, we want
-to create an **intents system for the web**.
+to create an **interoperability system for the web**.
 
 Our [explainer document](docs/explainer.md) dives deeper into the problem space
 and outlines an API that we think solves this problem. But this is less about
