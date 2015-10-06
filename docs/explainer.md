@@ -6,11 +6,11 @@
 communication between one website and another site of the user's choosing.
 Imagine being able to:
 
-* Click a "share" button, then choose which social network or other web app to
-  share it with, based on which apps *you* have installed (not a pre-defined
-  list chosen by the site you're on).
+* Click a "share" button, then choose which social network or other web/native
+  app to share it with, based on which apps *you* have installed (not a
+  pre-defined list chosen by the site you're on).
 * Click an "edit" button on a photo or document in a cloud drive or web IDE,
-  then choose a web app or native app to edit it with.
+  then choose a web/native app to edit it with.
 * Click an "attach" button in a webmail app, then pick a photo or file from a
   cloud photo collection or drive, instead of your local disk.
 * Register a web editor as the default editor for certain file types in the
