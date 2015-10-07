@@ -120,8 +120,6 @@ function sendPortToHandler(url, port) {
     return;
   }
 
-  var slashIdx = url.indexOf('/', 10);
-  var origin = url.substr(0, slashIdx);
   var iframe = document.createElement('iframe');
   iframe.style.display = 'none';
   iframe.onload = function(event) {
