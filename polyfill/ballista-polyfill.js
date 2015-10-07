@@ -117,13 +117,25 @@ function sendPortToProxy(port) {
     return;
   }
 
+  var div = document.createElement('div');
+  div.style.zIndex = 100;
+  div.style.position = 'absolute';
+  div.style.left = '200px';
+  div.style.top = '200px';
+  div.style.width = '640px';
+  div.style.height = '480px';
+
   var iframe = document.createElement('iframe');
   iframe.onload = function(event) {
     iframe.contentWindow.postMessage({port: port}, '*', [port]);
   };
 
   iframe.setAttribute('src', kProxyUrl);
-  document.body.appendChild(iframe);
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+
+  div.appendChild(iframe);
+  document.body.appendChild(div);
 
   // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
 }
