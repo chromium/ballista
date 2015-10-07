@@ -67,7 +67,3 @@ self.addEventListener('message', event => {
   if (type == 'open')
     editFile(data.file, data.port);
 });
-
-// Tell the polyfill which handler to use. This isn't part of the final API,
-// just a temporary requirement of the polyfill.
-navigator.actions.polyfillHandlerUrl = 'http://localhost:8080/test';

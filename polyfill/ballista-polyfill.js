@@ -19,10 +19,6 @@
 // API, by design, does things that aren't possible in a polyfill, so this will
 // be broken without specific browser hacks. All work-in-progress; don't get too
 // excited about it.
-//
-// Note: The requester needs to set navigator.actions.polyfillHandlerUrl to a
-// valid handler URL before calling performAction. This is a temporary
-// requirement of the polyfill and won't be part of the final API.
 "use strict";
 
 (function() {
@@ -30,6 +26,11 @@
 // Portions are copied (and heavily modified) from tha navigator-connect
 // polyfill by mkruisselbrink and reillyeon:
 // https://github.com/mkruisselbrink/navigator-connect
+
+// The URL of the proxy app, which provides the handler chooser and routes
+// actions through to the chosen handler.
+// TODO(mgiuca): Move this to a fixed public location.
+var kProxyUrl = 'http://localhost:8080/choose';
 
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
@@ -69,8 +70,8 @@ function onMessage(event) {
     }
     event.stopImmediatePropagation();
     return;
-  } else if (data.type == 'sendPortToHandler') {
-    sendPortToHandler(data.url, data.port);
+  } else if (data.type == 'sendPortToProxy') {
+    sendPortToProxy(data.port);
   }
 }
 
@@ -101,7 +102,7 @@ if (self.WorkerNavigator !== undefined) {
 // Establishes a connection with the polyfill handler (by embedding a page from
 // the handler's domain in an iframe), and posts a MessagePort object to it.
 // Asynchronous; no return value.
-function sendPortToHandler(url, port) {
+function sendPortToProxy(port) {
   if (self.document === undefined) {
     // We are in a service worker. No way to create an iframe here (needed to
     // establish a connection to handler service worker), so connect to a random
@@ -111,8 +112,7 @@ function sendPortToHandler(url, port) {
     // page, this will fail. This *should not* happen in the real API, but there
     // is no way around this in the polyfill.
     findLastTopLevelClient().then(client => {
-      client.postMessage({type: 'sendPortToHandler', url: url, port: port},
-                         [port]);
+      client.postMessage({type: 'sendPortToProxy', port: port}, [port]);
     });
     return;
   }
@@ -123,16 +123,16 @@ function sendPortToHandler(url, port) {
     iframe.contentWindow.postMessage({port: port}, '*', [port]);
   };
 
-  iframe.setAttribute('src', url + kProxyUrlSuffix);
+  iframe.setAttribute('src', kProxyUrl);
   document.body.appendChild(iframe);
 
   // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
 }
 
-// Establish a connection with the polyfill handler (by embedding a page from
-// the handler's domain in an iframe). Returns (in a promise) a MessagePort on
-// succesful connection to the handler.
-function connectToHandler(url) {
+// Prompts the user for a handler app and establish a connection with the chosen
+// handler. Returns (in a promise) a MessagePort on succesful connection to the
+// handler.
+function connectToHandler() {
   return new Promise(function(resolve, reject) {
     var channel = new MessageChannel();
     channel.port1.onmessage = e => {
@@ -143,7 +143,7 @@ function connectToHandler(url) {
         reject(new Error("Received unexpected response from handler."));
       }
     };
-    sendPortToHandler(url, channel.port2);
+    sendPortToProxy(channel.port2);
   });
 };
 
@@ -242,11 +242,6 @@ if (navigator.actions === undefined) {
   var actions = new NavigatorActions();
   navigator.actions = actions;
 
-  // The URL of the handler to send requests to. The final API will have the
-  // user agent let the user choose a handler from a registered list. For now,
-  // we just let the requester specify its URL by setting this variable.
-  actions.polyfillHandlerUrl = null;
-
   var event_or_extendable_event = Event;
 
   // HandleEvent is only available when the global scope is a
@@ -286,28 +281,19 @@ if (navigator.actions === undefined) {
   // interaction with the handler. Fails with AbortError if a connection could
   // not be made.
   actions.performAction = function(options, data) {
-    // Get the URL of the handler to connect to. For now, this is just a fixed
-    // URL set by the requester.
-    var handlerUrl = actions.polyfillHandlerUrl;
-    if (handlerUrl === null) {
-      throw new Error(
-          'You need to set navigator.actions.polyfillHandlerUrl ' +
-          '(temporary requirement of the polyfill only).');
-    }
+    return connectToHandler().then(port => {
+      var id = nextActionId++;
+      if (typeof options == 'string')
+        options = {verb: options};
+      var action = new Action(id);
 
-    return connectToHandler(handlerUrl)
-        .then(port => {
-          var id = nextActionId++;
-          if (typeof options == 'string') options = {verb: options};
-          var action = new Action(id);
+      // Send the options and data payload to the handler.
+      var message = {type: 'action', options: options, data: data, id: id};
+      port.postMessage(message);
+      port.onmessage = m => onMessageReceived(m.data, null);
 
-          // Send the options and data payload to the handler.
-          var message = {type: 'action', options: options, data: data, id: id};
-          port.postMessage(message);
-          port.onmessage = m => onMessageReceived(m.data, null);
-
-          return action;
-        });
+      return action;
+    });
   };
 
   // Sends an updated version of the data payload associated with an action back
