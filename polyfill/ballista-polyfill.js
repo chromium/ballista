@@ -118,7 +118,6 @@ function sendPortToProxy(port) {
   }
 
   var iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
   iframe.onload = function(event) {
     iframe.contentWindow.postMessage({port: port}, '*', [port]);
   };
