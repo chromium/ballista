@@ -21,7 +21,7 @@ This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
 * If the requester API (`navigator.actions.performAction`) is used from a
   service worker, a foreground page on that domain must be open (but it does not
   need to remain open to receive updates).
-* No handler picking UI. Each requester is tied to a single handler.
+* Not able to send actions to native applications.
 * Not possible to use `clients.openWindow` from the `'action'` event handler
   (when the handler's service worker receives an action). This means your apps
   need to handle the action in an existing tab, rather than opening a new tab.
