@@ -34,6 +34,10 @@ var kProxyUrl = 'http://localhost:8080/choose';
 
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
+// DOM element for the <div> containing the chooser UI (hosted by the proxy
+// site) in an iframe. Only non-null while choosing is taking place.
+var chooserDiv = null;
+
 // The handler's service worker provides a special proxy page that will be
 // embedded in an iframe in the requester (by connectToHandler).
 //
@@ -72,6 +76,8 @@ function onMessage(event) {
     return;
   } else if (data.type == 'sendPortToProxy') {
     sendPortToProxy(data.port);
+  } else if (data.type == 'closeChooser') {
+    closeChooser();
   }
 }
 
@@ -117,13 +123,13 @@ function sendPortToProxy(port) {
     return;
   }
 
-  var div = document.createElement('div');
-  div.style.zIndex = 100;
-  div.style.position = 'absolute';
-  div.style.left = '200px';
-  div.style.top = '200px';
-  div.style.width = '640px';
-  div.style.height = '480px';
+  chooserDiv = document.createElement('div');
+  chooserDiv.style.zIndex = 100;
+  chooserDiv.style.position = 'absolute';
+  chooserDiv.style.left = '200px';
+  chooserDiv.style.top = '200px';
+  chooserDiv.style.width = '640px';
+  chooserDiv.style.height = '480px';
 
   var iframe = document.createElement('iframe');
   iframe.onload = function(event) {
@@ -134,10 +140,22 @@ function sendPortToProxy(port) {
   iframe.style.width = '100%';
   iframe.style.height = '100%';
 
-  div.appendChild(iframe);
-  document.body.appendChild(div);
+  chooserDiv.appendChild(iframe);
+  document.body.appendChild(chooserDiv);
+}
 
-  // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
+// Destroy the chooser div.
+function closeChooser() {
+  if (self.document === undefined) {
+    // We are in a service worker. Tell the foreground page to destroy the
+    // chooser.
+    findLastTopLevelClient().then(client => {
+      client.postMessage({type: 'closeChooser'});
+    });
+    return;
+  }
+
+  document.body.removeChild(chooserDiv);
 }
 
 // Prompts the user for a handler app and establish a connection with the chosen
@@ -147,6 +165,8 @@ function connectToHandler() {
   return new Promise(function(resolve, reject) {
     var channel = new MessageChannel();
     channel.port1.onmessage = e => {
+      closeChooser();
+
       if (e.data.connected) {
         channel.port1.onmessage = null;
         resolve(channel.port1);
