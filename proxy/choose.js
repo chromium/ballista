@@ -95,6 +95,9 @@ window.onmessage = function(e) {
 
 function selectedHandler() {
   var selectedNode = document.querySelector('input[name = "handler"]:checked');
+  if (selectedNode == undefined)
+    return null;
+
   return Number(selectedNode.value);
 }
 
@@ -102,6 +105,9 @@ function selectedHandler() {
 function openHandler(handlerId) {
   if (requesterPort == null)
     throw Error('Cannot open handler; never received a port from requester.');
+
+  if (handlerId == null)
+    throw Error('No handler selected.');
 
   var handler = handlers[handlerId];
   sendPortToHandler(handler.url, requesterPort);
