@@ -68,6 +68,26 @@ function populateHandlers() {
   var choices = document.querySelector('#choices');
   while (choices.firstChild)
     choices.removeChild(choices.firstChild);
+
+  var open = document.querySelector('#open');
+  if (handlers.length == 0) {
+    // Show the error, hide the choosing interface, and disable the Open button.
+    document.querySelector('#no_handlers').style.display = 'block';
+    document.querySelector('#yes_handlers').style.display = 'none';
+    choices.style.display = 'none';
+    open.setAttribute('disabled', '');
+    open.classList.remove('mdl-button--colored');
+    componentHandler.upgradeElement(open);
+    return;
+  }
+
+  document.querySelector('#no_handlers').style.display = 'none';
+  document.querySelector('#yes_handlers').style.display = 'block';
+  choices.style.display = 'block';
+  open.removeAttribute('disabled');
+  open.classList.add('mdl-button--colored');
+  componentHandler.upgradeElement(open);
+
   for (var i = 0; i < handlers.length; i++) {
     var handler = handlers[i];
     var p = document.createElement('p');
