@@ -32,9 +32,10 @@ var handlers;
 var requesterPort = null;
 
 function createRadioButton(name, index, title, checked) {
-  var span = document.createElement('span');
+  var label = document.createElement('label');
   var input = document.createElement('input');
   input.type = 'radio';
+  input.setAttribute('class', 'mdl-radio__button');
   input.name = name;
   input.value = index;
   var id = name + '_' + index;
@@ -42,14 +43,17 @@ function createRadioButton(name, index, title, checked) {
   if (checked)
     input.checked = true;
 
-  var label = document.createElement('label');
+  var span = document.createElement('span');
+  span.setAttribute('class', 'mdl-radio__label');
+  span.appendChild(document.createTextNode(title));
+
+  label.setAttribute('class', 'mdl-radio mdl-js-radio mdl-js-ripple-effect');
   label.setAttribute('for', id);
-  label.appendChild(document.createTextNode(title));
+  label.appendChild(input);
+  label.appendChild(span);
 
-  span.appendChild(input);
-  span.appendChild(label);
-
-  return span;
+  componentHandler.upgradeElement(label);
+  return label;
 }
 
 // Populates the global |handlers| variable, and also creates the radio buttons

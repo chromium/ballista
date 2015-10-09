@@ -23,12 +23,26 @@ limitations under the License.
     <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.2/material.orange-indigo.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   </head>
-  <body style="background-color: white">
-    <h1>Open With</h1>
-    <p>Which app do you want to use?</p>
-    <div id="choices"></div>
-    <p><input type="button" id="open" value="Open">
-       <input type="button" id="cancel" value="Cancel"></p>
+  <body>
+    <!-- Card for chooser/confirmation dialog -->
+    <div id="chooser" class="mdl-card mdl-shadow--2dp">
+      <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Open with</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        Which app do you want to use?
+      </div>
+      <div class="mdl-card__supporting-text" id="choices"></div>
+      <div class="mdl-card__actions mdl-card--border">
+        <a id="open" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          Open
+        </a>
+        <a id="cancel" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          Cancel
+        </a>
+      </div>
+    </div>
+
     <!-- The handler's proxy page is embedded in this iframe. -->
     <iframe id="handler_iframe" style="display: none">
   </body>
