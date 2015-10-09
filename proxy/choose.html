@@ -20,8 +20,11 @@ limitations under the License.
     <script type="text/javascript" src="choose.js"></script>
   </head>
   <body style="background-color: white">
-    <h1>Ballista Proxy Chooser Dialog</h1>
+    <h1>Open With</h1>
     <p>Which app do you want to use?</p>
+    <div id="choices"></div>
+    <p><input type="button" id="open" value="Open">
+       <input type="button" id="cancel" value="Cancel"></p>
     <!-- The handler's proxy page is embedded in this iframe. -->
     <iframe id="handler_iframe" style="display: none">
   </body>

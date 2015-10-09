@@ -32,6 +32,9 @@ for (var i = 0; i < kHandlerList.length; i++) {
   handlers.push({title: handlerItem[0], url: handlerItem[1]});
 }
 
+// A MessagePort back to the requester that initiated this action.
+var requesterPort = null;
+
 // Establishes a connection with the handler (by embedding a page from the
 // handler's domain in an iframe), and posts a MessagePort object to it.
 // Asynchronous; no return value.
@@ -45,10 +48,64 @@ function sendPortToHandler(url, port) {
 }
 
 window.onmessage = function(e) {
-  var port = e.data.port;
-
-  // For now, just forward the port on to the hard-coded handler.
-  // TODO(mgiuca): Let the user choose from registered handlers.
-  var handler = handlers[0];
-  sendPortToHandler(handler.url, port);
+  requesterPort = e.data.port;
 };
+
+function selectedHandler() {
+  var selectedNode = document.querySelector('input[name = "handler"]:checked');
+  return Number(selectedNode.value);
+}
+
+// Opens this action in the chosen handler.
+function openHandler(handlerId) {
+  if (requesterPort == null) {
+    throw Error('Cannot open handler; never received a port from requester.');
+  }
+
+  var handler = handlers[handlerId];
+  sendPortToHandler(handler.url, requesterPort);
+}
+
+function closeDialog() {
+  // TODO(mgiuca): Figure out a way to close this iframe from the inside out.
+}
+
+function openButtonClick() {
+  var handlerId = selectedHandler();
+  openHandler(handlerId);
+  closeDialog();
+}
+
+function cancelButtonClick() {
+  closeDialog();
+}
+
+function onLoad() {
+  var choices = document.querySelector('#choices');
+  for (var i = 0; i < handlers.length; i++) {
+    var handler = handlers[i];
+    var p = document.createElement('p');
+    var input = document.createElement('input');
+    input.type = 'radio';
+    input.name = 'handler';
+    input.value = i;
+    var id = 'handler_' + i;
+    input.id = id;
+    if (i == 0)
+      input.checked = true;
+
+    var label = document.createElement('label');
+    label.setAttribute('for', id);
+    label.appendChild(document.createTextNode(handler.title));
+
+    p.appendChild(input);
+    p.appendChild(label);
+    choices.appendChild(p);
+  }
+
+  document.getElementById('open').addEventListener('click', openButtonClick);
+  document.getElementById('cancel')
+      .addEventListener('click', cancelButtonClick);
+}
+
+window.addEventListener('load', onLoad, false);
