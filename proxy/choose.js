@@ -16,11 +16,21 @@
 "use strict";
 
 // TODO(mgiuca): Let the user register and choose from registered handlers,
-// rather than hard-coding this URL.
-var kHandlerUrl = 'http://localhost:8081/test';
+// rather than hard-coding these URLs.
+// List of [title, url] pairs.
+var kHandlerList = [
+  ['Ballista Handler Demo', 'http://localhost:8081/test'],
+  ['Some Other App', 'https://example.com/foo'],
+]
 
 // Copied from polyfill/ballista-polyfill.js.
 var kProxyUrlSuffix = '?actions-handler-proxy';
+
+var handlers = [];
+for (var i = 0; i < kHandlerList.length; i++) {
+  var handlerItem = kHandlerList[i];
+  handlers.push({title: handlerItem[0], url: handlerItem[1]});
+}
 
 // Establishes a connection with the handler (by embedding a page from the
 // handler's domain in an iframe), and posts a MessagePort object to it.
@@ -39,5 +49,6 @@ window.onmessage = function(e) {
 
   // For now, just forward the port on to the hard-coded handler.
   // TODO(mgiuca): Let the user choose from registered handlers.
-  sendPortToHandler(kHandlerUrl, port);
+  var handler = handlers[0];
+  sendPortToHandler(handler.url, port);
 };
