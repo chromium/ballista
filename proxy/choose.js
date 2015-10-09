@@ -26,14 +26,51 @@ var kHandlerList = [
 // Copied from polyfill/ballista-polyfill.js.
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
-var handlers = [];
-for (var i = 0; i < kHandlerList.length; i++) {
-  var handlerItem = kHandlerList[i];
-  handlers.push({title: handlerItem[0], url: handlerItem[1]});
-}
+var handlers;
 
 // A MessagePort back to the requester that initiated this action.
 var requesterPort = null;
+
+function createRadioButton(name, index, title, checked) {
+  var span = document.createElement('span');
+  var input = document.createElement('input');
+  input.type = 'radio';
+  input.name = name;
+  input.value = index;
+  var id = name + '_' + index;
+  input.id = id;
+  if (checked)
+    input.checked = true;
+
+  var label = document.createElement('label');
+  label.setAttribute('for', id);
+  label.appendChild(document.createTextNode(title));
+
+  span.appendChild(input);
+  span.appendChild(label);
+
+  return span;
+}
+
+// Populates the global |handlers| variable, and also creates the radio buttons
+// in the DOM tree for the handlers.
+function populateHandlers() {
+  handlers = [];
+  for (var i = 0; i < kHandlerList.length; i++) {
+    var handlerItem = kHandlerList[i];
+    handlers.push({title: handlerItem[0], url: handlerItem[1]});
+  }
+
+  var choices = document.querySelector('#choices');
+  while (choices.firstChild)
+    choices.removeChild(choices.firstChild);
+  for (var i = 0; i < handlers.length; i++) {
+    var handler = handlers[i];
+    var p = document.createElement('p');
+    p.appendChild(createRadioButton('handler', i, handler.title, i == 0));
+    choices.appendChild(p);
+  }
+}
 
 // Establishes a connection with the handler (by embedding a page from the
 // handler's domain in an iframe), and posts a MessagePort object to it.
@@ -49,6 +86,7 @@ function sendPortToHandler(url, port) {
 
 window.onmessage = function(e) {
   requesterPort = e.data.port;
+  populateHandlers();
 };
 
 function selectedHandler() {
@@ -77,36 +115,7 @@ function cancelButtonClick() {
   requesterPort.postMessage({connected: false});
 }
 
-function createRadioButton(name, index, title, checked) {
-  var span = document.createElement('span');
-  var input = document.createElement('input');
-  input.type = 'radio';
-  input.name = name;
-  input.value = index;
-  var id = name + '_' + index;
-  input.id = id;
-  if (checked)
-    input.checked = true;
-
-  var label = document.createElement('label');
-  label.setAttribute('for', id);
-  label.appendChild(document.createTextNode(title));
-
-  span.appendChild(input);
-  span.appendChild(label);
-
-  return span;
-}
-
 function onLoad() {
-  var choices = document.querySelector('#choices');
-  for (var i = 0; i < handlers.length; i++) {
-    var handler = handlers[i];
-    var p = document.createElement('p');
-    p.appendChild(createRadioButton('handler', i, handler.title, i == 0));
-    choices.appendChild(p);
-  }
-
   document.getElementById('open').addEventListener('click', openButtonClick);
   document.getElementById('cancel')
       .addEventListener('click', cancelButtonClick);
