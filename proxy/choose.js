@@ -56,28 +56,25 @@ function selectedHandler() {
   return Number(selectedNode.value);
 }
 
-// Opens this action in the chosen handler.
+// Opens this action in the chosen handler. Automatically closes the dialog.
 function openHandler(handlerId) {
-  if (requesterPort == null) {
+  if (requesterPort == null)
     throw Error('Cannot open handler; never received a port from requester.');
-  }
 
   var handler = handlers[handlerId];
   sendPortToHandler(handler.url, requesterPort);
 }
 
-function closeDialog() {
-  // TODO(mgiuca): Figure out a way to close this iframe from the inside out.
-}
-
 function openButtonClick() {
   var handlerId = selectedHandler();
   openHandler(handlerId);
-  closeDialog();
 }
 
 function cancelButtonClick() {
-  closeDialog();
+  if (requesterPort == null)
+    throw Error('Cannot close dialog; never received a port from requester.');
+
+  requesterPort.postMessage({connected: false});
 }
 
 function onLoad() {

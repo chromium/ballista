@@ -170,6 +170,8 @@ function connectToHandler() {
       if (e.data.connected) {
         channel.port1.onmessage = null;
         resolve(channel.port1);
+      } else if (e.data.connected == false) {
+        // Fail silently. (This happens if the user cancels the dialog.)
       } else {
         reject(new Error("Received unexpected response from handler."));
       }
