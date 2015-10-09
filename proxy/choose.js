@@ -77,26 +77,33 @@ function cancelButtonClick() {
   requesterPort.postMessage({connected: false});
 }
 
+function createRadioButton(name, index, title, checked) {
+  var span = document.createElement('span');
+  var input = document.createElement('input');
+  input.type = 'radio';
+  input.name = name;
+  input.value = index;
+  var id = name + '_' + index;
+  input.id = id;
+  if (checked)
+    input.checked = true;
+
+  var label = document.createElement('label');
+  label.setAttribute('for', id);
+  label.appendChild(document.createTextNode(title));
+
+  span.appendChild(input);
+  span.appendChild(label);
+
+  return span;
+}
+
 function onLoad() {
   var choices = document.querySelector('#choices');
   for (var i = 0; i < handlers.length; i++) {
     var handler = handlers[i];
     var p = document.createElement('p');
-    var input = document.createElement('input');
-    input.type = 'radio';
-    input.name = 'handler';
-    input.value = i;
-    var id = 'handler_' + i;
-    input.id = id;
-    if (i == 0)
-      input.checked = true;
-
-    var label = document.createElement('label');
-    label.setAttribute('for', id);
-    label.appendChild(document.createTextNode(handler.title));
-
-    p.appendChild(input);
-    p.appendChild(label);
+    p.appendChild(createRadioButton('handler', i, handler.title, i == 0));
     choices.appendChild(p);
   }
 
