@@ -1,0 +1,5 @@
+#chooser > .mdl-card__title {
+  /* From .mdl-layout__header. */
+  color: #424242;
+  background-color: #ff9800;
+}

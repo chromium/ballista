@@ -11,6 +11,11 @@ handlers:
   static_files: proxy/\1
   upload: proxy/.*\.js
 
+- url: /([^/]*\.css)
+  mime_type: text/css
+  static_files: proxy/\1
+  upload: proxy/.*\.css
+
 - url: /
   static_files: proxy/index.html
   upload: proxy/index.html
