@@ -75,6 +75,22 @@ function storeGet(objectStore, key) {
 
 // Handler registration database code.
 
+// Class representing a Handler entry in the database. |name| and |url| are
+// strings (|url| is the primary key). |verbs| is a list of strings.
+function Handler(name, url, verbs) {
+  this.name = name;
+  this.url = url;
+  this.verbs = verbs;
+}
+
+// Convert an Object into a Handler with the same fields.
+function handlerFromObject(object) {
+  var handler = new Handler();
+  for (var k in object)
+    handler[k] = object[k];
+  return handler;
+}
+
 function onUpgradeNeeded(db, oldVersion) {
   // Migration code.
   if (oldVersion < 2)
@@ -105,7 +121,7 @@ function getAllHandlers(db) {
     store.openCursor().onsuccess = e => {
       var cursor = e.target.result;
       if (cursor) {
-        handlers.push(cursor.value);
+        handlers.push(handlerFromObject(cursor.value));
         cursor.continue();
       } else {
         resolve(handlers);
