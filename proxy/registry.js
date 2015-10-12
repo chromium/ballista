@@ -93,4 +93,21 @@ function addHandler(db, handler) {
   return transactionWait(transaction);
 }
 
+function getAllHandlers(db) {
+  var transaction = db.transaction(['handlers']);
+  var store = transaction.objectStore('handlers');
+  var handlers = [];
+  return new Promise((resolve, reject) => {
+    store.openCursor().onsuccess = e => {
+      var cursor = e.target.result;
+      if (cursor) {
+        handlers.push(cursor.value);
+        cursor.continue();
+      } else {
+        resolve(handlers);
+      }
+    };
+  });
+}
+
 })();
