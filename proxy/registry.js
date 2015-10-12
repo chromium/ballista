@@ -31,8 +31,8 @@ function promisify(request) {
 }
 
 // Opens an indexeddb database. |upgradefunction| is called with the IDBDatabase
-// as an argument, if an upgrade is needed (it should return a promise). Returns
-// a promise that resolves with the IDBDatabase object.
+// and old version as arguments, if an upgrade is needed (it should return a
+// promise). Returns a promise that resolves with the IDBDatabase object.
 function openDatabase(name, version, upgradefunction) {
   var request = window.indexedDB.open(name, version);
   return new Promise((resolve, reject) => {
@@ -41,7 +41,7 @@ function openDatabase(name, version, upgradefunction) {
         new DOMError('The database cannot be upgraded because it is in use.'));
     request.onsuccess = e => resolve(request.result);
     request.onupgradeneeded = e => {
-      upgradefunction(request.result)
+      upgradefunction(request.result, e.oldVersion)
           .then(unused => resolve(request.result), error => reject(error));
     }
   });
@@ -75,14 +75,18 @@ function storeGet(objectStore, key) {
 
 // Handler registration database code.
 
-function onUpgradeNeeded(db) {
+function onUpgradeNeeded(db, oldVersion) {
+  // Migration code.
+  if (oldVersion < 2)
+    db.deleteObjectStore('handlers');
+
   // The 'handlers' store maps arbitrary ints onto Handler objects.
-  var objectStore = db.createObjectStore('handlers', {autoIncrement: true});
+  var objectStore = db.createObjectStore('handlers', {keyPath: 'url'});
   return new Promise((resolve, reject) => resolve());
 }
 
 function openRegistryDatabase() {
-  return openDatabase('TestRegistry', 1, onUpgradeNeeded);
+  return openDatabase('TestRegistry', 2, onUpgradeNeeded);
 }
 
 // Adds a new handler to the database.
