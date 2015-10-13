@@ -15,14 +15,6 @@
 // Foreground page
 "use strict";
 
-// TODO(mgiuca): Let the user register and choose from registered handlers,
-// rather than hard-coding these URLs.
-// List of [title, url] pairs.
-var kHandlerList = [
-  ['Ballista Handler Demo', 'http://localhost:8081/test'],
-  ['Some Other App', 'https://example.com/foo'],
-]
-
 // Copied from polyfill/ballista-polyfill.js.
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
@@ -59,12 +51,13 @@ function createRadioButton(name, index, title, checked) {
 // Populates the global |handlers| variable, and also creates the radio buttons
 // in the DOM tree for the handlers.
 function populateHandlers() {
-  handlers = [];
-  for (var i = 0; i < kHandlerList.length; i++) {
-    var handlerItem = kHandlerList[i];
-    handlers.push({name: handlerItem[0], url: handlerItem[1]});
-  }
-  populateUI();
+  openRegistryDatabase().then(db => {
+    getAllHandlers(db).then(result => {
+      handlers = result;
+      db.close();
+      populateUI();
+    }, unused => db.close());
+  });
 }
 
 // Creates the radio buttons in the DOM tree for |handlers|.
