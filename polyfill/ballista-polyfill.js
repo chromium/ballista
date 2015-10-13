@@ -366,4 +366,38 @@ function onMessageReceived(data, port) {
   }
 }
 
+// Registers a handler with the proxy server.
+function registerHandler(name, url, verbs) {
+  console.log('registerHandler:', name, url, verbs);
+}
+
+// Parses the webapp manifest, and if there are any action handlers, prompts the
+// user to register with the proxy server.
+function performHandlerRegistration() {
+  var links = document.querySelectorAll('link[rel=manifest]');
+  for (var i = 0; i < links.length; i++) {
+    var manifestUrl = links[i].href;
+    fetch(manifestUrl).then(response => {
+      if (!response.ok)
+        return;
+
+      response.json().then(json => {
+        if (json.actions == undefined || json.actions.length == 0)
+          return;
+
+        // We have a manifest with action handlers. Attempt to register this
+        // handler with the proxy server.
+        var name = json.name || document.title;
+        var url = json.scope || document.location.href;
+        var verbs = [];
+        for (var verb in json.actions)
+          verbs.push(verb);
+        registerHandler(name, url, verbs);
+      });
+    });
+  }
+}
+
+addEventListener('load', performHandlerRegistration, false);
+
 })();
