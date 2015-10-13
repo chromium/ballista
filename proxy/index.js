@@ -96,13 +96,14 @@ function generateTableRows() {
       }
       db.close();
       reUpgradeTable();
-    });
+    }, unused => db.close());
   });
 }
 
 function deleteHandlersClick() {
   openRegistryDatabase().then(db => {
-    deleteHandlerForUrls(db, selectedUrls()).then(unused => db.close());
+    deleteHandlerForUrls(db, selectedUrls())
+        .then(unused => db.close(), unused => db.close());
     generateTableRows();
   });
 }
