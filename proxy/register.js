@@ -75,7 +75,19 @@ function populateUI() {
 
 // Registers this handler in the database.
 function register() {
-  console.log('TODO: Register this handler:', handler);
+  openRegistryDatabase().then(db => {
+    addHandler(db, handler)
+        .then(
+            unused => {
+              db.close();
+              closeDialog();
+            },
+            error => {
+              db.close();
+              closeDialog();
+              throw error;
+            });
+  });
 }
 
 window.onmessage = function(e) {
@@ -99,7 +111,6 @@ function closeDialog() {
 
 function registerButtonClick() {
   register();
-  closeDialog();
 }
 
 function cancelButtonClick() {
