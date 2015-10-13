@@ -104,13 +104,13 @@ function onUpgradeNeeded(db, oldVersion) {
   return new Promise((resolve, reject) => resolve());
 }
 
-function openRegistryDatabase() {
+window.openRegistryDatabase = function() {
   return openDatabase('TestRegistry', 2, onUpgradeNeeded);
 }
 
 // Adds a new handler to the database. Returns a promise that resolves once the
 // transaction is complete.
-function addHandler(db, handler) {
+window.addHandler = function(db, handler) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return new Promise((resolve, reject) => {
@@ -122,7 +122,7 @@ function addHandler(db, handler) {
 
 // Deletes a handler from the database. Returns a promise that resolves once the
 // transaction is complete.
-function deleteHandlerForUrl(db, url) {
+window.deleteHandlerForUrl = function(db, url) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return new Promise((resolve, reject) => {
@@ -134,7 +134,7 @@ function deleteHandlerForUrl(db, url) {
 
 // Gets all handlers in the database. Returns a promise that resolves with an
 // array of Handlers.
-function getAllHandlers(db) {
+window.getAllHandlers = function(db) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   var handlers = [];
@@ -153,7 +153,7 @@ function getAllHandlers(db) {
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
-function getHandlerForUrl(db, url) {
+window.getHandlerForUrl = function(db, url) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   return new Promise((resolve, reject) => {
@@ -165,7 +165,7 @@ function getHandlerForUrl(db, url) {
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
-function getHandlersForVerb(db, verb) {
+window.getHandlersForVerb = function(db, verb) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   var handlers = [];
