@@ -62,7 +62,7 @@ function populateHandlers() {
   handlers = [];
   for (var i = 0; i < kHandlerList.length; i++) {
     var handlerItem = kHandlerList[i];
-    handlers.push({title: handlerItem[0], url: handlerItem[1]});
+    handlers.push({name: handlerItem[0], url: handlerItem[1]});
   }
   populateUI();
 }
@@ -95,7 +95,7 @@ function populateUI() {
   for (var i = 0; i < handlers.length; i++) {
     var handler = handlers[i];
     var p = document.createElement('p');
-    p.appendChild(createRadioButton('handler', i, handler.title, i == 0));
+    p.appendChild(createRadioButton('handler', i, handler.name, i == 0));
     choices.appendChild(p);
   }
 }
