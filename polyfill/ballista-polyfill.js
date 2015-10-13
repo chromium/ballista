@@ -105,6 +105,30 @@ if (self.WorkerNavigator !== undefined) {
   navigator.serviceWorker.addEventListener('message', onMessage);
 }
 
+// Creates an iframe at |url|, and shows it in a popup window. Returns a promise
+// that resolves once the iframe has loaded, with the iframe DOM element.
+function createIframePopup(url) {
+  chooserDiv = document.createElement('div');
+  chooserDiv.style.zIndex = 100;
+  chooserDiv.style.position = 'absolute';
+  chooserDiv.style.left = '200px';
+  chooserDiv.style.top = '200px';
+  chooserDiv.style.width = '640px';
+  chooserDiv.style.height = '480px';
+
+  var iframe = document.createElement('iframe');
+  return new Promise((resolve, reject) => {
+    iframe.onload = e => resolve(iframe);
+
+    iframe.setAttribute('src', url);
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+
+    chooserDiv.appendChild(iframe);
+    document.body.appendChild(chooserDiv);
+  });
+}
+
 // Establishes a connection with the polyfill handler (by embedding a page from
 // the handler's domain in an iframe), and posts a MessagePort object to it.
 // Asynchronous; no return value.
@@ -123,25 +147,9 @@ function sendPortToProxy(port) {
     return;
   }
 
-  chooserDiv = document.createElement('div');
-  chooserDiv.style.zIndex = 100;
-  chooserDiv.style.position = 'absolute';
-  chooserDiv.style.left = '200px';
-  chooserDiv.style.top = '200px';
-  chooserDiv.style.width = '640px';
-  chooserDiv.style.height = '480px';
-
-  var iframe = document.createElement('iframe');
-  iframe.onload = function(event) {
+  createIframePopup(kProxyUrl).then(iframe => {
     iframe.contentWindow.postMessage({port: port}, '*', [port]);
-  };
-
-  iframe.setAttribute('src', kProxyUrl);
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-
-  chooserDiv.appendChild(iframe);
-  document.body.appendChild(chooserDiv);
+  });
 }
 
 // Destroy the chooser div.
