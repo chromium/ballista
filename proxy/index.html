@@ -51,29 +51,23 @@ limitations under the License.
                   <th class="mdl-data-table__cell--non-numeric">Name</th>
                   <th class="mdl-data-table__cell--non-numeric">URL</th>
                   <th class="mdl-data-table__cell--non-numeric">Accepted verbs</th>
-                  <th class="mdl-data-table__cell--non-numeric"></th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td class="mdl-data-table__cell--non-numeric">Ballista Handler
                     Demo</td><td class="mdl-data-table__cell--non-numeric">http://localhost:8081/test</td><td class="mdl-data-table__cell--non-numeric">open</td>
-                  <td>
-                    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
-                      <i class="material-icons">delete</i>
-                    </button>
-                  </td>
                 </tr>
                 <tr>
                   <td class="mdl-data-table__cell--non-numeric">Some Other App</td><td class="mdl-data-table__cell--non-numeric">https://example.com/foo</td><td class="mdl-data-table__cell--non-numeric">open</td>
-                  <td>
-                    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
-                      <i class="material-icons">delete</i>
-                    </button>
-                  </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+          <div class="mdl-cell mdl-cell--1-col">
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="delete_handlers" title="Delete selected handlers" disabled>
+              <i class="material-icons">delete</i>
+            </button>
           </div>
           <div class="mdl-cell mdl-cell--12-col">
             <h3>Add a new handler</h3>
@@ -97,7 +91,7 @@ limitations under the License.
             </div>
           </div>
           <div class="mdl-cell--1-col">
-              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="new_handler">
+              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="new_handler" title="Add new handler">
                   <i class="material-icons">add</i>
               </button>
           </div>
