@@ -57,35 +57,38 @@ limitations under the License.
             </table>
           </div>
           <div class="mdl-cell mdl-cell--1-col">
-            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="delete_handlers" title="Delete selected handlers" disabled>
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="delete_handlers" disabled>
               <i class="material-icons">delete</i>
             </button>
+            <div class="mdl-tooltip" for="delete_handlers">Delete selected handlers</div>
           </div>
           <div class="mdl-cell mdl-cell--12-col">
             <h3>Add a new handler</h3>
           </div>
-          <div class="mdl-cell mdl-cell--1-col">
+          <div class="mdl-cell mdl-cell--2-col">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
               <input class="mdl-textfield__input" type="text" id="new_handler_name" value="" />
               <label class="mdl-textfield__label" for="new_handler_name">Name</label>
             </div>
           </div>
-          <div class="mdl-cell mdl-cell--1-col">
+          <div class="mdl-cell mdl-cell--2-col">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
               <input class="mdl-textfield__input" type="text" id="new_handler_url" value="" />
               <label class="mdl-textfield__label" for="new_handler_url">URL</label>
             </div>
           </div>
-          <div class="mdl-cell mdl-cell--1-col">
+          <div class="mdl-cell mdl-cell--2-col">
             <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
-              <input class="mdl-textfield__input" type="text" id="new_handler_verbs" value="" title="Enter verbs as a comma-separated list." />
+              <input class="mdl-textfield__input" type="text" id="new_handler_verbs" value="" />
               <label class="mdl-textfield__label" for="new_handler_verbs">Verbs</label>
             </div>
+            <div class="mdl-tooltip" for="new_handler_verbs">Enter verbs as a comma-separated list.</div>
           </div>
-          <div class="mdl-cell--1-col">
-              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="new_handler" title="Add new handler">
+          <div class="mdl-cell mdl-cell--1-col">
+              <button class="mdl-button mdl-js-button mdl-button--fab mdl-js-ripple-effect mdl-button--colored" id="new_handler">
                   <i class="material-icons">add</i>
               </button>
+              <div class="mdl-tooltip" for="new_handler">Add new handler.</div>
           </div>
         </div>
       </main>
