@@ -146,7 +146,7 @@ function newHandlerClick() {
   var handler = new Handler(nameStr, urlStr, verbList);
 
   openRegistryDatabase().then(db => {
-    addHandler(db, handler)
+    registerHandler(db, handler)
         .then(
             unused => {
               db.close();

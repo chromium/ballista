@@ -108,7 +108,7 @@ function populateUI() {
 // Registers this handler in the database.
 function register() {
   openRegistryDatabase().then(db => {
-    addHandler(db, handler)
+    registerHandler(db, handler)
         .then(
             unused => {
               db.close();

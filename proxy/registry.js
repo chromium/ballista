@@ -106,11 +106,11 @@ window.openRegistryDatabase = function() {
 
 // Adds a new handler to the database. Returns a promise that resolves once the
 // transaction is complete.
-window.addHandler = function(db, handler) {
+window.registerHandler = function(db, handler) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return new Promise((resolve, reject) => {
-    storeAdd(store, handler).then(undefined, error => reject(error));
+    storePut(store, handler).then(undefined, error => reject(error));
     transactionWait(transaction)
         .then(unused => resolve(), error => reject(error));
   });
