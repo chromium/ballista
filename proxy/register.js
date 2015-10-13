@@ -21,6 +21,35 @@ var hostPort = null;
 // Details about the handler being registered.
 var handler = null;
 
+// Takes an object with the fields of a handler, and converts it into a new
+// Handler object. This sanitizes the object received from the host (which is
+// untrusted). Throws an error if the object contains missing or invalid fields.
+function processHandler(handler) {
+  if (typeof handler != 'object')
+    throw new Error('handler is not an object');
+
+  if (typeof handler.name != 'string' || handler.name == '')
+    throw new Error('handler.name is missing or invalid');
+
+  if (typeof handler.url != 'string' || handler.url.indexOf('://') < 0)
+    throw new Error('handler.url is missing or invalid');
+
+  if (typeof handler.verbs != 'object' || handler.verbs.length == undefined ||
+      handler.verbs.length == 0)
+    throw new Error('handler.verbs is missing or invalid');
+
+  var verbs = [];
+  for (var i = 0; i < handler.verbs.length; i++) {
+    var verb = handler.verbs[i];
+    if (typeof verb != 'string' || verb == '')
+      throw new Error('handler.verbs is missing or invalid');
+
+    verbs.push(verb);
+  }
+
+  return new Handler(handler.name, handler.url, verbs);
+}
+
 // Creates a human-readable (English) string from a list of strings. Inserts
 // commas between items, with "and" between the last two items.
 function listToFriendlyString(items) {
@@ -51,7 +80,13 @@ function register() {
 
 window.onmessage = function(e) {
   hostPort = e.data.port;
-  handler = e.data.handler;
+  var unsanitizedHandler = e.data.handler;
+  try {
+    handler = processHandler(unsanitizedHandler);
+  } catch (error) {
+    closeDialog();
+    throw error;
+  }
   populateUI();
 };
 
