@@ -30,7 +30,10 @@
 // The URL of the proxy app, which provides the handler chooser and routes
 // actions through to the chosen handler.
 // TODO(mgiuca): Move this to a fixed public location.
-var kProxyUrl = 'http://localhost:8080/choose';
+var kChooseUrl = 'http://localhost:8080/choose';
+
+// The URL of the proxy app, which provides registration UI for handlers.
+var kRegisterUrl = 'http://localhost:8080/register';
 
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
@@ -147,7 +150,7 @@ function sendPortToProxy(port) {
     return;
   }
 
-  createIframePopup(kProxyUrl).then(iframe => {
+  createIframePopup(kChooseUrl).then(iframe => {
     iframe.contentWindow.postMessage({port: port}, '*', [port]);
   });
 }
@@ -375,8 +378,23 @@ function onMessageReceived(data, port) {
 }
 
 // Registers a handler with the proxy server.
-function registerHandler(name, url, verbs) {
-  console.log('registerHandler:', name, url, verbs);
+function registerHandler(handler) {
+  // This channel will be used to get back a "close" signal from the proxy.
+  var channel = new MessageChannel();
+  channel.port1.onmessage = e => {
+    if (e.data.close) {
+      closeChooser();
+    } else {
+      reject(new Error("Received unexpected response from proxy."));
+    }
+  };
+
+  // Show the registration UI.
+  createIframePopup(kRegisterUrl)
+      .then(iframe => {
+        iframe.contentWindow.postMessage(
+            {handler: handler, port: channel.port2}, '*', [channel.port2]);
+      });
 }
 
 // Parses the webapp manifest, and if there are any action handlers, prompts the
@@ -400,7 +418,7 @@ function performHandlerRegistration() {
         var verbs = [];
         for (var verb in json.actions)
           verbs.push(verb);
-        registerHandler(name, url, verbs);
+        registerHandler({name: name, url: url, verbs: verbs});
       });
     });
   }
