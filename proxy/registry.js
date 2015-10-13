@@ -105,7 +105,8 @@ function openRegistryDatabase() {
   return openDatabase('TestRegistry', 2, onUpgradeNeeded);
 }
 
-// Adds a new handler to the database.
+// Adds a new handler to the database. Returns a promise that resolves once the
+// transaction is complete.
 function addHandler(db, handler) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
@@ -113,6 +114,8 @@ function addHandler(db, handler) {
   return transactionWait(transaction);
 }
 
+// Gets all handlers in the database. Returns a promise that resolves with an
+// array of Handlers.
 function getAllHandlers(db) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
