@@ -64,7 +64,11 @@ function populateHandlers() {
     var handlerItem = kHandlerList[i];
     handlers.push({title: handlerItem[0], url: handlerItem[1]});
   }
+  populateUI();
+}
 
+// Creates the radio buttons in the DOM tree for |handlers|.
+function populateUI() {
   var choices = document.querySelector('#choices');
   while (choices.firstChild)
     choices.removeChild(choices.firstChild);
