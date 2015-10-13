@@ -94,6 +94,7 @@ function generateTableRows() {
         var tr = createTableRow(cells);
         tbody.appendChild(tr);
       }
+      db.close();
       reUpgradeTable();
     });
   });
