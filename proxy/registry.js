@@ -95,17 +95,13 @@ function handlerFromObject(object) {
 }
 
 function onUpgradeNeeded(db, oldVersion) {
-  // Migration code.
-  if (oldVersion < 2)
-    db.deleteObjectStore('handlers');
-
   // The 'handlers' store maps arbitrary ints onto Handler objects.
   var objectStore = db.createObjectStore('handlers', {keyPath: 'url'});
   return new Promise((resolve, reject) => resolve());
 }
 
 window.openRegistryDatabase = function() {
-  return openDatabase('TestRegistry', 2, onUpgradeNeeded);
+  return openDatabase('ProxyRegistry', 1, onUpgradeNeeded);
 }
 
 // Adds a new handler to the database. Returns a promise that resolves once the
