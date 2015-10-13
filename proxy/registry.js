@@ -120,16 +120,23 @@ window.addHandler = function(db, handler) {
   });
 }
 
-// Deletes a handler from the database. Returns a promise that resolves once the
+// Deletes handlers from the database. Returns a promise that resolves once the
 // transaction is complete.
-window.deleteHandlerForUrl = function(db, url) {
+window.deleteHandlerForUrls = function(db, urls) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return new Promise((resolve, reject) => {
-    storeDelete(store, url).then(undefined, error => reject(error));
+    urls.forEach(
+        url => storeDelete(store, url).then(undefined, error => reject(error)));
     transactionWait(transaction)
         .then(unused => resolve(), error => reject(error));
   });
+}
+
+// Deletes a handler from the database. Returns a promise that resolves once the
+// transaction is complete.
+window.deleteHandlerForUrl = function(db, url) {
+  deleteHandlerForUrls(db, [url]);
 }
 
 // Gets all handlers in the database. Returns a promise that resolves with an

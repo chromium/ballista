@@ -100,6 +100,13 @@ function generateTableRows() {
   });
 }
 
+function deleteHandlersClick() {
+  openRegistryDatabase().then(db => {
+    deleteHandlerForUrls(db, selectedUrls()).then(unused => db.close());
+    generateTableRows();
+  });
+}
+
 function newHandlerClick() {
   var name = document.getElementById('new_handler_name').value;
   var url = document.getElementById('new_handler_url').value;
@@ -108,6 +115,8 @@ function newHandlerClick() {
 }
 
 function onLoad() {
+  document.getElementById('delete_handlers')
+      .addEventListener('click', deleteHandlersClick);
   document.getElementById('new_handler')
       .addEventListener('click', newHandlerClick);
   generateTableRows();
