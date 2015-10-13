@@ -26,3 +26,7 @@ h3 {
   /* From "a" in MDL. */
   color: #7c4dff;
 }
+
+.registration-field {
+  font-weight: bold;
+}

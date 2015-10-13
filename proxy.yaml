@@ -26,5 +26,10 @@ handlers:
   upload: proxy/choose.html
   mime_type: text/html; charset=utf-8
 
+- url: /register
+  static_files: proxy/register.html
+  upload: proxy/register.html
+  mime_type: text/html; charset=utf-8
+
 - url: /icon
   static_dir: proxy/icon

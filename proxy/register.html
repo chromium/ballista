@@ -1,0 +1,53 @@
+<!--
+Copyright 2015 Google Inc. All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Register as action handler</title>
+    <script src="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.min.js"></script>
+    <script type="text/javascript" src="register.js"></script>
+    <script type="text/javascript" src="registry.js"></script>
+    <link rel="stylesheet" href="https://storage.googleapis.com/code.getmdl.io/1.0.5/material.blue_grey-deep_purple.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="common.css">
+  </head>
+  <body>
+    <!-- Card for handler registration dialog -->
+    <div id="chooser" class="mdl-card mdl-shadow--2dp">
+      <div class="mdl-card__title">
+        <h2 class="mdl-card__title-text">Register as action handler?</h2>
+      </div>
+      <div class="mdl-card__supporting-text">
+        Do you want this site (<span id="site_url"
+          class="registration-field"></span>) to be registered as a handler for
+        <span id="verb" class="registration-field"></span> actions?
+      </div>
+      <div class="mdl-card__supporting-text">
+        It will show up in the action chooser as "<span id="site_name"
+          class="registration-field"></span>".
+      </div>
+      <div class="mdl-card__actions mdl-card--border">
+        <button id="register" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          OK
+        </button>
+        <button id="cancel" class="mdl-button mdl-button--colored mdl-js-button mdl-js-ripple-effect">
+          No thanks
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
