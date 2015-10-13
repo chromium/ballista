@@ -108,6 +108,13 @@ function deleteHandlersClick() {
   });
 }
 
+function setNewHandlerError(message) {
+  var p = document.getElementById('new_handler_error');
+  while (p.firstChild)
+    p.removeChild(p.firstChild);
+  p.appendChild(document.createTextNode(message));
+}
+
 function setTextField(textfield, value) {
   textfield.parentNode.MaterialTextfield.change(value);
 }
@@ -117,18 +124,44 @@ function newHandlerClick() {
   var url = document.getElementById('new_handler_url');
   var verbs = document.getElementById('new_handler_verbs');
 
+  var nameStr = name.value.trim();
+  var urlStr = url.value.trim();
   var verbList = verbs.value.split(',').map(s => s.trim());
+  verbList = verbList.filter(s => s != '');
 
-  var handler = new Handler(name.value, url.value, verbList);
+  var missingFields = [];
+  if (!nameStr)
+    missingFields.push('Name');
+  if (!urlStr)
+    missingFields.push('URL');
+  if (verbList.length == 0)
+    missingFields.push('Verbs');
+
+  if (missingFields.length > 0) {
+    setNewHandlerError('Error: Missing required fields: ' +
+                       missingFields.join(', '));
+    return;
+  }
+
+  var handler = new Handler(nameStr, urlStr, verbList);
 
   openRegistryDatabase().then(db => {
     addHandler(db, handler)
-        .then(unused => {
-          db.close();
-          setTextField(name, '');
-          setTextField(url, '');
-          setTextField(verbs, '');
-        }, unused => db.close());
+        .then(
+            unused => {
+              db.close();
+              setTextField(name, '');
+              setTextField(url, '');
+              setTextField(verbs, '');
+              setNewHandlerError('');
+            },
+            e => {
+              db.close();
+              var message = e.message;
+              if (e.name == 'ConstraintError')
+                message = 'A handler with that URL already exists.';
+              setNewHandlerError('Error: ' + message);
+            });
     generateTableRows();
   });
 }

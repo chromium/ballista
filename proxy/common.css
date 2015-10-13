@@ -21,3 +21,8 @@ h3 {
   color: #fff;
   background-color: #607d8b;
 }
+
+.error {
+  /* From "a" in MDL. */
+  color: #7c4dff;
+}
