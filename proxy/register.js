@@ -103,6 +103,8 @@ function populateUI() {
   siteName.innerText = handler.name;
   siteUrl.innerText = handler.url;
   verb.innerText = listToFriendlyString(handler.verbs);
+
+  document.getElementById('registrar').style.display = 'block';
 }
 
 // Registers this handler in the database.
