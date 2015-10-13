@@ -85,6 +85,9 @@ function Handler(name, url, verbs) {
 
 // Convert an Object into a Handler with the same fields.
 function handlerFromObject(object) {
+  if (object == undefined)
+    return object;
+
   var handler = new Handler();
   for (var k in object)
     handler[k] = object[k];
@@ -114,6 +117,15 @@ function addHandler(db, handler) {
   return transactionWait(transaction);
 }
 
+// Deletes a handler from the database. Returns a promise that resolves once the
+// transaction is complete.
+function deleteHandlerForUrl(db, url) {
+  var transaction = db.transaction(['handlers'], 'readwrite');
+  var store = transaction.objectStore('handlers');
+  storeDelete(store, url);
+  return transactionWait(transaction);
+}
+
 // Gets all handlers in the database. Returns a promise that resolves with an
 // array of Handlers.
 function getAllHandlers(db) {
@@ -125,6 +137,40 @@ function getAllHandlers(db) {
       var cursor = e.target.result;
       if (cursor) {
         handlers.push(handlerFromObject(cursor.value));
+        cursor.continue();
+      } else {
+        resolve(handlers);
+      }
+    };
+  });
+}
+
+// Gets a handler for a specific URL. Returns a promise that resolves with the
+// Handler, or undefined if it is not found.
+function getHandlerForUrl(db, url) {
+  var transaction = db.transaction(['handlers']);
+  var store = transaction.objectStore('handlers');
+  return new Promise((resolve, reject) => {
+    storeGet(store, url)
+        .then(handler => resolve(handlerFromObject(handler)),
+              error => reject(error));
+  });
+}
+
+// Gets a handler for a specific URL. Returns a promise that resolves with the
+// Handler, or undefined if it is not found.
+function getHandlersForVerb(db, verb) {
+  var transaction = db.transaction(['handlers']);
+  var store = transaction.objectStore('handlers');
+  var handlers = [];
+  return new Promise((resolve, reject) => {
+    // TODO(mgiuca): Index handlers by verb, to avoid a full database search.
+    store.openCursor().onsuccess = e => {
+      var cursor = e.target.result;
+      if (cursor) {
+        var verbs = cursor.value.verbs;
+        if (verbs && verbs.indexOf(verb) >= 0)
+          handlers.push(handlerFromObject(cursor.value));
         cursor.continue();
       } else {
         resolve(handlers);
