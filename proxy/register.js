@@ -15,16 +15,45 @@
 // Foreground page
 "use strict";
 
+// To communicate back to the host (handler site).
 var hostPort = null;
+
+// Details about the handler being registered.
+var handler = null;
+
+// Creates a human-readable (English) string from a list of strings. Inserts
+// commas between items, with "and" between the last two items.
+function listToFriendlyString(items) {
+  if (items.length >= 2) {
+    var last = items[items.length - 1];
+    var secondLast = items[items.length - 2];
+    items = items.slice(0, items.length - 2);
+    items.push(secondLast + ' and ' + last);
+  }
+  return items.join(', ');
+}
 
 // Fills in the text fields.
 function populateUI() {
+  var siteName = document.getElementById('site_name');
+  var siteUrl = document.getElementById('site_url');
+  var verb = document.getElementById('verb');
+
+  siteName.innerText = handler.name;
+  siteUrl.innerText = handler.url;
+  verb.innerText = listToFriendlyString(handler.verbs);
 }
 
 // Registers this handler in the database.
 function register() {
-  console.log('TODO: Register this handler.');
+  console.log('TODO: Register this handler:', handler);
 }
+
+window.onmessage = function(e) {
+  hostPort = e.data.port;
+  handler = e.data.handler;
+  populateUI();
+};
 
 function closeDialog() {
   if (hostPort == null)
