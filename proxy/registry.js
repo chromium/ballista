@@ -77,7 +77,7 @@ function storeGet(objectStore, key) {
 
 // Class representing a Handler entry in the database. |name| and |url| are
 // strings (|url| is the primary key). |verbs| is a list of strings.
-function Handler(name, url, verbs) {
+window.Handler = function(name, url, verbs) {
   this.name = name;
   this.url = url;
   this.verbs = verbs;

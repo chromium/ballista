@@ -108,11 +108,29 @@ function deleteHandlersClick() {
   });
 }
 
+function setTextField(textfield, value) {
+  textfield.parentNode.MaterialTextfield.change(value);
+}
+
 function newHandlerClick() {
-  var name = document.getElementById('new_handler_name').value;
-  var url = document.getElementById('new_handler_url').value;
-  var verbs = document.getElementById('new_handler_verbs').value;
-  console.log("New handler:", name, url, verbs);
+  var name = document.getElementById('new_handler_name');
+  var url = document.getElementById('new_handler_url');
+  var verbs = document.getElementById('new_handler_verbs');
+
+  var verbList = verbs.value.split(',').map(s => s.trim());
+
+  var handler = new Handler(name.value, url.value, verbList);
+
+  openRegistryDatabase().then(db => {
+    addHandler(db, handler)
+        .then(unused => {
+          db.close();
+          setTextField(name, '');
+          setTextField(url, '');
+          setTextField(verbs, '');
+        }, unused => db.close());
+    generateTableRows();
+  });
 }
 
 function onLoad() {
