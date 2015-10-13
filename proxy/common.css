@@ -21,12 +21,3 @@ h3 {
   color: #fff;
   background-color: #607d8b;
 }
-
-.handler-table {
-  border-collapse: collapse;
-}
-
-.handler-table th,td {
-  padding: 5px;
-  border: 1px solid grey;
-}

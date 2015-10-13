@@ -45,27 +45,34 @@ limitations under the License.
               page is for managing registrations made through the experimental
               polyfill.</p>
             <h2>Registered handlers</h2>
-            <table class="handler-table">
-              <tr>
-                <th>Name</th><th>URL</th><th>Accepted verbs</th><th></th>
-              </tr>
-              <tr>
-                <td>Ballista Handler
-                  Demo</td><td>http://localhost:8081/test</td><td>open</td>
-                <td>
-                  <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
-                    <i class="material-icons">delete</i>
-                  </button>
-                </td>
-              </tr>
-              <tr>
-                <td>Some Other App</td><td>https://example.com/foo</td><td>open</td>
-                <td>
-                  <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
-                    <i class="material-icons">delete</i>
-                  </button>
-                </td>
-              </tr>
+            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Name</th>
+                  <th class="mdl-data-table__cell--non-numeric">URL</th>
+                  <th class="mdl-data-table__cell--non-numeric">Accepted verbs</th>
+                  <th class="mdl-data-table__cell--non-numeric"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">Ballista Handler
+                    Demo</td><td class="mdl-data-table__cell--non-numeric">http://localhost:8081/test</td><td class="mdl-data-table__cell--non-numeric">open</td>
+                  <td>
+                    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+                      <i class="material-icons">delete</i>
+                    </button>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">Some Other App</td><td class="mdl-data-table__cell--non-numeric">https://example.com/foo</td><td class="mdl-data-table__cell--non-numeric">open</td>
+                  <td>
+                    <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored">
+                      <i class="material-icons">delete</i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div class="mdl-cell mdl-cell--12-col">
