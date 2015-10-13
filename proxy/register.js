@@ -21,6 +21,18 @@ var hostPort = null;
 // Details about the handler being registered.
 var handler = null;
 
+function arraysEqual(x, y) {
+  if (x.length != y.length)
+    return false;
+
+  for (var i = 0; i < x.length; i++) {
+    if (x[i] != y[i])
+      return false;
+  }
+
+  return true;
+}
+
 // Takes an object with the fields of a handler, and converts it into a new
 // Handler object. This sanitizes the object received from the host (which is
 // untrusted). Throws an error if the object contains missing or invalid fields.
@@ -48,6 +60,26 @@ function processHandler(handler) {
   }
 
   return new Handler(handler.name, handler.url, verbs);
+}
+
+// Determines whether a handler is already registered in the database. This does
+// an exact match -- doesn't just check the URL. If any details have changed,
+// returns false (because the handler needs to be re-registered). Returns a
+// promise that is resolved with a Boolean.
+function alreadyRegistered(handler) {
+  return new Promise((resolve, reject) => {
+    openRegistryDatabase().then(db => {
+      getHandlerForUrl(db, handler.url).then(existing => {
+        if (existing == undefined) {
+          resolve(false);
+          return;
+        }
+
+        resolve(existing.name == handler.name &&
+                arraysEqual(existing.verbs, handler.verbs));
+      }, error => reject(error));
+    }, error => reject(error));
+  });
 }
 
 // Creates a human-readable (English) string from a list of strings. Inserts
@@ -99,7 +131,17 @@ window.onmessage = function(e) {
     closeDialog();
     throw error;
   }
-  populateUI();
+
+  alreadyRegistered(handler).then(isRegistered => {
+    if (isRegistered) {
+      console.log('Ballista proxy: Not registering handler for ' + handler.url +
+                  '; already registered.');
+      closeDialog();
+      return;
+    }
+
+    populateUI();
+  });
 };
 
 function closeDialog() {
