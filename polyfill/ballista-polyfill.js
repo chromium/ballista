@@ -78,7 +78,7 @@ function onMessage(event) {
     event.stopImmediatePropagation();
     return;
   } else if (data.type == 'sendPortToProxy') {
-    sendPortToProxy(data.port);
+    sendPortToProxy(data.port, data.options);
   } else if (data.type == 'closeChooser') {
     closeChooser();
   }
@@ -134,8 +134,9 @@ function createIframePopup(url) {
 
 // Establishes a connection with the polyfill handler (by embedding a page from
 // the handler's domain in an iframe), and posts a MessagePort object to it.
-// Asynchronous; no return value.
-function sendPortToProxy(port) {
+// |options| is a dictionary of various fields used to identify which
+// handlers can be used. Asynchronous; no return value.
+function sendPortToProxy(port, options) {
   if (self.document === undefined) {
     // We are in a service worker. No way to create an iframe here (needed to
     // establish a connection to handler service worker), so connect to a random
@@ -145,14 +146,17 @@ function sendPortToProxy(port) {
     // page, this will fail. This *should not* happen in the real API, but there
     // is no way around this in the polyfill.
     findLastTopLevelClient().then(client => {
-      client.postMessage({type: 'sendPortToProxy', port: port}, [port]);
+      client.postMessage(
+          {type: 'sendPortToProxy', port: port, options: options}, [port]);
     });
     return;
   }
 
-  createIframePopup(kChooseUrl).then(iframe => {
-    iframe.contentWindow.postMessage({port: port}, '*', [port]);
-  });
+  createIframePopup(kChooseUrl)
+      .then(iframe => {
+        iframe.contentWindow.postMessage({port: port, options: options}, '*',
+                                         [port]);
+      });
 }
 
 // Destroy the chooser div.
@@ -170,9 +174,10 @@ function closeChooser() {
 }
 
 // Prompts the user for a handler app and establish a connection with the chosen
-// handler. Returns (in a promise) a MessagePort on succesful connection to the
-// handler.
-function connectToHandler() {
+// handler. |options| is a dictionary of various fields used to identify which
+// handlers can be used. Returns (in a promise) a MessagePort on succesful
+// connection to the handler.
+function connectToHandler(options) {
   return new Promise(function(resolve, reject) {
     var channel = new MessageChannel();
     channel.port1.onmessage = e => {
@@ -187,7 +192,7 @@ function connectToHandler() {
         reject(new Error("Received unexpected response from handler."));
       }
     };
-    sendPortToProxy(channel.port2);
+    sendPortToProxy(channel.port2, options);
   });
 };
 
@@ -325,10 +330,11 @@ if (navigator.actions === undefined) {
   // interaction with the handler. Fails with AbortError if a connection could
   // not be made.
   actions.performAction = function(options, data) {
-    return connectToHandler().then(port => {
+    if (typeof options == 'string')
+      options = {verb: options};
+
+    return connectToHandler(options).then(port => {
       var id = nextActionId++;
-      if (typeof options == 'string')
-        options = {verb: options};
       var action = new Action(id);
 
       // Send the options and data payload to the handler.

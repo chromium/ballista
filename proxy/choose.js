@@ -23,6 +23,9 @@ var handlers;
 // A MessagePort back to the requester that initiated this action.
 var requesterPort = null;
 
+// Options dictionary provided by requester.
+var options = null;
+
 function createRadioButton(name, index, title, checked) {
   var label = document.createElement('label');
   var input = document.createElement('input');
@@ -52,10 +55,7 @@ function createRadioButton(name, index, title, checked) {
 // in the DOM tree for the handlers.
 function populateHandlers() {
   openRegistryDatabase().then(db => {
-    // TODO(mgiuca): Get the verb from the action metadata, rather than
-    // hard-coding 'open'.
-    var verb = 'open';
-    getHandlersForVerb(db, verb).then(result => {
+    getHandlersForVerb(db, options.verb).then(result => {
       handlers = result;
       db.close();
       populateUI();
@@ -110,6 +110,7 @@ function sendPortToHandler(url, port) {
 
 window.onmessage = function(e) {
   requesterPort = e.data.port;
+  options = e.data.options;
   populateHandlers();
 };
 
