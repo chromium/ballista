@@ -120,8 +120,6 @@ function sendPortToHandler(url, port) {
     return;
   }
 
-  var slashIdx = url.indexOf('/', 10);
-  var origin = url.substr(0, slashIdx);
   var iframe = document.createElement('iframe');
   iframe.style.display = 'none';
   iframe.onload = function(event) {
@@ -238,19 +236,14 @@ var nextActionId = 0;
 var newHandleEvent = null;
 var newUpdateEvent = null;
 
-// Polyfill Navigator.actions.
-// The prototype of |navigator| is Navigator in normal pages, WorkerNavigator in
-// Web Workers. Support either case.
-var navigator_proto =
-    (self.WorkerNavigator !== undefined ? WorkerNavigator : Navigator)
-        .prototype;
-if (navigator_proto.actions === undefined) {
+// Polyfill navigator.actions.
+if (navigator.actions === undefined) {
   var NavigatorActions = function() {
     CustomEventTarget.call(this);
   };
   NavigatorActions.prototype = Object.create(CustomEventTarget.prototype);
   var actions = new NavigatorActions();
-  navigator_proto.actions = actions;
+  navigator.actions = actions;
 
   // The URL of the handler to send requests to. The final API will have the
   // user agent let the user choose a handler from a registered list. For now,

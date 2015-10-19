@@ -11,11 +11,6 @@ handlers:
   static_files: requester/\1
   upload: requester/.*\.js
 
-- url: /([^/]*\.webmanifest)
-  mime_type: application/manifest+json
-  static_files: requester/\1
-  upload: requester/.*\.webmanifest
-
 - url: /
   static_files: requester/index.html
   upload: requester/index.html

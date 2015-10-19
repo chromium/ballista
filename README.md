@@ -4,12 +4,14 @@
 
 ![A ballista](docs/images/ballista-300.png)
 
-**Ballista** is a project to explore inter-website communication; specifically,
-communication between one website and another site of the user's choosing. We
-want the user to be able to *share* or *edit* documents in another website that
-the first website has never even heard of, *choose* documents from another
-website, or register a website as a *native file handler*. Essentially, we want
-to create an **intents system for the web**.
+**Ballista** is a project to explore inter-website and web/native communication;
+specifically, communication between one website and another site or native app
+of the user's choosing. We want the user to be able to *share* or *edit*
+documents in another website or app that the first website has never even heard
+of, *choose* documents from another website, or register a website as a *native
+file handler*. We're attempting to solve similar problems to the intents system
+on Android, but also address other use cases like document editing. Essentially,
+we want to create an **interoperability system for the web**.
 
 Our [explainer document](docs/explainer.md) dives deeper into the problem space
 and outlines an API that we think solves this problem. But this is less about

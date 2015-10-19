@@ -25,6 +25,6 @@ You can try it out locally using the App Engine dev appserver.
    register its service worker. You need to keep the handler app open (due to
    limitations of the polyfill).
 5. Open the [requester](http://localhost:8081) in another tab.
-6. From the requester, click "Edit". This opens the file in the handler's tab.
+6. From the requester, click "Open". This opens the file in the handler's tab.
 7. Edit the text in the handler, then click "Save".
 8. The new text will be visible in the requester.
