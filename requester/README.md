@@ -22,10 +22,13 @@ You can try it out locally using the App Engine dev appserver.
 2. `cd` to the `ballista` directory.
 3. Run the dev appserver: `dev_appserver.py proxy.yaml handler.yaml
    requester.yaml`.
-4. Open the [handler](http://localhost:8081) in a supported browser. This will
-   register its service worker. You need to keep the handler app open (due to
-   limitations of the polyfill).
-5. Open the [requester](http://localhost:8082) in another tab.
-6. From the requester, click "Open". This opens the file in the handler's tab.
-7. Edit the text in the handler, then click "Save".
-8. The new text will be visible in the requester.
+4. Open the [handler](http://localhost:8081) in a supported browser. You will be
+   prompted to register this site as an action handler. Click "OK". You need to
+   keep the handler app open (due to limitations of the polyfill).
+5. You can view and delete handler registrations in the [polyfill control
+   panel](http://localhost:8000).
+6. Open the [requester](http://localhost:8082) in another tab.
+7. From the requester, click "Open". Select "Ballista Handler Demo". This opens
+   the file in the handler's tab.
+8. Edit the text in the handler, then click "Save".
+9. The new text will be visible in the requester.
