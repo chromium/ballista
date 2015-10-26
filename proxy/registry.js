@@ -109,11 +109,7 @@ window.openRegistryDatabase = function() {
 window.registerHandler = function(db, handler) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
-  return new Promise((resolve, reject) => {
-    storePut(store, handler).then(undefined, error => reject(error));
-    transactionWait(transaction)
-        .then(unused => resolve(), error => reject(error));
-  });
+  return Promise.all([storePut(store, handler), transactionWait(transaction)]);
 }
 
 // Deletes handlers from the database. Returns a promise that resolves once the
@@ -121,12 +117,9 @@ window.registerHandler = function(db, handler) {
 window.deleteHandlerForUrls = function(db, urls) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
-  return new Promise((resolve, reject) => {
-    urls.forEach(
-        url => storeDelete(store, url).then(undefined, error => reject(error)));
-    transactionWait(transaction)
-        .then(unused => resolve(), error => reject(error));
-  });
+  var promises = urls.map(url => storeDelete(store, url));
+  promises.push(transactionWait(transaction));
+  return Promise.all(promises);
 }
 
 // Deletes a handler from the database. Returns a promise that resolves once the
