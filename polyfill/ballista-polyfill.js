@@ -132,10 +132,10 @@ function createIframePopup(url) {
   });
 }
 
-// Establishes a connection with the polyfill handler (by embedding a page from
-// the handler's domain in an iframe), and posts a MessagePort object to it.
-// |options| is a dictionary of various fields used to identify which
-// handlers can be used. Asynchronous; no return value.
+// Establishes a connection with the polyfill handler (via the proxy, by
+// embedding a page from the proxy's domain in an iframe), and posts a
+// MessagePort object to it. |options| is a dictionary of various fields used to
+// identify which handlers can be used. Asynchronous; no return value.
 function sendPortToProxy(port, options) {
   if (self.document === undefined) {
     // We are in a service worker. No way to create an iframe here (needed to
