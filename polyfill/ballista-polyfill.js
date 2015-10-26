@@ -391,7 +391,7 @@ function registerHandler(handler) {
     if (e.data.close) {
       closeChooser();
     } else {
-      reject(new Error("Received unexpected response from proxy."));
+      throw new Error("Received unexpected response from proxy.");
     }
   };
 
