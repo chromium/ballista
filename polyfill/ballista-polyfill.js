@@ -173,9 +173,9 @@ function closeChooser() {
   document.body.removeChild(chooserDiv);
 }
 
-// Prompts the user for a handler app and establish a connection with the chosen
-// handler. |options| is a dictionary of various fields used to identify which
-// handlers can be used. Returns (in a promise) a MessagePort on succesful
+// Prompts the user for a handler app and establishes a connection with the
+// chosen handler. |options| is a dictionary of various fields used to identify
+// which handlers can be used. Returns (in a promise) a MessagePort on succesful
 // connection to the handler.
 function connectToHandler(options) {
   return new Promise(function(resolve, reject) {
