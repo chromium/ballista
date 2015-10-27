@@ -23,7 +23,7 @@ function selectedUrls() {
     var tr = trs[i];
     if (tr.querySelector('input').checked) {
       var urlCell = tr.querySelectorAll('td')[2];
-      urls.push(urlCell.innerText);
+      urls.push(urlCell.textContent);
     }
   }
   return urls;

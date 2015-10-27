@@ -100,9 +100,9 @@ function populateUI() {
   var siteUrl = document.getElementById('site_url');
   var verb = document.getElementById('verb');
 
-  siteName.innerText = handler.name;
-  siteUrl.innerText = handler.url;
-  verb.innerText = listToFriendlyString(handler.verbs);
+  siteName.textContent = handler.name;
+  siteUrl.textContent = handler.url;
+  verb.textContent = listToFriendlyString(handler.verbs);
 
   document.getElementById('registrar').style.display = 'block';
 }
