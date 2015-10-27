@@ -42,7 +42,7 @@ function openDatabase(name, version, upgradefunction) {
     request.onsuccess = e => resolve(request.result);
     request.onupgradeneeded = e => {
       upgradefunction(request.result, e.oldVersion)
-          .then(unused => resolve(request.result), error => reject(error));
+          .then(() => resolve(request.result), error => reject(error));
     }
   });
 }

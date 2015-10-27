@@ -96,14 +96,14 @@ function generateTableRows() {
       }
       db.close();
       reUpgradeTable();
-    }, unused => db.close());
+    }, () => db.close());
   });
 }
 
 function deleteHandlersClick() {
   openRegistryDatabase().then(db => {
     deleteHandlerForUrls(db, selectedUrls())
-        .then(unused => db.close(), unused => db.close());
+        .then(() => db.close(), () => db.close());
     generateTableRows();
   });
 }
@@ -148,7 +148,7 @@ function newHandlerClick() {
   openRegistryDatabase().then(db => {
     registerHandler(db, handler)
         .then(
-            unused => {
+            () => {
               db.close();
               setTextField(name, '');
               setTextField(url, '');

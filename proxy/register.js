@@ -112,7 +112,7 @@ function register() {
   openRegistryDatabase().then(db => {
     registerHandler(db, handler)
         .then(
-            unused => {
+            () => {
               db.close();
               closeDialog();
             },

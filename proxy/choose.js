@@ -59,7 +59,7 @@ function populateHandlers() {
       handlers = result;
       db.close();
       populateUI();
-    }, unused => db.close());
+    }, () => db.close());
   });
 }
 
