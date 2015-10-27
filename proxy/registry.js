@@ -110,7 +110,8 @@ function RegistryDatabase(db) {
 RegistryDatabase.prototype.registerHandler = function(handler) {
   var transaction = this.db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
-  return Promise.all([storePut(store, handler), transactionWait(transaction)]);
+  return Promise.all([storePut(store, handler), transactionWait(transaction)])
+      .then(() => undefined);
 };
 
 // Deletes handlers from the database. Returns a promise that resolves once the
@@ -120,7 +121,7 @@ RegistryDatabase.prototype.deleteHandlerForUrls = function(urls) {
   var store = transaction.objectStore('handlers');
   var promises = urls.map(url => storeDelete(store, url));
   promises.push(transactionWait(transaction));
-  return Promise.all(promises);
+  return Promise.all(promises).then(() => undefined);
 };
 
 // Deletes a handler from the database. Returns a promise that resolves once the
