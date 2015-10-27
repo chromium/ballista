@@ -54,15 +54,12 @@ function onMessage(event) {
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateUIFromFile(file) {
-  return new Promise((resolve, reject) => {
-    var contents_textfield = document.getElementById('contents_textfield');
-    var filename_textfield = document.getElementById('filename_textfield');
-    readBlobAsText(file).then(text => {
-      contents_textfield.value = text;
-      // Need to call this method to update the placeholder text.
-      filename_textfield.parentNode.MaterialTextfield.change(file.name);
-      resolve();
-    }, err => reject(err));
+  var contents_textfield = document.getElementById('contents_textfield');
+  var filename_textfield = document.getElementById('filename_textfield');
+  return readBlobAsText(file).then(text => {
+    contents_textfield.value = text;
+    // Need to call this method to update the placeholder text.
+    filename_textfield.parentNode.MaterialTextfield.change(file.name);
   });
 }
 
