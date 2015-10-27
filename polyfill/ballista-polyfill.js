@@ -84,16 +84,13 @@ if (self.WorkerNavigator !== undefined) {
   // Finds the most recently opened top-level client belonging to this service
   // worker. Returns a promise. Rejects the promise if none found.
   findLastTopLevelClient = () => {
-    return new Promise((resolve, reject) => {
-      clients.matchAll().then(allClients => {
-        for (var i = allClients.length - 1; i >= 0; i--) {
-          if (allClients[i].frameType == 'top-level') {
-            resolve(allClients[i]);
-            return;
-          }
+    return clients.matchAll().then(allClients => {
+      for (var i = allClients.length - 1; i >= 0; i--) {
+        if (allClients[i].frameType == 'top-level') {
+          return allClients[i];
         }
-        reject(new Error('No available clients; please open a tab.'));
-      });
+      }
+      throw new Error('No available clients; please open a tab.');
     });
   }
 } else {
@@ -298,23 +295,19 @@ if (navigator.actions === undefined) {
           '(temporary requirement of the polyfill only).');
     }
 
-    return new Promise((resolve, reject) => {
-      connectToHandler(handlerUrl)
-          .then(port => {
-            var id = nextActionId++;
-            if (typeof options == 'string')
-              options = {verb: options};
-            var action = new Action(id);
+    return connectToHandler(handlerUrl)
+        .then(port => {
+          var id = nextActionId++;
+          if (typeof options == 'string') options = {verb: options};
+          var action = new Action(id);
 
-            // Send the options and data payload to the handler.
-            var message =
-                {type: 'action', options: options, data: data, id: id};
-            port.postMessage(message);
-            port.onmessage = m => onMessageReceived(m.data, null);
+          // Send the options and data payload to the handler.
+          var message = {type: 'action', options: options, data: data, id: id};
+          port.postMessage(message);
+          port.onmessage = m => onMessageReceived(m.data, null);
 
-            resolve(action);
-          }, err => reject(err))
-    });
+          return action;
+        });
   };
 
   // Sends an updated version of the data payload associated with an action back

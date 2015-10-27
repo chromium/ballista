@@ -68,32 +68,27 @@ self.addEventListener('fetch', event => {
 // Finds the most recently opened top-level client belonging to this service
 // worker. Returns a promise. Rejects the promise if none found.
 function findLastTopLevelClient() {
-  return new Promise((resolve, reject) => {
-    clients.matchAll().then(allClients => {
-      for (var i = allClients.length - 1; i >= 0; i--) {
-        if (allClients[i].frameType == 'top-level') {
-          resolve(allClients[i]);
-          return;
-        }
-      }
-      reject(new Error('No available clients; please open a tab.'));
-    });
+  return clients.matchAll().then(allClients => {
+    for (var i = allClients.length - 1; i >= 0; i--) {
+      if (allClients[i].frameType == 'top-level')
+        return allClients[i];
+    }
+
+    throw new Error('No available clients; please open a tab.');
   });
 }
 
 // Opens a new window and loads the file up. Returns the Client object
 // associated with the window, in a promise.
 function openFileInNewWindow(file, actionId) {
-  return new Promise((resolve, reject) => {
-    // TODO(mgiuca): We'd like to use clients.openWindow() to open a new client
-    // here. Unfortunately, this is not allowed here because it is not in direct
-    // response to a user gesture. Hopefully, the final API will allow it, but
-    // for the polyfill, we just need to take control of an existing client.
-    findLastTopLevelClient().then(client => {
-      var message = {type: 'loadFile', file: file, actionId: actionId};
-      client.postMessage(message);
-      resolve(client);
-    }, err => reject(err));
+  // TODO(mgiuca): We'd like to use clients.openWindow() to open a new client
+  // here. Unfortunately, this is not allowed here because it is not in direct
+  // response to a user gesture. Hopefully, the final API will allow it, but for
+  // the polyfill, we just need to take control of an existing client.
+  return findLastTopLevelClient().then(client => {
+    var message = {type: 'loadFile', file: file, actionId: actionId};
+    client.postMessage(message);
+    return client;
   });
 }
 

@@ -26,13 +26,11 @@ function setOpenState(isOpen) {
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
-  return new Promise((resolve, reject) => {
-    var contents_textfield = document.getElementById('contents_textfield');
-    readBlobAsText(file).then(text => {
-      contents_textfield.value = text;
-      resolve();
-    }, err => reject(err));
-  });
+  var contents_textfield = document.getElementById('contents_textfield');
+  return readBlobAsText(file)
+      .then(text => {
+        contents_textfield.value = text;
+      });
 }
 
 function editButtonClick() {
