@@ -81,7 +81,7 @@ window.Handler = function(name, url, verbs) {
   this.name = name;
   this.url = url;
   this.verbs = verbs;
-}
+};
 
 // Convert an Object into a Handler with the same fields.
 function handlerFromObject(object) {
@@ -102,7 +102,7 @@ function onUpgradeNeeded(db, oldVersion) {
 
 window.openRegistryDatabase = function() {
   return openDatabase('ProxyRegistry', 1, onUpgradeNeeded);
-}
+};
 
 // Adds a new handler to the database. Returns a promise that resolves once the
 // transaction is complete.
@@ -110,7 +110,7 @@ window.registerHandler = function(db, handler) {
   var transaction = db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return Promise.all([storePut(store, handler), transactionWait(transaction)]);
-}
+};
 
 // Deletes handlers from the database. Returns a promise that resolves once the
 // transaction is complete.
@@ -120,13 +120,13 @@ window.deleteHandlerForUrls = function(db, urls) {
   var promises = urls.map(url => storeDelete(store, url));
   promises.push(transactionWait(transaction));
   return Promise.all(promises);
-}
+};
 
 // Deletes a handler from the database. Returns a promise that resolves once the
 // transaction is complete.
 window.deleteHandlerForUrl = function(db, url) {
   deleteHandlerForUrls(db, [url]);
-}
+};
 
 // Gets all handlers in the database. Returns a promise that resolves with an
 // array of Handlers.
@@ -145,7 +145,7 @@ window.getAllHandlers = function(db) {
       }
     };
   });
-}
+};
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
@@ -153,7 +153,7 @@ window.getHandlerForUrl = function(db, url) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   return storeGet(store, url).then(handlerFromObject);
-}
+};
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
@@ -175,6 +175,6 @@ window.getHandlersForVerb = function(db, verb) {
       }
     };
   });
-}
+};
 
 })();
