@@ -152,11 +152,7 @@ window.getAllHandlers = function(db) {
 window.getHandlerForUrl = function(db, url) {
   var transaction = db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
-  return new Promise((resolve, reject) => {
-    storeGet(store, url)
-        .then(handler => resolve(handlerFromObject(handler)),
-              error => reject(error));
-  });
+  return storeGet(store, url).then(handlerFromObject);
 }
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the

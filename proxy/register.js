@@ -80,17 +80,14 @@ function processHandler(handler) {
 // returns false (because the handler needs to be re-registered). Returns a
 // promise that is resolved with a Boolean.
 function alreadyRegistered(handler) {
-  return new Promise((resolve, reject) => {
-    openRegistryDatabase().then(db => {
-      getHandlerForUrl(db, handler.url).then(existing => {
-        if (existing == undefined) {
-          resolve(false);
-          return;
-        }
+  return openRegistryDatabase().then(db => {
+    return getHandlerForUrl(db, handler.url)
+        .then(existing => {
+          if (existing == undefined)
+            return false;
 
-        resolve(handlersEqual(existing, handler));
-      }, error => reject(error));
-    }, error => reject(error));
+          return handlersEqual(existing, handler);
+        });
   });
 }
 
