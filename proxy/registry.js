@@ -126,7 +126,7 @@ RegistryDatabase.prototype.deleteHandlerForUrls = function(urls) {
 // Deletes a handler from the database. Returns a promise that resolves once the
 // transaction is complete.
 RegistryDatabase.prototype.deleteHandlerForUrl = function(url) {
-  db.deleteHandlerForUrls([url]);
+  return db.deleteHandlerForUrls([url]);
 };
 
 // Gets all handlers in the database. Returns a promise that resolves with an
