@@ -100,22 +100,23 @@ function onUpgradeNeeded(db, oldVersion) {
   return new Promise((resolve, reject) => resolve());
 }
 
-window.openRegistryDatabase = function() {
-  return openDatabase('ProxyRegistry', 1, onUpgradeNeeded);
-};
+// Wrapper around the database, providing methods for accessing handlers.
+function RegistryDatabase(db) {
+  this.db = db;
+}
 
 // Adds a new handler to the database. Returns a promise that resolves once the
 // transaction is complete.
-window.registerHandler = function(db, handler) {
-  var transaction = db.transaction(['handlers'], 'readwrite');
+RegistryDatabase.prototype.registerHandler = function(handler) {
+  var transaction = this.db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   return Promise.all([storePut(store, handler), transactionWait(transaction)]);
 };
 
 // Deletes handlers from the database. Returns a promise that resolves once the
 // transaction is complete.
-window.deleteHandlerForUrls = function(db, urls) {
-  var transaction = db.transaction(['handlers'], 'readwrite');
+RegistryDatabase.prototype.deleteHandlerForUrls = function(urls) {
+  var transaction = this.db.transaction(['handlers'], 'readwrite');
   var store = transaction.objectStore('handlers');
   var promises = urls.map(url => storeDelete(store, url));
   promises.push(transactionWait(transaction));
@@ -124,14 +125,14 @@ window.deleteHandlerForUrls = function(db, urls) {
 
 // Deletes a handler from the database. Returns a promise that resolves once the
 // transaction is complete.
-window.deleteHandlerForUrl = function(db, url) {
-  deleteHandlerForUrls(db, [url]);
+RegistryDatabase.prototype.deleteHandlerForUrl = function(url) {
+  db.deleteHandlerForUrls([url]);
 };
 
 // Gets all handlers in the database. Returns a promise that resolves with an
 // array of Handlers.
-window.getAllHandlers = function(db) {
-  var transaction = db.transaction(['handlers']);
+RegistryDatabase.prototype.getAllHandlers = function() {
+  var transaction = this.db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   var handlers = [];
   return new Promise((resolve, reject) => {
@@ -149,16 +150,16 @@ window.getAllHandlers = function(db) {
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
-window.getHandlerForUrl = function(db, url) {
-  var transaction = db.transaction(['handlers']);
+RegistryDatabase.prototype.getHandlerForUrl = function(url) {
+  var transaction = this.db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   return storeGet(store, url).then(handlerFromObject);
 };
 
 // Gets a handler for a specific URL. Returns a promise that resolves with the
 // Handler, or undefined if it is not found.
-window.getHandlersForVerb = function(db, verb) {
-  var transaction = db.transaction(['handlers']);
+RegistryDatabase.prototype.getHandlersForVerb = function(verb) {
+  var transaction = this.db.transaction(['handlers']);
   var store = transaction.objectStore('handlers');
   var handlers = [];
   return new Promise((resolve, reject) => {
@@ -175,6 +176,15 @@ window.getHandlersForVerb = function(db, verb) {
       }
     };
   });
+};
+
+RegistryDatabase.prototype.close = function() {
+  this.db.close();
+};
+
+window.openRegistryDatabase = function() {
+  return openDatabase('ProxyRegistry', 1, onUpgradeNeeded)
+      .then(db => new RegistryDatabase(db));
 };
 
 })();

@@ -55,7 +55,7 @@ function createRadioButton(name, index, title, checked) {
 // in the DOM tree for the handlers.
 function populateHandlers() {
   openRegistryDatabase().then(db => {
-    getHandlersForVerb(db, options.verb).then(result => {
+    db.getHandlersForVerb(options.verb).then(result => {
       handlers = result;
       db.close();
       populateUI();

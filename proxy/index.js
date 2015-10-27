@@ -87,7 +87,7 @@ function generateTableRows() {
     tbody.removeChild(tbody.firstChild);
 
   openRegistryDatabase().then(db => {
-    getAllHandlers(db).then(handlers => {
+    db.getAllHandlers().then(handlers => {
       for (var i = 0; i < handlers.length; i++) {
         var handler = handlers[i];
         var cells = [handler.name, handler.url, handler.verbs.join(', ')];
@@ -102,7 +102,7 @@ function generateTableRows() {
 
 function deleteHandlersClick() {
   openRegistryDatabase().then(db => {
-    deleteHandlerForUrls(db, selectedUrls())
+    db.deleteHandlerForUrls(selectedUrls())
         .then(() => db.close(), () => db.close());
     generateTableRows();
   });
@@ -146,7 +146,7 @@ function newHandlerClick() {
   var handler = new Handler(nameStr, urlStr, verbList);
 
   openRegistryDatabase().then(db => {
-    registerHandler(db, handler)
+    db.registerHandler(handler)
         .then(
             () => {
               db.close();

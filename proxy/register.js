@@ -81,7 +81,7 @@ function processHandler(handler) {
 // promise that is resolved with a Boolean.
 function alreadyRegistered(handler) {
   return openRegistryDatabase().then(db => {
-    return getHandlerForUrl(db, handler.url)
+    return db.getHandlerForUrl(handler.url)
         .then(existing => {
           if (existing == undefined)
             return false;
@@ -119,7 +119,7 @@ function populateUI() {
 // Registers this handler in the database.
 function register() {
   openRegistryDatabase().then(db => {
-    registerHandler(db, handler)
+    db.registerHandler(handler)
         .then(
             () => {
               db.close();
