@@ -97,7 +97,7 @@ function handlerFromObject(object) {
 function onUpgradeNeeded(db, oldVersion) {
   // The 'handlers' store maps arbitrary ints onto Handler objects.
   var objectStore = db.createObjectStore('handlers', {keyPath: 'url'});
-  return new Promise((resolve, reject) => resolve());
+  return Promise.resolve();
 }
 
 // Wrapper around the database, providing methods for accessing handlers.
