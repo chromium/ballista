@@ -65,22 +65,12 @@ function populateHandlers() {
 
 // Creates the radio buttons in the DOM tree for |handlers|.
 function populateUI() {
-  var choices = document.querySelector('#choices');
-  while (choices.firstChild)
-    choices.removeChild(choices.firstChild);
-
-  var open = document.querySelector('#open');
-  if (handlers.length == 0) {
-    // Show the error, hide the choosing interface, and disable the Open button.
-    document.querySelector('#no_handlers').style.display = 'block';
-    document.querySelector('#yes_handlers').style.display = 'none';
-    choices.style.display = 'none';
-    open.setAttribute('disabled', '');
-    open.classList.remove('mdl-button--colored');
-    componentHandler.upgradeElement(open);
+  // If no handlers, do nothing (showing the "no handlers" error).
+  if (handlers.length == 0)
     return;
-  }
 
+  var choices = document.querySelector('#choices');
+  var open = document.querySelector('#open');
   document.querySelector('#no_handlers').style.display = 'none';
   document.querySelector('#yes_handlers').style.display = 'block';
   choices.style.display = 'block';
@@ -109,6 +99,9 @@ function sendPortToHandler(url, port) {
 }
 
 window.onmessage = function(e) {
+  // Only accept a single message.
+  window.onmessage = null;
+
   requesterPort = e.data.port;
   options = e.data.options;
   populateHandlers();
