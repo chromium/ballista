@@ -33,7 +33,7 @@ function createRadioButton(name, index, title, checked) {
   input.setAttribute('class', 'mdl-radio__button');
   input.name = name;
   input.value = index;
-  var id = name + '_' + index;
+  var id = `${name}_${index}`;
   input.id = id;
   if (checked)
     input.checked = true;

@@ -89,7 +89,7 @@ function listToFriendlyString(items) {
     var last = items[items.length - 1];
     var secondLast = items[items.length - 2];
     items = items.slice(0, items.length - 2);
-    items.push(secondLast + ' and ' + last);
+    items.push(`${secondLast} and ${last}`);
   }
   return items.join(', ');
 }
@@ -136,8 +136,8 @@ window.onmessage = function(e) {
 
   alreadyRegistered(handler).then(isRegistered => {
     if (isRegistered) {
-      console.log('Ballista proxy: Not registering handler for ' + handler.url +
-                  '; already registered.');
+      console.log(`Ballista proxy: Not registering handler for ${handler.url}; `
+                  + 'already registered.');
       closeDialog();
       return;
     }
