@@ -33,10 +33,17 @@ function arraysEqual(x, y) {
   return true;
 }
 
+// Sorts an array, non-destructively.
+function sorted(arr) {
+  var copy = arr.slice();
+  copy.sort();
+  return copy;
+}
+
 // Determines if two handlers are "equal" (for the purpose of re-registering a
 // handler).
 function handlersEqual(x, y) {
-  return x.name == y.name && arraysEqual(x.verbs, y.verbs);
+  return x.name == y.name && arraysEqual(sorted(x.verbs), sorted(y.verbs));
 }
 
 // Takes an object with the fields of a handler, and converts it into a new
