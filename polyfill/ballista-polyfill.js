@@ -19,10 +19,6 @@
 // API, by design, does things that aren't possible in a polyfill, so this will
 // be broken without specific browser hacks. All work-in-progress; don't get too
 // excited about it.
-//
-// Note: The requester needs to set navigator.actions.polyfillHandlerUrl to a
-// valid handler URL before calling performAction. This is a temporary
-// requirement of the polyfill and won't be part of the final API.
 "use strict";
 
 (function() {
@@ -31,7 +27,19 @@
 // polyfill by mkruisselbrink and reillyeon:
 // https://github.com/mkruisselbrink/navigator-connect
 
+// The URL of the proxy app, which provides the handler chooser and routes
+// actions through to the chosen handler.
+// TODO(mgiuca): Move this to a fixed public location.
+var kChooseUrl = 'http://localhost:8080/choose';
+
+// The URL of the proxy app, which provides registration UI for handlers.
+var kRegisterUrl = 'http://localhost:8080/register';
+
 var kProxyUrlSuffix = '?actions-handler-proxy';
+
+// DOM element for the <div> containing the chooser UI (hosted by the proxy
+// site) in an iframe. Only non-null while choosing is taking place.
+var chooserDiv = null;
 
 // The handler's service worker provides a special proxy page that will be
 // embedded in an iframe in the requester (by connectToHandler).
@@ -69,8 +77,10 @@ function onMessage(event) {
     }
     event.stopImmediatePropagation();
     return;
-  } else if (data.type == 'sendPortToHandler') {
-    sendPortToHandler(data.url, data.port);
+  } else if (data.type == 'sendPortToProxy') {
+    sendPortToProxy(data.port, data.options);
+  } else if (data.type == 'closeChooser') {
+    closeChooser();
   }
 }
 
@@ -98,10 +108,35 @@ if (self.WorkerNavigator !== undefined) {
   navigator.serviceWorker.addEventListener('message', onMessage);
 }
 
-// Establishes a connection with the polyfill handler (by embedding a page from
-// the handler's domain in an iframe), and posts a MessagePort object to it.
-// Asynchronous; no return value.
-function sendPortToHandler(url, port) {
+// Creates an iframe at |url|, and shows it in a popup window. Returns a promise
+// that resolves once the iframe has loaded, with the iframe DOM element.
+function createIframePopup(url) {
+  chooserDiv = document.createElement('div');
+  chooserDiv.style.zIndex = 100;
+  chooserDiv.style.position = 'absolute';
+  chooserDiv.style.left = '200px';
+  chooserDiv.style.top = '200px';
+  chooserDiv.style.width = '640px';
+  chooserDiv.style.height = '480px';
+
+  var iframe = document.createElement('iframe');
+  return new Promise((resolve, reject) => {
+    iframe.onload = e => resolve(iframe);
+
+    iframe.setAttribute('src', url);
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+
+    chooserDiv.appendChild(iframe);
+    document.body.appendChild(chooserDiv);
+  });
+}
+
+// Establishes a connection with the polyfill handler (via the proxy, by
+// embedding a page from the proxy's domain in an iframe), and posts a
+// MessagePort object to it. |options| is a dictionary of various fields used to
+// identify which handlers can be used. Asynchronous; no return value.
+function sendPortToProxy(port, options) {
   if (self.document === undefined) {
     // We are in a service worker. No way to create an iframe here (needed to
     // establish a connection to handler service worker), so connect to a random
@@ -111,39 +146,53 @@ function sendPortToHandler(url, port) {
     // page, this will fail. This *should not* happen in the real API, but there
     // is no way around this in the polyfill.
     findLastTopLevelClient().then(client => {
-      client.postMessage({type: 'sendPortToHandler', url: url, port: port},
-                         [port]);
+      client.postMessage(
+          {type: 'sendPortToProxy', port: port, options: options}, [port]);
     });
     return;
   }
 
-  var iframe = document.createElement('iframe');
-  iframe.style.display = 'none';
-  iframe.onload = function(event) {
-    iframe.contentWindow.postMessage({port: port}, '*', [port]);
-  };
-
-  iframe.setAttribute('src', url + kProxyUrlSuffix);
-  document.body.appendChild(iframe);
-
-  // TODO(mgiuca): document.body.removeChild(iframe), after done using it.
+  createIframePopup(kChooseUrl)
+      .then(iframe => {
+        iframe.contentWindow.postMessage({port: port, options: options}, '*',
+                                         [port]);
+      });
 }
 
-// Establish a connection with the polyfill handler (by embedding a page from
-// the handler's domain in an iframe). Returns (in a promise) a MessagePort on
-// succesful connection to the handler.
-function connectToHandler(url) {
+// Destroy the chooser div.
+function closeChooser() {
+  if (self.document === undefined) {
+    // We are in a service worker. Tell the foreground page to destroy the
+    // chooser.
+    findLastTopLevelClient().then(client => {
+      client.postMessage({type: 'closeChooser'});
+    });
+    return;
+  }
+
+  document.body.removeChild(chooserDiv);
+}
+
+// Prompts the user for a handler app and establishes a connection with the
+// chosen handler. |options| is a dictionary of various fields used to identify
+// which handlers can be used. Returns (in a promise) a MessagePort on succesful
+// connection to the handler.
+function connectToHandler(options) {
   return new Promise(function(resolve, reject) {
     var channel = new MessageChannel();
     channel.port1.onmessage = e => {
+      closeChooser();
+
       if (e.data.connected) {
         channel.port1.onmessage = null;
         resolve(channel.port1);
+      } else if (e.data.connected == false) {
+        reject(new Error("User cancelled dialog."));
       } else {
         reject(new Error("Received unexpected response from handler."));
       }
     };
-    sendPortToHandler(url, channel.port2);
+    sendPortToProxy(channel.port2, options);
   });
 };
 
@@ -242,11 +291,6 @@ if (navigator.actions === undefined) {
   var actions = new NavigatorActions();
   navigator.actions = actions;
 
-  // The URL of the handler to send requests to. The final API will have the
-  // user agent let the user choose a handler from a registered list. For now,
-  // we just let the requester specify its URL by setting this variable.
-  actions.polyfillHandlerUrl = null;
-
   var event_or_extendable_event = Event;
 
   // HandleEvent is only available when the global scope is a
@@ -286,28 +330,20 @@ if (navigator.actions === undefined) {
   // interaction with the handler. Fails with AbortError if a connection could
   // not be made.
   actions.performAction = function(options, data) {
-    // Get the URL of the handler to connect to. For now, this is just a fixed
-    // URL set by the requester.
-    var handlerUrl = actions.polyfillHandlerUrl;
-    if (handlerUrl === null) {
-      throw new Error(
-          'You need to set navigator.actions.polyfillHandlerUrl ' +
-          '(temporary requirement of the polyfill only).');
-    }
+    if (typeof options == 'string')
+      options = {verb: options};
 
-    return connectToHandler(handlerUrl)
-        .then(port => {
-          var id = nextActionId++;
-          if (typeof options == 'string') options = {verb: options};
-          var action = new Action(id);
+    return connectToHandler(options).then(port => {
+      var id = nextActionId++;
+      var action = new Action(id);
 
-          // Send the options and data payload to the handler.
-          var message = {type: 'action', options: options, data: data, id: id};
-          port.postMessage(message);
-          port.onmessage = m => onMessageReceived(m.data, null);
+      // Send the options and data payload to the handler.
+      var message = {type: 'action', options: options, data: data, id: id};
+      port.postMessage(message);
+      port.onmessage = m => onMessageReceived(m.data, null);
 
-          return action;
-        });
+      return action;
+    });
   };
 
   // Sends an updated version of the data payload associated with an action back
@@ -346,5 +382,54 @@ function onMessageReceived(data, port) {
     console.log('Received unknown message:', data);
   }
 }
+
+// Registers a handler with the proxy server.
+function registerHandler(handler) {
+  // This channel will be used to get back a "close" signal from the proxy.
+  var channel = new MessageChannel();
+  channel.port1.onmessage = e => {
+    if (e.data.close) {
+      closeChooser();
+    } else {
+      throw new Error("Received unexpected response from proxy.");
+    }
+  };
+
+  // Show the registration UI.
+  createIframePopup(kRegisterUrl)
+      .then(iframe => {
+        iframe.contentWindow.postMessage(
+            {handler: handler, port: channel.port2}, '*', [channel.port2]);
+      });
+}
+
+// Parses the webapp manifest, and if there are any action handlers, prompts the
+// user to register with the proxy server.
+function performHandlerRegistration() {
+  var links = document.querySelectorAll('link[rel=manifest]');
+  for (var i = 0; i < links.length; i++) {
+    var manifestUrl = links[i].href;
+    fetch(manifestUrl).then(response => {
+      if (!response.ok)
+        return;
+
+      response.json().then(json => {
+        if (json.actions == undefined || json.actions.length == 0)
+          return;
+
+        // We have a manifest with action handlers. Attempt to register this
+        // handler with the proxy server.
+        var name = json.name || document.title;
+        var url = json.scope || document.location.href;
+        var verbs = [];
+        for (var verb in json.actions)
+          verbs.push(verb);
+        registerHandler({name: name, url: url, verbs: verbs});
+      });
+    });
+  }
+}
+
+addEventListener('load', performHandlerRegistration, false);
 
 })();

@@ -1,0 +1,32 @@
+main {
+  padding: 20px;
+}
+
+h2 {
+  font-size: 2em;
+  margin: 16px 0;
+}
+
+h3 {
+  font-size: 1.5em;
+  margin: 12px 0;
+}
+
+.mdl-layout__header-row {
+  padding-left: 40px;
+}
+
+.mdl-card__title {
+  /* From .mdl-layout__header. */
+  color: #fff;
+  background-color: #607d8b;
+}
+
+.error {
+  /* From "a" in MDL. */
+  color: #7c4dff;
+}
+
+.registration-field {
+  font-weight: bold;
+}

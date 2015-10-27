@@ -1,0 +1,35 @@
+version: 1
+module: proxy
+runtime: python27
+api_version: 1
+threadsafe: true
+
+# Cannot use top-level static_dir due to / -> index.html redirect.
+handlers:
+- url: /([^/]*\.js)
+  mime_type: text/javascript
+  static_files: proxy/\1
+  upload: proxy/.*\.js
+
+- url: /([^/]*\.css)
+  mime_type: text/css
+  static_files: proxy/\1
+  upload: proxy/.*\.css
+
+- url: /
+  static_files: proxy/index.html
+  upload: proxy/index.html
+  mime_type: text/html; charset=utf-8
+
+- url: /choose
+  static_files: proxy/choose.html
+  upload: proxy/choose.html
+  mime_type: text/html; charset=utf-8
+
+- url: /register
+  static_files: proxy/register.html
+  upload: proxy/register.html
+  mime_type: text/html; charset=utf-8
+
+- url: /icon
+  static_dir: proxy/icon
