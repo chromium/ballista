@@ -33,6 +33,12 @@ function arraysEqual(x, y) {
   return true;
 }
 
+// Determines if two handlers are "equal" (for the purpose of re-registering a
+// handler).
+function handlersEqual(x, y) {
+  return x.name == y.name && arraysEqual(x.verbs, y.verbs);
+}
+
 // Takes an object with the fields of a handler, and converts it into a new
 // Handler object. This sanitizes the object received from the host (which is
 // untrusted). Throws an error if the object contains missing or invalid fields.
@@ -75,8 +81,7 @@ function alreadyRegistered(handler) {
           return;
         }
 
-        resolve(existing.name == handler.name &&
-                arraysEqual(existing.verbs, handler.verbs));
+        resolve(handlersEqual(existing, handler));
       }, error => reject(error));
     }, error => reject(error));
   });
