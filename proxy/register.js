@@ -136,8 +136,9 @@ window.onmessage = function(e) {
 
   alreadyRegistered(handler).then(isRegistered => {
     if (isRegistered) {
-      console.log(`Ballista proxy: Not registering handler for ${handler.url}; `
-                  + 'already registered.');
+      console.debug(
+          `Ballista proxy: Not registering handler for ${handler.url}; ` +
+          'already registered.');
       closeDialog();
       return;
     }
