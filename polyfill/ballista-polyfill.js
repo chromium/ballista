@@ -27,13 +27,15 @@
 // polyfill by mkruisselbrink and reillyeon:
 // https://github.com/mkruisselbrink/navigator-connect
 
+// TODO(mgiuca): Move this to a fixed public location.
+var kProxySite = 'http://localhost:8080';
+
 // The URL of the proxy app, which provides the handler chooser and routes
 // actions through to the chosen handler.
-// TODO(mgiuca): Move this to a fixed public location.
-var kChooseUrl = 'http://localhost:8080/choose';
+var kChooseUrl = kProxySite + '/choose';
 
 // The URL of the proxy app, which provides registration UI for handlers.
-var kRegisterUrl = 'http://localhost:8080/register';
+var kRegisterUrl = kProxySite + '/register';
 
 var kProxyUrlSuffix = '?actions-handler-proxy';
 
