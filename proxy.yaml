@@ -1,5 +1,5 @@
 version: 1
-module: proxy
+module: default
 runtime: python27
 api_version: 1
 threadsafe: true
