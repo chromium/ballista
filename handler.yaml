@@ -10,22 +10,28 @@ handlers:
   mime_type: text/javascript
   static_files: handler/\1
   upload: handler/.*\.js
+  secure: always
 
 - url: /([^/]*\.webmanifest)
   mime_type: application/manifest+json
   static_files: handler/\1
   upload: handler/.*\.webmanifest
+  secure: always
 
 - url: /
   static_files: handler/index.html
   upload: handler/index.html
   mime_type: text/html; charset=utf-8
+  secure: always
 
 - url: /icon
   static_dir: handler/icon
+  secure: always
 
 - url: /common
   static_dir: common
+  secure: always
 
 - url: /polyfill
   static_dir: polyfill
+  secure: always

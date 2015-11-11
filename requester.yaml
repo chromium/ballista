@@ -10,17 +10,22 @@ handlers:
   mime_type: text/javascript
   static_files: requester/\1
   upload: requester/.*\.js
+  secure: always
 
 - url: /
   static_files: requester/index.html
   upload: requester/index.html
   mime_type: text/html; charset=utf-8
+  secure: always
 
 - url: /icon
   static_dir: requester/icon
+  secure: always
 
 - url: /common
   static_dir: common
+  secure: always
 
 - url: /polyfill
   static_dir: polyfill
+  secure: always

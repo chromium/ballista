@@ -10,26 +10,32 @@ handlers:
   mime_type: text/javascript
   static_files: proxy/\1
   upload: proxy/.*\.js
+  secure: always
 
 - url: /([^/]*\.css)
   mime_type: text/css
   static_files: proxy/\1
   upload: proxy/.*\.css
+  secure: always
 
 - url: /
   static_files: proxy/index.html
   upload: proxy/index.html
   mime_type: text/html; charset=utf-8
+  secure: always
 
 - url: /choose
   static_files: proxy/choose.html
   upload: proxy/choose.html
   mime_type: text/html; charset=utf-8
+  secure: always
 
 - url: /register
   static_files: proxy/register.html
   upload: proxy/register.html
   mime_type: text/html; charset=utf-8
+  secure: always
 
 - url: /icon
   static_dir: proxy/icon
+  secure: always
