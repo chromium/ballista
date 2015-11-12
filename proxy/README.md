@@ -16,6 +16,10 @@ required in a browser that actually implements Ballista).
 The proxy is now running at [http://localhost:8080](http://localhost:8080).
 Visiting that site allows you to view, add and remove handler registrations.
 
+To test the polyfill against your local version of the proxy, update
+`polyfill/ballista-polyfill.js`, changing `kProxySite` to
+`"http://localhost:8080"`.
+
 ## Details
 
 The proxy is an implementation detail which neither users nor developers need to
