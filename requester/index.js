@@ -15,7 +15,9 @@
 // Foreground page
 "use strict";
 
-var files = [];
+var files = [
+  {name: 'file.txt', contents: 'You can edit this file using Ballista!\n'},
+];
 
 var newFileIndex = 0;
 
