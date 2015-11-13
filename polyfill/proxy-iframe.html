@@ -21,8 +21,15 @@ limitations under the License.
 // it onto the handler's service worker. The iframe does not need to remain
 // alive after the exchange has taken place.
 window.onmessage = function(e) {
+  // Pop open a new tab. Note: The final API should not do this; instead the
+  // user's code should use |clients.openWindow()| to open a window if desired.
+  // Since this isn't possible in the polyfill, we just pop open a tab on the
+  // user's behalf.
+  var w = window.open(e.data.url);
   var port = e.data.port;
-  navigator.serviceWorker.controller.postMessage(
-      {type: 'connect', port: port}, [port]);
+  w.addEventListener('load', e => {
+    navigator.serviceWorker.controller.postMessage(
+        {type: 'connect', port: port}, [port]);
+  }, true);
 };
 </script>

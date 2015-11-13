@@ -23,8 +23,7 @@ You can try it out locally using the App Engine dev appserver.
 3. Run the dev appserver: `dev_appserver.py proxy.yaml handler.yaml
    requester.yaml`.
 4. Open the [handler](http://localhost:8081) in a supported browser. You will be
-   prompted to register this site as an action handler. Click "OK". You need to
-   keep the handler app open (due to limitations of the polyfill).
+   prompted to register this site as an action handler. Click "OK".
 5. You can view and delete handler registrations in the [polyfill control
    panel](http://localhost:8000).
 6. Open the [requester](http://localhost:8082) in another tab.
