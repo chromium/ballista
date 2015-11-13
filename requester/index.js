@@ -16,31 +16,41 @@
 "use strict";
 
 var files = [
-  {name: 'one.txt'},
-  {name: 'two.txt'},
+  {name: 'one.txt', contents: 'One contents.'},
+  {name: 'two.txt', contents: 'Two contents.'},
 ];
 
 // Returns the selected filenames.
 function selectedFiles() {
-  var files = [];
+  var selected = [];
   var trs = document.querySelectorAll('#file_table tbody tr');
   for (var i = 0; i < trs.length; i++) {
     var tr = trs[i];
     if (tr.querySelector('input[type = "checkbox"]').checked) {
       var fileBox = tr.querySelector('input[type = "text"]');
-      files.push(fileBox.value);
+      selected.push(files[i]);
     }
   }
-  return files;
+  return selected;
 }
 
 function selectionChanged() {
-  var selected = selectedFiles().length > 0;
+  var selected = selectedFiles();
+
   var deleteButton = document.getElementById('delete_files');
-  if (selected)
+  if (selected.length > 0)
     deleteButton.removeAttribute('disabled');
   else
     deleteButton.setAttribute('disabled', '');
+
+  var contents_textfield = document.getElementById('contents_textfield');
+  if (selected.length == 1) {
+    // Display a preview of the file's contents.
+    contents_textfield.value = selected[0].contents;
+    contents_textfield.style.display = 'block';
+  } else {
+    contents_textfield.style.display = 'none';
+  }
 }
 
 function generateTableRows() {
