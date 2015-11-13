@@ -51,11 +51,11 @@ function createTableRow(cells) {
   return tr;
 }
 
-// Call this to re-run the MDL upgrade step on the table (to regenerate the
-// checkboxes). This should be called whenever the table is changed.
-function reUpgradeTable() {
+// Call this to re-run the MDL upgrade step on a table (to regenerate the
+// checkboxes). This should be called whenever |table| is changed.
+function reUpgradeTable(table) {
   // Delete all the checkbox cells.
-  var trs = document.querySelectorAll('#handler_table tr');
+  var trs = table.querySelectorAll('tr');
   for (var i = 0; i < trs.length; i++) {
     var tr = trs[i];
     var firstCell = tr.querySelector('th,td');
@@ -67,7 +67,6 @@ function reUpgradeTable() {
   // is required due to
   // https://github.com/google/material-design-lite/issues/984; this is a
   // proposed work-around.)
-  var table = document.getElementById('handler_table');
   table.removeAttribute('data-upgraded');
   componentHandler.upgradeElement(table);
 
@@ -82,7 +81,8 @@ function reUpgradeTable() {
 }
 
 function generateTableRows() {
-  var tbody = document.querySelector('#handler_table tbody');
+  var table = document.getElementById('handler_table');
+  var tbody = table.querySelector('tbody');
   while (tbody.firstChild)
     tbody.removeChild(tbody.firstChild);
 
@@ -95,7 +95,7 @@ function generateTableRows() {
         tbody.appendChild(tr);
       }
       db.close();
-      reUpgradeTable();
+      reUpgradeTable(table);
     }, () => db.close());
   });
 }
