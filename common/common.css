@@ -25,6 +25,10 @@ body {
   width: 600px;
 }
 
+.compact-mdl-textfield {
+  padding: 0;
+}
+
 .edit-button {
   margin-bottom: 10px;
 }

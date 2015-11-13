@@ -53,7 +53,7 @@ function generateTableRows() {
         tbody.appendChild(tr);
       }
       db.close();
-      reUpgradeTable(table);
+      reUpgradeTable(table, selectionChanged);
     }, () => db.close());
   });
 }

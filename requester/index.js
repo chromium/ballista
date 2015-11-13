@@ -15,6 +15,72 @@
 // Foreground page
 "use strict";
 
+var files = [
+  {name: 'one.txt'},
+  {name: 'two.txt'},
+];
+
+// Returns the selected filenames.
+function selectedFiles() {
+  var files = [];
+  var trs = document.querySelectorAll('#file_table tbody tr');
+  for (var i = 0; i < trs.length; i++) {
+    var tr = trs[i];
+    if (tr.querySelector('input[type = "checkbox"]').checked) {
+      var fileBox = tr.querySelector('input[type = "text"]');
+      files.push(fileBox.value);
+    }
+  }
+  return files;
+}
+
+function selectionChanged() {
+  var selected = selectedFiles().length > 0;
+  var deleteButton = document.getElementById('delete_files');
+  if (selected)
+    deleteButton.removeAttribute('disabled');
+  else
+    deleteButton.setAttribute('disabled', '');
+}
+
+function generateTableRows() {
+  var table = document.getElementById('file_table');
+  var tbody = table.querySelector('tbody');
+  while (tbody.firstChild)
+    tbody.removeChild(tbody.firstChild);
+
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    var tr = document.createElement('tr');
+
+    var td1 = document.createElement('td');
+    td1.setAttribute('class', 'mdl-data-table__cell--non-numeric');
+    var textField = document.createElement('div');
+    textField.setAttribute(
+        'class', 'mdl-textfield mdl-js-textfield compact-mdl-textfield');
+    var textFieldInput = document.createElement('input');
+    textFieldInput.setAttribute('class', 'mdl-textfield__input');
+    textFieldInput.setAttribute('type', 'text');
+    textFieldInput.value = file.name;
+    textField.appendChild(textFieldInput);
+    componentHandler.upgradeElement(textField);
+    td1.appendChild(textField);
+    tr.appendChild(td1);
+
+    var td2 = document.createElement('td');
+    td2.setAttribute('class', 'mdl-data-table__cell--non-numeric');
+    var button = document.createElement('button');
+    button.setAttribute('class', 'mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect edit-button');
+    button.appendChild(document.createTextNode('Open'));
+    componentHandler.upgradeElement(button);
+    td2.appendChild(button);
+    tr.appendChild(td2);
+
+    tbody.appendChild(tr);
+  }
+  reUpgradeTable(table, selectionChanged);
+}
+
 // Sets whether the file is open in the external editor.
 function setOpenState(isOpen) {
   var status_p = document.getElementById('status_p');
@@ -70,6 +136,8 @@ function onLoad() {
 
   document.getElementById('edit_button')
       .addEventListener('click', editButtonClick);
+
+  generateTableRows();
 }
 
 window.addEventListener('load', onLoad, false);

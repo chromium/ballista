@@ -42,13 +42,14 @@ function createTableRow(cells) {
 
 // Call this to re-run the MDL upgrade step on a table (to regenerate the
 // checkboxes). This should be called whenever |table| is changed.
-function reUpgradeTable(table) {
+function reUpgradeTable(table, selectionChangedCallback) {
   // Delete all the checkbox cells.
   var trs = table.querySelectorAll('tr');
   for (var i = 0; i < trs.length; i++) {
     var tr = trs[i];
     var firstCell = tr.querySelector('th,td');
-    if (firstCell.querySelector('input') != null)
+    var firstCellInput = firstCell.querySelector('input');
+    if (firstCellInput != null && firstCellInput.type == 'checkbox')
       tr.removeChild(firstCell);
   }
 
@@ -64,7 +65,7 @@ function reUpgradeTable(table) {
     var tr = trs[i];
     var firstCell = tr.querySelector('th,td');
     var checkbox = firstCell.querySelector('input');
-    if (checkbox != null)
-      checkbox.addEventListener('change', selectionChanged);
+    if (checkbox != null && selectionChangedCallback != null)
+      checkbox.addEventListener('change', selectionChangedCallback);
   }
 }
