@@ -15,10 +15,9 @@
 // Foreground page
 "use strict";
 
-var files = [
-  {name: 'one.txt', contents: 'One contents.'},
-  {name: 'two.txt', contents: 'Two contents.'},
-];
+var files = [];
+
+var newFileIndex = 0;
 
 // Returns the selected filenames.
 function selectedFiles() {
@@ -91,6 +90,12 @@ function generateTableRows() {
   reUpgradeTable(table, selectionChanged);
 }
 
+function createNewFile() {
+  var filename = `New File ${++newFileIndex}.txt`;
+  files.push({name: filename, contents: ''});
+  generateTableRows();
+}
+
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
   var contents_textfield = document.getElementById('contents_textfield');
@@ -131,6 +136,9 @@ function onLoad() {
       console.log('ServiceWorker registration failed: ', err);
     });
   }
+
+  document.getElementById('new_file')
+      .addEventListener('click', createNewFile);
 
   generateTableRows();
 }
