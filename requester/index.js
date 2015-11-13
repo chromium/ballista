@@ -91,15 +91,6 @@ function generateTableRows() {
   reUpgradeTable(table, selectionChanged);
 }
 
-// Sets whether the file is open in the external editor.
-function setOpenState(isOpen) {
-  var status_p = document.getElementById('status_p');
-  var status_line;
-  status_line =
-      isOpen ? 'File is open in external editor.' : 'File is not being edited.';
-  status_p.innerHTML = status_line;
-}
-
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
   var contents_textfield = document.getElementById('contents_textfield');
@@ -121,9 +112,6 @@ function editButtonClick() {
     var type = data.type;
 
     if (type == 'update') {
-      if (data.openState !== undefined)
-        setOpenState(data.openState);
-
       if (data.file !== undefined)
         updateTextFromFile(data.file);
     }
@@ -143,9 +131,6 @@ function onLoad() {
       console.log('ServiceWorker registration failed: ', err);
     });
   }
-
-  document.getElementById('edit_button')
-      .addEventListener('click', editButtonClick);
 
   generateTableRows();
 }
