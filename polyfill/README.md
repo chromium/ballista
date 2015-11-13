@@ -23,8 +23,8 @@ This includes newer versions of Google Chrome / Chromium and Mozilla Firefox.
   need to remain open to receive updates).
 * Not able to send actions to native applications.
 * Not possible to use `clients.openWindow` from the `'action'` event handler
-  (when the handler's service worker receives an action). This means your apps
-  need to handle the action in an existing tab, rather than opening a new tab.
+  (when the handler's service worker receives an action). The polyfill will
+  automatically open the handler in a new tab for you.
 
 ## Usage instructions
 
