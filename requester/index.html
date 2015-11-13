@@ -36,6 +36,43 @@ limitations under the License.
       </header>
       <main class="mdl-layout__content">
         <div class="mdl-grid">
+          <div class="mdl-cell--12-col">
+            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" id="file_table">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Filename</th>
+                  <th class="mdl-data-table__cell--non-numeric"></th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <input class="mdl-textfield__input" type="text" id="filename_textfield" value="test.txt" />
+                  </td>
+                  <td class="mdl-data-table__cell--non-numeric">
+                    <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect edit-button" id="edit_button">Open</button>
+                    <div class="mdl-tooltip" for="edit_button">
+                      Open up the file in an external editor using <strong>Ballista</strong>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="mdl-cell mdl-cell--1-col">
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="delete_files" disabled>
+              <i class="material-icons">delete</i>
+            </button>
+            <div class="mdl-tooltip" for="delete_files">Delete selected files</div>
+          </div>
+          <div class="mdl-cell mdl-cell--1-col">
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="new_file">
+                <i class="material-icons">add</i>
+            </button>
+            <div class="mdl-tooltip" for="new_file">Add new file</div>
+          </div>
+        </div>
+        <div class="mdl-grid">
           <div class="mdl-cell mdl-cell--12-col">
             This text field represents the contents of a file in cloud storage:
           </div>

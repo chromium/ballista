@@ -24,3 +24,7 @@ body {
 #contents_textfield {
   width: 600px;
 }
+
+.edit-button {
+  margin-bottom: 10px;
+}
