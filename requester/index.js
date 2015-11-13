@@ -113,12 +113,13 @@ function onFilenameChanged(e) {
   file.name = e.target.value;
 }
 
-// Updates |contents_textfield| with the contents of |file|, asynchronously.
-function updateTextFromFile(file) {
-  var contents_textfield = document.getElementById('contents_textfield');
-  return readBlobAsText(file)
+// Updates the local file |index| with the contents of |blob|, asynchronously.
+function updateFileFromBlob(index, blob) {
+  return readBlobAsText(blob)
       .then(text => {
-        contents_textfield.value = text;
+        files[index].contents = text;
+        // Refresh the contents textfield if selected.
+        selectionChanged();
       });
 }
 
@@ -133,7 +134,7 @@ function editButtonClick(index) {
 
     if (type == 'update') {
       if (data.file !== undefined)
-        updateTextFromFile(data.file);
+        updateFileFromBlob(index, data.file);
     }
   }
   navigator.serviceWorker.controller.postMessage(
