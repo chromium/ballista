@@ -33,6 +33,22 @@ function selectedFiles() {
   return selected;
 }
 
+function selectFiles(indices) {
+  var selected = [];
+  var trs = document.querySelectorAll('#file_table tbody tr');
+  for (var i = 0; i < trs.length; i++) {
+    var tr = trs[i];
+    var checkbox = tr.querySelector('input[type = "checkbox"]')
+                       .parentNode.MaterialCheckbox;
+    if (indices.indexOf(i) != -1)
+      checkbox.check();
+    else
+      checkbox.uncheck();
+  }
+
+  selectionChanged();
+}
+
 function selectionChanged() {
   var selected = selectedFiles();
 
@@ -139,6 +155,9 @@ function editButtonClick(index) {
   }
   navigator.serviceWorker.controller.postMessage(
       {type: 'open', file: blob, port: channel.port2}, [channel.port2]);
+
+  // Select the opened file.
+  selectFiles([index]);
 }
 
 function onLoad() {
