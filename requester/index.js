@@ -71,6 +71,7 @@ function generateTableRows() {
     textFieldInput.setAttribute('class', 'mdl-textfield__input');
     textFieldInput.setAttribute('type', 'text');
     textFieldInput.value = file.name;
+    textFieldInput.ballistaIndex = i;
     textField.appendChild(textFieldInput);
     componentHandler.upgradeElement(textField);
     td1.appendChild(textField);
@@ -86,6 +87,8 @@ function generateTableRows() {
     tr.appendChild(td2);
 
     tbody.appendChild(tr);
+
+    textFieldInput.addEventListener('change', onFilenameChanged);
   }
   reUpgradeTable(table, selectionChanged);
 }
@@ -101,6 +104,12 @@ function deleteSelectedFiles() {
   selected.reverse();
   selected.forEach(i => files.splice(i, 1));
   generateTableRows();
+}
+
+function onFilenameChanged(e) {
+  var index = e.target.ballistaIndex;
+  var file = files[index];
+  file.name = e.target.value;
 }
 
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
