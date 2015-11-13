@@ -89,6 +89,7 @@ function generateTableRows() {
     tbody.appendChild(tr);
 
     textFieldInput.addEventListener('change', onFilenameChanged);
+    button.addEventListener('click', editButtonClick.bind(undefined, i));
   }
   reUpgradeTable(table, selectionChanged);
 }
@@ -121,11 +122,9 @@ function updateTextFromFile(file) {
       });
 }
 
-function editButtonClick() {
-  var contents_textfield = document.getElementById('contents_textfield');
-  var contents = contents_textfield.value;
-  var filename = document.getElementById('filename_textfield').value;
-  var file = new File([contents], filename, {type: "text/plain"});
+function editButtonClick(index) {
+  var file = files[index];
+  var blob = new File([file.contents], file.name, {type: "text/plain"});
 
   var channel = new MessageChannel();
   channel.port1.onmessage = event => {
@@ -138,7 +137,7 @@ function editButtonClick() {
     }
   }
   navigator.serviceWorker.controller.postMessage(
-      {type: 'open', file: file, port: channel.port2}, [channel.port2]);
+      {type: 'open', file: blob, port: channel.port2}, [channel.port2]);
 }
 
 function onLoad() {
