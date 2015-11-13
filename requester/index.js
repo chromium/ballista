@@ -19,7 +19,7 @@ var files = [];
 
 var newFileIndex = 0;
 
-// Returns the selected filenames.
+// Returns the indices of the selected files.
 function selectedFiles() {
   var selected = [];
   var trs = document.querySelectorAll('#file_table tbody tr');
@@ -27,7 +27,7 @@ function selectedFiles() {
     var tr = trs[i];
     if (tr.querySelector('input[type = "checkbox"]').checked) {
       var fileBox = tr.querySelector('input[type = "text"]');
-      selected.push(files[i]);
+      selected.push(i);
     }
   }
   return selected;
@@ -45,7 +45,7 @@ function selectionChanged() {
   var contents_textfield = document.getElementById('contents_textfield');
   if (selected.length == 1) {
     // Display a preview of the file's contents.
-    contents_textfield.value = selected[0].contents;
+    contents_textfield.value = files[selected[0]].contents;
     contents_textfield.style.display = 'block';
   } else {
     contents_textfield.style.display = 'none';
@@ -96,6 +96,13 @@ function createNewFile() {
   generateTableRows();
 }
 
+function deleteSelectedFiles() {
+  var selected = selectedFiles();
+  selected.reverse();
+  selected.forEach(i => files.splice(i, 1));
+  generateTableRows();
+}
+
 // Updates |contents_textfield| with the contents of |file|, asynchronously.
 function updateTextFromFile(file) {
   var contents_textfield = document.getElementById('contents_textfield');
@@ -136,6 +143,9 @@ function onLoad() {
       console.log('ServiceWorker registration failed: ', err);
     });
   }
+
+  document.getElementById('delete_files')
+      .addEventListener('click', deleteSelectedFiles);
 
   document.getElementById('new_file')
       .addEventListener('click', createNewFile);
