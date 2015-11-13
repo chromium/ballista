@@ -59,12 +59,16 @@ function selectionChanged() {
     deleteButton.setAttribute('disabled', '');
 
   var contents_textfield = document.getElementById('contents_textfield');
+  var preview_label = document.getElementById('preview_label');
+  var preview_box = document.getElementById('preview_box');
   if (selected.length == 1) {
     // Display a preview of the file's contents.
     contents_textfield.value = files[selected[0]].contents;
-    contents_textfield.style.display = 'block';
+    preview_label.style.display = 'block';
+    preview_box.style.display = 'block';
   } else {
-    contents_textfield.style.display = 'none';
+    preview_label.style.display = 'none';
+    preview_box.style.display = 'none';
   }
 }
 
