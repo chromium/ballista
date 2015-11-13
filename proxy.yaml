@@ -39,3 +39,7 @@ handlers:
 - url: /icon
   static_dir: proxy/icon
   secure: always
+
+- url: /common
+  static_dir: common
+  secure: always
