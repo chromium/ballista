@@ -27,6 +27,19 @@ function readBlobAsText(blob) {
   });
 }
 
+// Creates a <tr> element for a table with simple text in each cell (MDL style).
+// |cells| is an array of strings.
+function createTableRow(cells) {
+  var tr = document.createElement('tr');
+  for (var i = 0; i < cells.length; i++) {
+    var td = document.createElement('td');
+    td.setAttribute('class', 'mdl-data-table__cell--non-numeric');
+    td.appendChild(document.createTextNode(cells[i]));
+    tr.appendChild(td);
+  }
+  return tr;
+}
+
 // Call this to re-run the MDL upgrade step on a table (to regenerate the
 // checkboxes). This should be called whenever |table| is changed.
 function reUpgradeTable(table) {

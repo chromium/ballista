@@ -38,19 +38,6 @@ function selectionChanged() {
     deleteButton.setAttribute('disabled', '');
 }
 
-// Creates a <tr> element for a table with simple text in each cell. |cells| is
-// an array of strings.
-function createTableRow(cells) {
-  var tr = document.createElement('tr');
-  for (var i = 0; i < cells.length; i++) {
-    var td = document.createElement('td');
-    td.setAttribute('class', 'mdl-data-table__cell--non-numeric');
-    td.appendChild(document.createTextNode(cells[i]));
-    tr.appendChild(td);
-  }
-  return tr;
-}
-
 function generateTableRows() {
   var table = document.getElementById('handler_table');
   var tbody = table.querySelector('tbody');
