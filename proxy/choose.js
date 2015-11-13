@@ -92,7 +92,7 @@ function populateUI() {
 function sendPortToHandler(url, port) {
   var iframe = document.querySelector('#handler_iframe');
   iframe.onload = function(event) {
-    iframe.contentWindow.postMessage({port: port}, '*', [port]);
+    iframe.contentWindow.postMessage({port: port, url: url}, '*', [port]);
   };
 
   iframe.setAttribute('src', url + kProxyUrlSuffix);

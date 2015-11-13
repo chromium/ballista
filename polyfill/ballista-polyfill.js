@@ -96,7 +96,7 @@ if (self.WorkerNavigator !== undefined) {
   // worker. Returns a promise. Rejects the promise if none found.
   findLastTopLevelClient = () => {
     return clients.matchAll().then(allClients => {
-      for (var i = allClients.length - 1; i >= 0; i--) {
+      for (var i = 0; i < allClients.length; i++) {
         if (allClients[i].frameType == 'top-level') {
           return allClients[i];
         }
