@@ -27,7 +27,7 @@ You can try it out locally using the App Engine dev appserver.
 5. You can view and delete handler registrations in the [polyfill control
    panel](http://localhost:8000).
 6. Open the [requester](http://localhost:8082) in another tab.
-7. From the requester, click "Open". Select "Ballista Handler Demo". This opens
+7. From the requester, click "Open". Select "Ballista Editor Demo". This opens
    the file in the handler's tab.
 8. Edit the text in the handler, then click "Save".
 9. The new text will be visible in the requester.

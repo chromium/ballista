@@ -1,6 +1,6 @@
 {
-  "name": "Ballista Handler Demo",
-  "short_name": "Handler Demo",
+  "name": "Ballista Editor Demo",
+  "short_name": "Editor Demo",
   "icons": [
     {
       "src": "icon/32.png",
