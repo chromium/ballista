@@ -37,33 +37,47 @@ limitations under the License.
       <main class="mdl-layout__content">
         <div class="mdl-grid">
           <div class="mdl-cell mdl-cell--12-col">
-            This text field represents the contents of a file in cloud storage:
+            Test out the <a href="https://github.com/chromium/ballista">Ballista
+              API</a> by creating a file, then editing it in an external
+            editor.<br /><strong>Note: These files are not saved anywhere; this
+              is just a demo.</strong>
           </div>
         </div>
         <div class="mdl-grid">
+          <div class="mdl-cell--12-col">
+            <table class="mdl-data-table mdl-js-data-table mdl-data-table--selectable mdl-shadow--2dp" id="file_table">
+              <thead>
+                <tr>
+                  <th class="mdl-data-table__cell--non-numeric">Filename</th>
+                  <th class="mdl-data-table__cell--non-numeric"></th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="mdl-cell mdl-cell--1-col">
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="delete_files" disabled>
+              <i class="material-icons">delete</i>
+            </button>
+            <div class="mdl-tooltip" for="delete_files">Delete selected files</div>
+          </div>
+          <div class="mdl-cell mdl-cell--1-col">
+            <button class="mdl-button mdl-js-button mdl-button--fab mdl-button--mini-fab mdl-js-ripple-effect mdl-button--colored" id="new_file">
+                <i class="material-icons">add</i>
+            </button>
+            <div class="mdl-tooltip" for="new_file">Add new file</div>
+          </div>
+        </div>
+        <div class="mdl-grid" id="preview_label" style="display: none">
+          <div class="mdl-cell mdl-cell--12-col">
+            Preview of selected file:
+          </div>
+        </div>
+        <div class="mdl-grid" id="preview_box" style="display: none">
           <div class="mdl-cell mdl-cell--4-col">
             <div class="mdl-textfield mdl-js-textfield">
-              <textarea id="contents_textfield" class="mdl-textfield__input" type="text" rows="15">The file contents.</textarea>
+              <textarea id="contents_textfield" class="mdl-textfield__input" type="text" rows="15" readonly></textarea>
             </div>
-          </div>
-        </div>
-        <div class="mdl-grid">
-          <div class="mdl-cell mdl-cell--2-col">
-            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label textfield-demo">
-              <input class="mdl-textfield__input" type="text" id="filename_textfield" value="file.txt" />
-              <label class="mdl-textfield__label" for="filename_textfield">File name</label>
-            </div>
-          </div>
-          <div class="mdl-cell mdl-cell--2-col">
-            <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect" id="edit_button">Open</button>
-            <div class="mdl-tooltip" for="edit_button">
-              Open up the file in an external editor using <strong>Ballista</strong>
-            </div>
-          </div>
-        </div>
-        <div class="mdl-grid">
-          <div class="mdl-cell mdl-cell--2-col">
-            <p id="status_p">File is not being edited.</p>
           </div>
         </div>
       </main>

@@ -26,3 +26,46 @@ function readBlobAsText(blob) {
     reader.readAsText(blob);
   });
 }
+
+// Creates a <tr> element for a table with simple text in each cell (MDL style).
+// |cells| is an array of strings.
+function createTableRow(cells) {
+  var tr = document.createElement('tr');
+  for (var i = 0; i < cells.length; i++) {
+    var td = document.createElement('td');
+    td.setAttribute('class', 'mdl-data-table__cell--non-numeric');
+    td.appendChild(document.createTextNode(cells[i]));
+    tr.appendChild(td);
+  }
+  return tr;
+}
+
+// Call this to re-run the MDL upgrade step on a table (to regenerate the
+// checkboxes). This should be called whenever |table| is changed.
+function reUpgradeTable(table, selectionChangedCallback) {
+  // Delete all the checkbox cells.
+  var trs = table.querySelectorAll('tr');
+  for (var i = 0; i < trs.length; i++) {
+    var tr = trs[i];
+    var firstCell = tr.querySelector('th,td');
+    var firstCellInput = firstCell.querySelector('input');
+    if (firstCellInput != null && firstCellInput.type == 'checkbox')
+      tr.removeChild(firstCell);
+  }
+
+  // Force MDL to regenerate the checkbox cells. (The removal of data-upgraded
+  // is required due to
+  // https://github.com/google/material-design-lite/issues/984; this is a
+  // proposed work-around.)
+  table.removeAttribute('data-upgraded');
+  componentHandler.upgradeElement(table);
+
+  // Add event handlers to the checkboxes.
+  for (var i = 0; i < trs.length; i++) {
+    var tr = trs[i];
+    var firstCell = tr.querySelector('th,td');
+    var checkbox = firstCell.querySelector('input');
+    if (checkbox != null && selectionChangedCallback != null)
+      checkbox.addEventListener('change', selectionChangedCallback);
+  }
+}
