@@ -18,6 +18,26 @@ and outlines an API that we think solves this problem. But this is less about
 proposing an API, and more about starting a conversation, so take a look, and
 let us know what you think (contact details below).
 
+## Demo
+
+We have a prototype that works in Chrome and Firefox. Try this:
+
+1. Go to
+   [handler-dot-chromium-ballista.appspot.com](https://handler-dot-chromium-ballista.appspot.com)
+   (Ballista Editor Demo), and click "OK" to register it as an action handler.
+2. Go to
+   [requester-dot-chromium-ballista.appspot.com](https://requester-dot-chromium-ballista.appspot.com)
+   (Ballista Cloud Demo), and open a file with "Ballista Editor Demo".
+
+These two apps don't know about each other, yet the editor can edit files from
+the cloud app. Using our polyfill, you can write a web app that interoperates
+with our demo apps in the same way.
+
+You can view and manage app registrations at
+[chromium-ballista.appspot.com](https://chromium-ballista.appspot.com). In the
+final product, the registration, picking and management UI would be part of the
+browser.
+
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
