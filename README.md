@@ -21,11 +21,11 @@ let us know what you think (contact details below).
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
-* In the `polyfill` directory, there is a partial polyfill. This doesn't allow
-  websites to register as handlers, but is sufficient to set up a bidirectional
-  action flow between two participating sites.
-* In the `handler` and `requester` directories are sample apps that work
-  together.
+* In the [`polyfill`](polyfill) directory, there is a polyfill that you can use
+  to write a requester that can fire actions at any handler, or a handler that
+  can receive actions from any requester.
+* The [`handler`](handler) and [`requester`](requester) directories contain the
+  source code for the demo apps described above.
 
 See the `README.md` file in each directory for details. Many caveats apply.
 
