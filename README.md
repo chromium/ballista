@@ -18,14 +18,34 @@ and outlines an API that we think solves this problem. But this is less about
 proposing an API, and more about starting a conversation, so take a look, and
 let us know what you think (contact details below).
 
+## Demo
+
+We have a prototype that works in Chrome and Firefox. Try this:
+
+1. Go to
+   [handler-dot-chromium-ballista.appspot.com](https://handler-dot-chromium-ballista.appspot.com)
+   (Ballista Editor Demo), and click "OK" to register it as an action handler.
+2. Go to
+   [requester-dot-chromium-ballista.appspot.com](https://requester-dot-chromium-ballista.appspot.com)
+   (Ballista Cloud Demo), and open a file with "Ballista Editor Demo".
+
+These two apps don't know about each other, yet the editor can edit files from
+the cloud app. Using our polyfill, you can write a web app that interoperates
+with our demo apps in the same way.
+
+You can view and manage app registrations at
+[chromium-ballista.appspot.com](https://chromium-ballista.appspot.com). In the
+final product, the registration, picking and management UI would be part of the
+browser.
+
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
-* In the `polyfill` directory, there is a partial polyfill. This doesn't allow
-  websites to register as handlers, but is sufficient to set up a bidirectional
-  action flow between two participating sites.
-* In the `handler` and `requester` directories are sample apps that work
-  together.
+* In the [`polyfill`](polyfill) directory, there is a polyfill that you can use
+  to write a requester that can fire actions at any handler, or a handler that
+  can receive actions from any requester.
+* The [`handler`](handler) and [`requester`](requester) directories contain the
+  source code for the demo apps described above.
 
 See the `README.md` file in each directory for details. Many caveats apply.
 
@@ -40,7 +60,7 @@ The Google Chrome team, including:
 This is not an official Google product (experimental or otherwise), it is just
 code that happens to be owned by Google.
 
-Copyright 2015 Google Inc. All Rights Reserved.
+Copyright 2016 Google Inc. All Rights Reserved.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
