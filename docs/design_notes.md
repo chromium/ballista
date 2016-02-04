@@ -6,20 +6,23 @@ In this document, I'll go over some of the design decisions in the current
 Ballista [API proposal](explainer.md), and go over how we address some common
 problems with similar APIs.
 
+As the explainer sets out, nothing is set in stone. This doc just covers our
+current thinking.
+
 **Why is the requester's foreground page only allowed to perform one-directional
 actions?**
 
 If a foreground page could perform a bidirectional action, and the user closed
 the foreground page before closing the handler, updates from the handler could
-be lost. More details on that below.
+be lost. See the following question for more details.
 
 We could allow this, but we decided to forbid it, in order to encourage best
-practises for developers.
+practices for developers.
 
 **What if the requester's tab closes while it is waiting for a response?**
 
-If we want to handle long-term editing sessions, we have to handle this case. If
-your requester is a cloud file store, and your editor is a text editor, if the
+If we want to handle long-term editing sessions, we have to handle this case.
+Say the requester is a cloud file store, and the editor is a text editor: if the
 user closes the cloud store's foreground tab, they should still be able to save
 their work to the cloud.
 
@@ -29,7 +32,7 @@ page is closed, updates will simply be lost. That's why, for bidirectional
 actions, we require that the request comes from a service worker, so we can
 receive updates in the background, even after the foreground tab closes.
 
-**OK, but what if the requester's service worker gets killed?**
+**What if the requester's service worker gets killed?**
 
 Service workers can be killed at any time, and when that happens, the JavaScript
 context (all the global variables, objects, any unresolved promises, registered
