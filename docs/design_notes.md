@@ -1,6 +1,6 @@
 # Ballista Design Notes
 
-**Date**: 2016-01-21
+**Date**: 2016-02-26
 
 In this document, I'll go over some of the design decisions in the current
 Ballista [API proposal](explainer.md), and go over how we address some common
@@ -43,16 +43,16 @@ But let's talk about this feature specifically for the Share use case. The main
 thing it has going for it is it works right now! But how well does it solve the
 Share use case, and how can we build on it?
 
-So firstly, this is Android-only, and not a web standard, and that's similar to
-Web Activities for Firefox. Could we generalize it and standardize? In its
-current form, I think it's a bit too tightly coupled with Android; for example,
-it directly uses Android intent names and package names (like
+Firstly, this is Android-only, and not a web standard, and that's similar to Web
+Activities for Firefox. Could we generalize it and standardize? In its current
+form, I think it's a bit too tightly coupled with Android; for example, it
+directly uses Android intent names and package names (like
 `com.google.zxing.client.android`). Also, it has some abilities that I consider
 outside the scope of Ballista, like being able to directly launch a specific
 native application. These sort of things don't belong in a web standard because
 they rely too much on the host operating system.
 
-OK, but what if we start from scratch, but take inspiration from intent:// URIs.
+OK, what if we start from scratch, but take inspiration from intent:// URIs.
 What if we invent an action:// URI that isn't Android-specific, as Paul Kinlan
 suggests
 [here](https://paul.kinlan.me/every-browser-should-support-intent-urls/). That
