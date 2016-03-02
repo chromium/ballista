@@ -31,6 +31,8 @@ Ballista is all about helping web applications become first-class apps on
 desktop and mobile, interoperating with native apps and the underlying local
 file system, as well as with each other.
 
+See also: [Design Notes](design_notes.md), an informal Q&A about the design.
+
 ## How is this different from other web interoperability systems?
 
 There have been several past attempts at doing this, notably [Web
