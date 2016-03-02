@@ -3,7 +3,7 @@
 **Date**: 2016-02-26
 
 In this document, I'll go over some of the design decisions in the current
-Ballista [API proposal](explainer.md), and go over how we address some common
+Ballista [API proposal](explainer.md), and highlight how we address some common
 problems with similar APIs.
 
 As the explainer sets out, nothing is set in stone. This doc just covers our
@@ -43,14 +43,13 @@ But let's talk about this feature specifically for the Share use case. The main
 thing it has going for it is it works right now! But how well does it solve the
 Share use case, and how can we build on it?
 
-Firstly, this is Android-only, and not a web standard, and that's similar to Web
-Activities for Firefox. Could we generalize it and standardize? In its current
-form, I think it's a bit too tightly coupled with Android; for example, it
-directly uses Android intent names and package names (like
-`com.google.zxing.client.android`). Also, it has some abilities that I consider
-outside the scope of Ballista, like being able to directly launch a specific
-native application. These sort of things don't belong in a web standard because
-they rely too much on the host operating system.
+Firstly, this is Android-only, and not a web standard. Could we generalize it
+and standardize? In its current form, I think it's a bit too tightly coupled
+with Android; for example, it directly uses Android intent names and package
+names (like `com.google.zxing.client.android`). Also, it has some abilities that
+I consider outside the scope of Ballista, like being able to directly launch a
+specific native application. These sort of things don't belong in a web standard
+because they rely too much on the host operating system.
 
 OK, what if we start from scratch, but take inspiration from intent:// URIs.
 What if we invent an action:// URI that isn't Android-specific, as Paul Kinlan
@@ -99,10 +98,10 @@ actions?**
 
 If a foreground page could perform a bidirectional action, and the user closed
 the foreground page before closing the handler, updates from the handler could
-be lost. See the following question for more details.
+be lost.
 
 We could allow this, but we decided to forbid it, in order to encourage best
-practices for developers.
+practices for developers. See the following question for more details.
 
 **What if the requester's tab closes while it is waiting for a response?**
 
@@ -135,8 +134,8 @@ More details on that in the follow-up questions.
 Firstly, because promises can only be resolved once, and we want to be able to
 deliver multiple updates.
 
-Secondly, because of the service worker killing problem discussed above.
-Promises can't live beyond the lifetime of the worker. Neither do event
+Secondly, because of the service worker lifetime problem discussed above.
+Promises can't live beyond the lifetime of the worker. Neither can event
 registrations, of course, but the events are re-registered when the worker
 restarts.
 
@@ -144,7 +143,7 @@ restarts.
 
 Our original design was to represent every action with a neat `Action` object.
 Update events would be delivered directly to the `Action` (rather than to a
-global object), which allowed you to write this beautiful code in the
+global object), which allowed you to write this nice, simple code in the
 requester's service worker:
 
 ```js
@@ -158,11 +157,11 @@ navigator.actions.performAction('open', {file: file})
 Unfortunately, we realised that those event listeners, and the `Action` objects
 themselves, would be destroyed when the service worker is killed. In order to
 keep listening for updates even while stopped, all of the state would have to be
-serializable.
+serializable (which isn't possible for event handlers).
 
 So we ditched the `Action` object and used an opaque integer ID to represent
 actions. The requester can keep track of these IDs across service worker
 restarts. Of course, this still requires some effort on the developer's part:
 you need to keep a map from action IDs to relevant metadata (e.g., the file's ID
 in the server's database) in some persistent store, like IndexedDB. But that is
-a standard necessity when writing a service worker.
+a general necessity when writing a service worker.
