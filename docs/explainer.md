@@ -61,7 +61,7 @@ Activities, but a few things are different now:
 OK, what about some less ambitious approaches?
 
 * [intent:// URLs](https://developer.chrome.com/multidevice/android/intents):
-  Works today, but it's specific to Chrome on Android, and only allows us to
+  Works today, but it's specific to Android, and only allows us to
   send intents to native apps.
 * [registerProtocolHandler](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/registerProtocolHandler)
   and registerContentHandler: Can be [used for this
