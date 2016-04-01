@@ -1,0 +1,6 @@
+# This file is used by git cl to get repository specific information.
+# Note: For trivial code reviews (no discussion expected), use a GitHub pull
+# request. For anything non-trivial, use git cl upload and Reitveld code review.
+CODE_REVIEW_SERVER: codereview.chromium.org
+VIEW_VC: https://github.com/chromium/ballista/blob/master
+PROJECT: ballista
