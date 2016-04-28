@@ -41,6 +41,8 @@ browser.
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
+* For our UX story (with pictures), see [Ballista User
+  Flows](docs/user_flow.md).
 * In the [`polyfill`](polyfill) directory, there is a polyfill that you can use
   to write a requester that can fire actions at any handler, or a handler that
   can receive actions from any requester.
