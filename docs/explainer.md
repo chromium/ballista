@@ -33,7 +33,7 @@ file system, as well as with each other.
 
 See also:
 * [Design Notes](design_notes.md), an informal Q&A about the design.
-* [User Flows](docs/user_flow.md), our UX story with mocks.
+* [User Flows](user_flow.md), our UX story with mocks.
 
 ## How is this different from other web interoperability systems?
 
@@ -137,22 +137,24 @@ any tabs.
 
 #### manifest.webmanifest
 
-```js
+```JSON
 {
   "name": "Includinator",
   "short_name": "Includinator",
   "icons": [...],
-  "actions": {
-    "share": {}
-  }
+  "actions": [
+    {
+      "verb": "share"
+    }
+  ]
 }
 ```
 
 #### serviceworker.js
 
 ```js
-self.addEventListener('action', event => {
-  if (event.verb == 'share') {
+navigator.actions.addEventListener('handle', event => {
+  if (event.options.verb == 'share') {
     if (event.data.url === undefined)
       throw new Error('Did not contain URL.');
 
@@ -231,17 +233,18 @@ we need a web app manifest and a service worker.
 
 #### manifest.webmanifest
 
-```js
+```JSON
 {
   "name": "WebEditor",
   "short_name": "Editor",
   "icons": [...],
-  "actions": {
-    "open": {
+  "actions": [
+    {
+      "verb": "open",
       "bidirectional": true,
       "types": ["text/*"]
     }
-  }
+  ]
 }
 ```
 
