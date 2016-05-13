@@ -104,3 +104,6 @@ preference:
 the user will perceive as duplicate entries: a native app and web app of the
 same thing (e.g., Facebook), or the same web app registered with two browsers.
 At least on Android, the web apps will be badged with the browser's icon.
+
+For more technical details on integrating with native apps, see [Native
+Integration Story](native.md).
