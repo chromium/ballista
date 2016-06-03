@@ -114,8 +114,8 @@ choosing, just attach this JavaScript code to a "share" button.
 
 ```js
 shareButton.addEventListener('click', () => {
-  navigator.actions.performAction('share', {url: window.location.href})
-      .then(action => console.log(action));
+  navigator.share({url: window.location.href})
+      .then(console.log('Share successful'));
 });
 ```
 
@@ -142,24 +142,18 @@ any tabs.
   "name": "Includinator",
   "short_name": "Includinator",
   "icons": [...],
-  "actions": [
-    {
-      "verb": "share"
-    }
-  ]
+  "supports_share": true
 }
 ```
 
 #### serviceworker.js
 
 ```js
-navigator.actions.addEventListener('handle', event => {
-  if (event.options.verb == 'share') {
-    if (event.data.url === undefined)
-      throw new Error('Did not contain URL.');
+navigator.actions.addEventListener('share', event => {
+  if (event.data.url === undefined)
+    throw new Error('Did not contain URL.');
 
-    includinate(event.data.url);
-  }
+  includinate(event.data.url);
 });
 ```
 
