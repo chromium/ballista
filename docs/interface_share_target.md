@@ -13,7 +13,7 @@ manifests](https://www.w3.org/TR/appmanifest/). The [Web Share
 API](interface_share.md) is not required, but recommended.
 
 Examples of using the Share Target API for sharing can be seen in the
-[explainer document](explainer.md).
+[explainer document](../share-target/docs/explainer.md).
 
 **Note**: The Web Share Target API is a proposal of the [Ballista
 project](../README.md), which aims to explore website-to-website and
@@ -38,7 +38,7 @@ that handle shares.
 Handlers declaring `supports_share` in their manifest will **not** be
 automatically registered; the user must explicitly authorize the registration.
 How this takes place is still under consideration (see [User
-Flow](user_flow.md#registering-a-website-as-a-handler-on-mobile), but will
+Flow](../share-target/docs/explainer.md#user-flow), but will
 ultimately be at the discretion of the user agent (the user may be automatically
 prompted, or may have to explicitly request registration).
 

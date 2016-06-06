@@ -9,7 +9,7 @@ plan to have websites receive share requests from the system, or other websites,
 see the [Share Target API](interface_share_target.md).
 
 Examples of using the Share API for sharing can be seen in the
-[explainer document](explainer.md).
+[explainer document](../share/docs/explainer.md).
 
 **Note**: The Web Share API is the first concrete proposal of the [Ballista
 project](../README.md), which aims to explore website-to-website and
@@ -53,7 +53,7 @@ following optional fields:
 `share` always shows some form of UI, to give the user a choice of application
 and get their approval to invoke and send data to a potentially native
 application (which carries a security risk). UX mocks are shown
-[here](user_flow.md).
+[here](../share/docs/explainer.md#user-flow).
 
 `share`'s promise is resolved if the user chooses a target application,
 and that application accepts the data without error. The promise may be rejected

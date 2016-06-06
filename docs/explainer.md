@@ -33,7 +33,14 @@ file system, as well as with each other.
 
 See also:
 * [Design Notes](design_notes.md), an informal Q&A about the design.
-* [User Flows](user_flow.md), our UX story with mocks.
+
+## Spun-off proposals
+
+We are planning to present each piece of Ballista as a separate standards
+proposal.
+
+* [Web Share explainer](../share/docs/explainer.md)
+* [Web Share Target explainer](../share-target/docs/explainer.md)
 
 ## How is this different from other web interoperability systems?
 
@@ -105,64 +112,11 @@ A site / app can be either a requester or a handler, or both.
 
 ### Sharing (requester)
 
-To let the user share the current page's URL with an app or website of their
-choosing, just attach this JavaScript code to a "share" button.
-
-> **Note:** Only one-way actions can be requested from a foreground page.
-
-#### foreground.js
-
-```js
-shareButton.addEventListener('click', () => {
-  navigator.share({url: window.location.href})
-      .then(console.log('Share successful'));
-});
-```
-
-#### User experience
-
-1. The user clicks the "share" button. The browser shows a list of registered
-   share handlers, and the user can pick one.
+See [Web Share explainer](../share/docs/explainer.md).
 
 ### Share handler
 
-Here's how to register a website to appear in the list of apps that can handle a
-"share" intent on Android, or a "share" action from another website.
-
-You need both a [web app manifest](https://w3c.github.io/manifest/) and a
-[service
-worker](http://slightlyoff.github.io/ServiceWorker/spec/service_worker/),
-so that your site can be contacted even when the user does not have it open in
-any tabs.
-
-#### manifest.webmanifest
-
-```JSON
-{
-  "name": "Includinator",
-  "short_name": "Includinator",
-  "icons": [...],
-  "supports_share": true
-}
-```
-
-#### serviceworker.js
-
-```js
-navigator.actions.addEventListener('share', event => {
-  if (event.data.url === undefined)
-    throw new Error('Did not contain URL.');
-
-  includinate(event.data.url);
-});
-```
-
-#### User experience
-
-1. When the user is on your site, the browser provides a button to register the
-   app as a "share handler".
-2. The user clicks this button. The app is registered and appears in the list of
-   share handlers that the browser shows to the user.
+See [Web Share Target explainer](../share-target/docs/explainer.md).
 
 ### Edit a file (requester)
 
