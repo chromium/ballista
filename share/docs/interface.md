@@ -6,13 +6,13 @@ This document is a rough spec (i.e., *not* a formal web standard draft) of the
 Web Share API. The basic Share API only allows share requests to be sent (this
 API does not provide the capability to receive share requests). For a follow-up
 plan to have websites receive share requests from the system, or other websites,
-see the [Share Target API](interface_share_target.md).
+see the [Share Target API](../../share-target/docs/interface.md).
 
 Examples of using the Share API for sharing can be seen in the
-[explainer document](../share/docs/explainer.md).
+[explainer document](explainer.md).
 
 **Note**: The Web Share API is the first concrete proposal of the [Ballista
-project](../README.md), which aims to explore website-to-website and
+project](../../README.md), which aims to explore website-to-website and
 website-to-native interoperability.
 
 ## navigator.share
@@ -53,7 +53,7 @@ following optional fields:
 `share` always shows some form of UI, to give the user a choice of application
 and get their approval to invoke and send data to a potentially native
 application (which carries a security risk). UX mocks are shown
-[here](../share/docs/explainer.md#user-flow).
+[here](explainer.md#user-flow).
 
 `share`'s promise is resolved if the user chooses a target application,
 and that application accepts the data without error. The promise may be rejected
@@ -97,7 +97,7 @@ sources, depending on the user agent and underlying OS:
 * Built-in service (e.g., "copy to clipboard").
 * Native applications.
 * Web applications registered using the [Web Share Target
-  API](interface_share_target.md).
+  API](../../share-target/docs/interface.md).
 
 The user agent can support any or all of the above (for example, on some
 platforms, there is no system for native apps to receive share data; some user
@@ -106,7 +106,7 @@ agents may not support the Share Target API).
 The user agent may either present its own picker UI and then forward the share
 data to the chosen app, or simply forward the share data to the system's native
 app picking system (e.g., Android, iOS and Windows 10 all [support this concept
-natively](native.md)) and let the OS do the work.
+natively](../../docs/native.md)) and let the OS do the work.
 
 When forwarding to a website using the Share Target API, the `ShareData` object
 is simply cloned. When forwarding to a native app, the user agent should do its

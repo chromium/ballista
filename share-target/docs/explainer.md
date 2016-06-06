@@ -16,7 +16,7 @@ This is a product of the [Ballista project](../../README.md), which aims to
 explore website-to-website and website-to-native interoperability.
 
 See also:
-* [Interface document](../../docs/interface_share_target.md), an informal spec.
+* [Interface document](interface.md), an informal spec.
 
 ## User flow
 

@@ -4,19 +4,19 @@
 
 This document is a rough spec (i.e., *not* a formal web standard draft) of the
 Web Share Target API. This API allows websites to register to receive shared
-content from either the [Web Share API](interface_share.md), or system events
-(e.g., shares from native apps).
+content from either the [Web Share API](../../share/docs/interface.md), or
+system events (e.g., shares from native apps).
 
 This API requires the user agent to support both [service
 workers](https://www.w3.org/TR/service-workers/) and [web app
 manifests](https://www.w3.org/TR/appmanifest/). The [Web Share
-API](interface_share.md) is not required, but recommended.
+API](../../share/docs/interface.md) is not required, but recommended.
 
 Examples of using the Share Target API for sharing can be seen in the
-[explainer document](../share-target/docs/explainer.md).
+[explainer document](explainer.md).
 
 **Note**: The Web Share Target API is a proposal of the [Ballista
-project](../README.md), which aims to explore website-to-website and
+project](../../README.md), which aims to explore website-to-website and
 website-to-native interoperability.
 
 ## App manifest
@@ -38,9 +38,9 @@ that handle shares.
 Handlers declaring `supports_share` in their manifest will **not** be
 automatically registered; the user must explicitly authorize the registration.
 How this takes place is still under consideration (see [User
-Flow](../share-target/docs/explainer.md#user-flow), but will
-ultimately be at the discretion of the user agent (the user may be automatically
-prompted, or may have to explicitly request registration).
+Flow](explainer.md#user-flow), but will ultimately be at the discretion of the
+user agent (the user may be automatically prompted, or may have to explicitly
+request registration).
 
 **For consideration**: We may wish to provide a method for websites to
 explicitly request to prompt the user for handler registration. There would
@@ -123,7 +123,7 @@ Share events can be sent from a variety of places:
 * Built-in trigger (e.g., user picks "Share" from a browser's menu, to share the
   URL in the address bar).
 * A native application.
-* A web application using the [Web Share API](interface_share.md).
+* A web application using the [Web Share API](../../share/docs/interface.md).
 
 There will usually be a picker that lets the user select a target app. This
 could be the native system app picker, or a user-agent-supplied picker. The apps
