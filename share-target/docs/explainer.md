@@ -28,8 +28,7 @@ actions from other websites and native apps. These mocks look a bit like
 Android, but we're designing with general desktop and mobile operating systems
 in mind.
 
-![Share on mobile: handler
-registration](mocks/share_mobile_handler.png)
+![Share on mobile: handler registration](mocks/share_mobile_handler.png)
 
 [[Image credits](mocks/README.md)]
 
