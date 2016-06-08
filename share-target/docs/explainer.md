@@ -1,4 +1,4 @@
-# Web Share Target Explained
+# Web Share Target API Explained
 
 **Date**: 2016-06-01
 

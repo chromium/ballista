@@ -1,4 +1,4 @@
-# Web Share Interface
+# Web Share API Interface
 
 **Date**: 2016-05-30
 

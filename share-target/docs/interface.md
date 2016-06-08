@@ -1,4 +1,4 @@
-# Web Share Target Interface
+# Web Share Target API Interface
 
 **Date**: 2016-05-30
 

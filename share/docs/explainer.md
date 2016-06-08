@@ -1,4 +1,4 @@
-# Web Share Explained
+# Web Share API Explained
 
 **Date**: 2016-05-30
 
