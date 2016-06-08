@@ -29,7 +29,9 @@ Android, but we're designing with general desktop and mobile operating systems
 in mind.
 
 ![Share on mobile: handler
-registration](../../docs/mocks/share_mobile_handler.png)
+registration](mocks/share_mobile_handler.png)
+
+[[Image credits](mocks/README.md)]
 
 1. User visits a social networking website. The site has an `"actions"` section
    in its [web manifest](https://w3c.github.io/manifest/), declaratively
@@ -57,7 +59,7 @@ Here we see the interaction between the [Web Share
 API](../../share/docs/explainer.md) and the Share Target API. You could also
 share from a native app (depending on the system).
 
-![Share on mobile: web to web](../../docs/mocks/share_mobile_web_web.png)
+![Share on mobile: web to web](mocks/share_mobile_web_web.png)
 
 1. The user clicks "share" from a web page.
 2. The intent picker is shown. "Example Social" appears in the list of

@@ -21,9 +21,9 @@ Here's how a user could share a link from a website to a native app of their
 choice, on a site using Web Share. These mocks look a bit like Android, but
 we're designing with general desktop and mobile operating systems in mind.
 
-![Share on mobile: web to native](../../docs/mocks/share_mobile_web_native.png)
+![Share on mobile: web to native](mocks/share_mobile_web_native.png)
 
-[[Image credits](../../docs/mocks/README.md)]
+[[Image credits](mocks/README.md)]
 
 1. User is browsing a website containing a gallery of photos. User clicks a
    "share" link (denoted by the [generic share
