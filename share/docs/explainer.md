@@ -13,6 +13,7 @@ explore website-to-website and website-to-native interoperability.
 
 See also:
 * [Interface document](interface.md), an informal spec.
+* [Native integration survey](native.md), for platform-specific matters.
 
 ## User flow
 

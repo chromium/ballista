@@ -17,6 +17,7 @@ explore website-to-website and website-to-native interoperability.
 
 See also:
 * [Interface document](interface.md), an informal spec.
+* [Native integration survey](native.md), for platform-specific matters.
 
 ## User flow
 
@@ -91,7 +92,7 @@ same thing (e.g., Facebook), or the same web app registered with two browsers.
 At least on Android, the web apps will be badged with the browser's icon.
 
 For more technical details on integrating with native apps, see [Native
-Integration Story](../../docs/native.md).
+Integration Story](native.md).
 
 ## Sample code
 

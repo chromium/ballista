@@ -106,7 +106,7 @@ agents may not support the Share Target API).
 The user agent may either present its own picker UI and then forward the share
 data to the chosen app, or simply forward the share data to the system's native
 app picking system (e.g., Android, iOS and Windows 10 all [support this concept
-natively](../../docs/native.md)) and let the OS do the work.
+natively](native.md)) and let the OS do the work.
 
 When forwarding to a website using the Share Target API, the `ShareData` object
 is simply cloned. When forwarding to a native app, the user agent should do its
