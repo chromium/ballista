@@ -41,8 +41,8 @@ browser.
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
-* [Web Share explainer](share/docs/explainer.md).
-* [Web Share Target explainer](share-target/docs/explainer.md).
+* [Web Share proposal](https://github.com/mgiuca/web-share).
+* [Web Share Target proposal](https://github.com/mgiuca/web-share-target).
 * In the [`polyfill`](polyfill) directory, there is a polyfill that you can use
   to write a requester that can fire actions at any handler, or a handler that
   can receive actions from any requester.

@@ -13,8 +13,10 @@ APIs. I would appreciate being informed of any errors.
 
 ## Share verb
 
-See [Share API Native Integration Survey](../share/docs/native.md) and [Share
-Target API Native Integration Survey](../share-target/docs/native.md).
+See [Share API Native Integration
+Survey](https://github.com/mgiuca/web-share/blob/master/docs/native.md) and
+[Share Target API Native Integration
+Survey](https://github.com/mgiuca/web-share-target/blob/master/docs/native.md).
 
 ## Edit verb
 

@@ -39,8 +39,8 @@ See also:
 We are planning to present each piece of Ballista as a separate standards
 proposal.
 
-* [Web Share explainer](../share/docs/explainer.md)
-* [Web Share Target explainer](../share-target/docs/explainer.md)
+* [Web Share API](https://github.com/mgiuca/web-share).
+* [Web Share Target API](https://github.com/mgiuca/web-share-target).
 
 ## How is this different from other web interoperability systems?
 
@@ -112,11 +112,13 @@ A site / app can be either a requester or a handler, or both.
 
 ### Sharing (requester)
 
-See [Web Share explainer](../share/docs/explainer.md).
+See [Web Share
+explainer](https://github.com/mgiuca/web-share/blob/master/docs/explainer.md).
 
 ### Share handler
 
-See [Web Share Target explainer](../share-target/docs/explainer.md).
+See [Web Share Target
+explainer](https://github.com/mgiuca/web-share-target/blob/master/docs/explainer.md).
 
 ### Edit a file (requester)
 
