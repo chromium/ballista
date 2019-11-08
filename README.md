@@ -1,22 +1,40 @@
 # Ballista
 
 **Date**: 2015-09-25
+**Updated**: 2019-11-08
 
 ![A ballista](docs/images/ballista-300.png)
 
-**Ballista** is a project to explore inter-website and web/native communication;
-specifically, communication between one website and another site or native app
-of the user's choosing. We want the user to be able to *share* or *edit*
-documents in another website or app that the first website has never even heard
-of, *choose* documents from another website, or register a website as a *native
-file handler*. We're attempting to solve similar problems to the intents system
-on Android, but also address other use cases like document editing. Essentially,
-we want to create an **interoperability system for the web**.
+**Ballista** was a project to explore inter-website and web/native
+communication; specifically, communication between one website and another site
+or native app of the user's choosing. We explored ways for the user to be able
+to *share* or *edit* documents in another website or app that the first website
+has never even heard of, *choose* documents from another website, or register a
+website as a *native file handler*. We were attempting to solve similar problems
+to the intents system on Android, but also address other use cases like document
+editing. Essentially, we set out to create an **interoperability system for the
+web**.
 
 Our [explainer document](docs/explainer.md) dives deeper into the problem space
-and outlines an API that we think solves this problem. But this is less about
-proposing an API, and more about starting a conversation, so take a look, and
-let us know what you think (contact details below).
+and outlines our early draft of an API that we thought solved this problem. But
+this was less about proposing an API, and more about starting a conversation.
+
+Epilogue (2019): The Ballista project started in 2015 as an ambitious
+exploration of the above concepts. The project evolved into a number of more
+specialized and smaller proposals to achieve these goals, several of which are
+now generally available. These include [Web
+Share](https://github.com/w3c/web-share), [Web Share
+Target](https://github.com/WICG/web-share-target) and [File
+Handling](https://github.com/WICG/file-handling).
+
+## Spin-off proposals
+
+These standards-track proposals were created as a result of the explorations
+begun in the Ballista project:
+
+* [Web Share](https://github.com/w3c/web-share).
+* [Web Share Target](https://github.com/WICG/web-share-target).
+* [File Handling](https://github.com/WICG/file-handling).
 
 ## Demo
 
@@ -41,8 +59,6 @@ browser.
 ## Resources
 
 * For a detailed overview, see [Ballista Explained](docs/explainer.md).
-* [Web Share proposal](https://github.com/mgiuca/web-share).
-* [Web Share Target proposal](https://github.com/mgiuca/web-share-target).
 * In the [`polyfill`](polyfill) directory, there is a polyfill that you can use
   to write a requester that can fire actions at any handler, or a handler that
   can receive actions from any requester.
